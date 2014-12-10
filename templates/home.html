@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Home{% endblock %}
+{% block body_block %}
+
+<img src="{% static "images/spider.png" %}" alt="Focra icon" />
+<h1 id="display">Start Crawling!</h1>
+<p>{{ id }}</p> 
+<button id="start" type="button">Start Crawler</button>
+<button id="stop" type="button">Stop Crawler</button>
+
+{% endblock %}

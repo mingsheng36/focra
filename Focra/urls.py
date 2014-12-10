@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^start/$', views.startCrawl, name='startCrawl'),
     url(r'^stop/$', views.stopCrawl, name='stopCrawl'),
+    url(r'^home/$', views.home, name='home'),
 )

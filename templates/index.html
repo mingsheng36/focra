@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% block title %}Home{% endblock %}
+{% block title %}Focra{% endblock %}
 {% block body_block %}
-
 <img src="{% static "images/spider.png" %}" alt="Focra icon" />
-<h1 id="display">Start Crawling!</h1>
-<button id="start" type="button">Start Crawler</button>
-<button id="stop" type="button">Stop Crawler</button>
+<h1 id="display">Welcome to Focra</h1>
+<form method="post" action="">
+	{% csrf_token %}
+	Username: <input type="text" name="username" value="" size="30" />
+    <br/>
+    Password: <input type="password" name="password" value="" size="30" />
+    <br/>
+  	<input type="submit" value="Sign Up">
+</form>
 {% endblock %}

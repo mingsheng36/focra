@@ -46,15 +46,6 @@ INSTALLED_APPS = (
     'mongoengine.django.mongo_auth',
 )
 
-AUTHENTICATION_BACKENDS = ( 
-    'mongoengine.django.auth.MongoEngineBackend',
- )
-
-AUTH_USER_MODEL = 'mongo_auth.MongoUser'
-MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
-SESSION_ENGINE = 'mongoengine.django.sessions'
-SESSION_SERIALIZER = 'mongoengine.django.sessions.BSONSerializer'
-
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -79,6 +70,15 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = ( 
+    'mongoengine.django.auth.MongoEngineBackend',
+ )
+
+AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
+SESSION_ENGINE = 'mongoengine.django.sessions'
+SESSION_SERIALIZER = 'mongoengine.django.sessions.BSONSerializer'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
@@ -101,3 +101,5 @@ STATIC_URL = '/static/'
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
