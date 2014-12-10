@@ -43,7 +43,7 @@ def home(request):
         return render(request, 'index.html')
 
 ####
-# To stop the specific crawler
+# To start the crawler
 #### 
 def startCrawl(request):
              
@@ -56,7 +56,6 @@ def startCrawl(request):
                 scrapyWebAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', scrapyOutput)
                 if scrapyWebAddr:
                     print scrapyWebAddr
-                    
                     #global runningCrawlers
                     #runningCrawlers['username'] = 
                     break;
