@@ -1,7 +1,10 @@
 Focra
 =====
 
-Web Crawler/Scraper
+Web Crawler/Scraper Built with 
+- Django 1.7
+- Scrapy 0.24.4
+- Mongodb 2.6.5
 
 TODOs : 
 
