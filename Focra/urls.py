@@ -12,4 +12,8 @@ urlpatterns = patterns('',
     url(r'^start/$', views.startCrawl, name='startCrawl'),
     url(r'^stop/$', views.stopCrawl, name='stopCrawl'),
     url(r'^home/$', views.home, name='home'),
+    url(r'^create/$', views.createCrawler, name='createCrawler'),
+    url(r'^retrieve/$', views.retrieveCrawlers, name='retrieveCrwalers'),
+    url(r'^update/$', views.updateCrawler, name='updateCrawler'),
+    url(r'^delete/$', views.deleteCrawler, name='deleteCrawler'),
 )

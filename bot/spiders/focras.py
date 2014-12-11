@@ -7,20 +7,27 @@ from scrapy import signals
 class FocraSpider(Spider):
 
 	name = 'focras'
-	start_urls = ['http://forums.hardwarezone.com.sg']
 	
+	def __init__(self, *args, **kwargs):
+		super(FocraSpider, self).__init__(*args, **kwargs)
+		print kwargs.get('seeds')
+		self.start_urls = [kwargs.get('seeds')]
+	
+	####
+	# To access scrapy's core API. basically can modify anything in the 'crawler'
+	####	
 	@classmethod
-	def from_crawler(cls, crawler):
-		cc = cls()
-		crawler.signals.connect(cc.dont_close_me ,signals.spider_idle)
-		return cc
-		
+	def from_crawler(cls, crawler, **kwargs):
+		spider = cls(**kwargs)
+		crawler.signals.connect(spider.dont_close_me ,signals.spider_idle)
+		return spider
+	
 	def dont_close_me(self):
-		#print "NO CLOSE ME"
 		raise DontCloseSpider("..I prefer live spiders.")
 		
 	def parse(self, response):
-		print "success! lol!!!!"
+		print "fake response"
+		print response.body
 		#print response.body
 	
 	
