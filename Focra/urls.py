@@ -4,7 +4,7 @@ import views
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'Focra.views.home', name='home'),
+    # url(r'^$', 'focra.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),

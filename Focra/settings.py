@@ -1,5 +1,5 @@
 """
-Django settings for Focra project.
+Django settings for focra project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-os.environ['SCRAPY_SETTINGS_MODULE'] = 'bot.settings'
+os.environ['SCRAPY_SETTINGS_MODULE'] = 'forbot.settings'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -56,9 +56,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'Focra.urls'
+ROOT_URLCONF = 'focra.urls'
 
-WSGI_APPLICATION = 'Focra.wsgi.application'
+WSGI_APPLICATION = 'focra.wsgi.application'
 
 
 # Database
