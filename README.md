@@ -3,7 +3,7 @@ Focra
 
 Web Crawler/Scraper
 
-To Dos : 
+TODOs : 
 
 12/12/2014
 =====
