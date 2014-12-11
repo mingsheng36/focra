@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% csrf_token %}
 <html>
 <head lang="en">
-<meta charset="UTF-8">
 <link rel="icon" href="{% static "images/icon.png" %}" type="image/png" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}" />
 <title>{% block title %}Focra{% endblock %}</title>
 </head>
 
 <body>
-	<div style="text-align:center;">{% block body_block %}Nothing to display.{% endblock %}</div>
+	<div id="wrapper">
+	    <div id="navbar">
+	    	<div class="nav">
+	    		<img src="{% static "images/spider.png" %}" alt="Focra icon" width="50%" height="50%"/>
+	    		<h3>{{ username }}</h3>
+		    	<a href="#">Accounts</a>
+		    	<br/>
+		    	<a href="#">Overview</a>
+		    	<br/>
+		    	<a href="#">Logout</a>
+		    	<br/>
+		    	<br/>
+		    	<a href="/create/">+ Create Crawler</a>
+	        </div>
+	    </div>
+	    <div id="main">
+	        {% block body_block %}Nothing to display.{% endblock %}
+	    </div>
+	</div>
 </body>
 <script src="{% static "js/jquery-2.1.1.min.js" %}"></script>
 <script src="{% static "js/focra.js" %}"></script>

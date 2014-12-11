@@ -1,0 +1,34 @@
+html {
+	width: 99%;
+    height: 98%;
+}
+
+body {
+	width: 100%;
+    height: 99%;
+}    
+#wrapper {
+     width: 100%;
+     height: 100%;
+}
+#navbar, #main {
+    border: 1% solid white;
+    float: left;
+    min-height: 100%;
+}
+#navbar {
+     width: 20%;
+     height: 100%;
+     text-align:center;
+}
+#main {
+     width: 70%;
+     text-align: center;
+}
+.main {
+	margin-top:5%
+}
+.hide
+{
+  display:none;
+}

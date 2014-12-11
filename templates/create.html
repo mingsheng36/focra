@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Create{% endblock %}
+{% block body_block %}
+
+<div id="createDiv" class="main">
+
+	<h1 id="display">Customise Your Crawler</h1>
+	<form method="post" action="/create/">
+		{% csrf_token %}
+		Name : <input type="text" name="crawlerName" value="" size="45" placeholder="e.g. MySpider">
+		<br/><br/>
+		Seeds : <input type="text" name="crawlerSeeds" value="" size="45" placeholder="e.g. http://forums.hardwarezone.com.sg">
+		<br/><br/>
+		<button id="startBn" type="submit">Start Crawling</button>
+		<button id="stopBn" type="button">Stop Crawler</button>
+	</form>
+</div>
+
+{% endblock %}

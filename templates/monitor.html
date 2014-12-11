@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Monitor{% endblock %}
+{% block body_block %}
+
+<div id="monitorDiv" class="main">
+	<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
+	{% for seed in crawler.crawlerSeeds %}
+	
+	{% endfor %}
+	<button id="stopBn" type="button">Stop Crawler</button>
+</div>
+
+{% endblock %}
