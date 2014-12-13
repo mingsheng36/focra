@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from scrapy.utils.jsonrpc import jsonrpc_client_call
 import re
-#from models import User
 from models import Crawler
 
 ####
@@ -14,7 +13,12 @@ from models import Crawler
 def index(request):
     # DEVELOPMENT PURPOSE
     request.session['username'] = 'jayden'
-    return home(request)
+    crawlers = Crawler.objects(owner='jayden')
+    names = []
+    for crawler in crawlers:
+        names.append(crawler.crawlerName)
+    request.session['crawlers'] = names 
+    return overview(request)
 
     #  FOR PRODUCTION USE
 #     if request.method == 'GET':      
@@ -32,7 +36,7 @@ def index(request):
 ####
 # display home page to authenticated usernames
 ####   
-def home(request):
+def overview(request):
     username = request.session.get('username');
     if username:
         print 'authenticated'
@@ -49,8 +53,9 @@ def createCrawler(request):
     
     if request.method == 'GET':
         username = request.session.get('username')
+        crawlers = request.session.get('crawlers')
         if username:
-            return render(request, 'create.html', {'username': username})
+            return render(request, 'create.html', {'username': username, 'crawlers': crawlers})
             
     if request.method == 'POST':   
         username = request.session.get('username')
@@ -60,7 +65,7 @@ def createCrawler(request):
             seeds.append(request.POST['crawlerSeeds'])
             try:
                 addr = runCrawler(seeds);
-                crawler = Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerPort=''.join(addr), crawlerStatus='running').save()
+                crawler = Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerPort=''.join(addr), crawlerStatus='running', owner=username).save()
                 return monitor(request, crawler=crawler)
             except:
                 print 'error'
@@ -68,12 +73,10 @@ def createCrawler(request):
     return render(request, 'index.html')
 
 def monitor(request, crawler=None):
+    crawlers = request.session.get('crawlers')
     if crawler:
-        return render(request, 'monitor.html', {'crawler': crawler})
+        return render(request, 'monitor.html', {'crawler': crawler, 'crawlers': crawlers})
     
-def retrieveCrawlers(request):
-    return
-
 def updateCrawler(request):
     return
 
@@ -115,7 +118,6 @@ def stopCrawl(request):
 # to run the crawler
 ####  
 def runCrawler(seeds):
-    print 'azad'
     commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds)]
     scrapyProcess = subprocess.Popen(commands, stderr=PIPE)    
     while True:

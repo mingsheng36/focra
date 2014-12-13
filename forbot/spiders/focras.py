@@ -26,8 +26,6 @@ class FocraSpider(Spider):
 		raise DontCloseSpider("..I prefer live spiders.")
 		
 	def parse(self, response):
-		print "fake response"
 		print response.body
-		#print response.body
 	
 	

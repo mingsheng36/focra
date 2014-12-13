@@ -23,8 +23,15 @@
 		    	<a href="#">Logout</a>
 		    	<br/>
 		    	<br/>
-		    	<a href="/create/">+ Create Crawler</a>
-	        </div>
+		    	<a href="/create/">+ Create Crawler</a> 
+		    	{% if crawlers %}
+	   				{% for crawler in crawlers %}
+	   					{{ crawler }} 
+	   				{% endfor %}
+				{% else %}
+   					Nothing
+				{% endif %}
+			</div>
 	    </div>
 	    <div id="main">
 	        {% block body_block %}Nothing to display.{% endblock %}
