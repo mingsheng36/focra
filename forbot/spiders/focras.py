@@ -10,7 +10,7 @@ class FocraSpider(Spider):
 	
 	def __init__(self, *args, **kwargs):
 		super(FocraSpider, self).__init__(*args, **kwargs)
-		print kwargs.get('seeds')
+		#print kwargs.get('seeds')
 		self.start_urls = [kwargs.get('seeds')]
 	
 	####
@@ -26,6 +26,7 @@ class FocraSpider(Spider):
 		raise DontCloseSpider("..I prefer live spiders.")
 		
 	def parse(self, response):
-		print response.body
+		print 'crawled response'
+		#print response.body
 	
 	

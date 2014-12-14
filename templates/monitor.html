@@ -10,11 +10,9 @@
 	{% endfor %}
 	
 	{% if crawler.crawlerStatus == 'running' %}
-		<button id="startBn" type="button" disabled>Start Crawler</button>
 		<button id="stopBn" type="button">Stop Crawler</button>
 	{% else %}
-   		<button id="startBn" type="button">Start Crawler</button>
-		<button id="stopBn" type="button" disabled>Stop Crawler</button>
+		<button id="startBn" type="button">Start Crawler</button>
 	{% endif %}
 	
 </div>

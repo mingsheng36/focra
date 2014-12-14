@@ -9,5 +9,5 @@ class Crawler(Document):
     crawlerName = StringField(primary_key=True, unique=True, required=True)
     crawlerSeeds = ListField(required=True,)
     crawlerStatus = StringField(required=True)
-    crawlerPort = StringField(required=True)
+    crawlerAddr = StringField(required=True)
     owner = StringField(required=True)

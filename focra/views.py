@@ -7,9 +7,9 @@ from scrapy.utils.jsonrpc import jsonrpc_client_call
 import re
 from models import Crawler
 
-####
-# welcome page and sign up page
-#### 
+'''
+welcome page and sign up page
+''' 
 def index(request):
     # DEVELOPMENT PURPOSE
     request.session['username'] = 'jayden'
@@ -34,56 +34,59 @@ def index(request):
 #     else: 
 #         return render(request, 'index.html')
 
-####
-# display home page to authenticated usernames
-####   
+'''
+display home page to authenticated usernames
+'''   
 def overview(request, username):
-    username = request.session.get('username');
-    if username:
-        print 'authenticated'
-        crawlers = request.session.get('crawlers')
-        # currently set to the page that i want to develop
-        #return redirect('/create')
-        return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
-    else:
-        print 'not auth'
-        return render(request, 'index.html')
-
-####
-# Crawler profile page
-####   
-def monitor(request, username=None, crawlerName=None):
-    username = request.session.get('username');
-    if username:
-        crawlers = request.session.get('crawlers')
-        c = Crawler.objects.get(crawlerName=crawlerName)
-        return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': c})
-    
-####
-# To create crawler
-####
-def createCrawler(request):
-    
     if request.method == 'GET':
-        username = request.session.get('username')
-        crawlers = request.session.get('crawlers')
+        username = request.session.get('username');
+        if username:
+            print 'authenticated'
+            crawlers = request.session.get('crawlers')
+            # currently set to the page that i want to develop
+            #return redirect('/create')
+            return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
+        else:
+            print 'not authorised'
+            return redirect('/')
+
+'''
+Crawler profile page
+'''   
+def monitor(request, username=None, crawlerName=None):
+    if request.method == 'GET':
+        username = request.session.get('username');
+        if username:
+            crawlers = request.session.get('crawlers')
+            crawler = Crawler.objects.get(crawlerName=crawlerName)
+            request.session['crawlerName'] = crawler.crawlerName
+            request.session['crawlerAddr'] = crawler.crawlerAddr
+            request.session['crawlerSeeds'] = crawler.crawlerSeeds
+            return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler})
+    
+'''
+To create crawler
+'''
+def createCrawler(request):
+    username = request.session.get('username')
+    crawlers = request.session.get('crawlers')
+    if request.method == 'GET':
         if username:
             return render(request, 'create.html', {'username': username, 'crawlers': crawlers})
-            
     if request.method == 'POST':   
-        username = request.session.get('username')
         if username:
             seeds = []
             crawlerName = request.POST['crawlerName']
             seeds.append(request.POST['crawlerSeeds'])
             try:
                 addr = runCrawler(seeds);
-                crawler = Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerPort=''.join(addr), crawlerStatus='running', owner=username).save()
-                return monitor(request, crawler=crawler)
+                Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerAddr=''.join(addr), crawlerStatus='running', owner=username).save()
+                request.session['crawlers'] = crawlers + [crawlerName]
+                return redirect('/' + username + '/' + crawlerName)
             except:
                 print 'error'
         
-    return render(request, 'index.html')
+    return redirect('/')
     
 def updateCrawler(request):
     return
@@ -91,36 +94,32 @@ def updateCrawler(request):
 def deleteCrawler(request):
     return
 
-####
-# To start the crawler
-#### 
-def startCrawl(request, crawler):  
+'''
+To start the crawler
+'''
+def startCrawl(request):  
     if request.method == 'POST':  
-        username = request.session.get('username') 
-        if username:
-            seeds = []
-            crawlerName = request.POST['crawlerName']
-            seeds.append(request.POST['crawlerSeeds'])
-            try:
-                crawler = Crawler(crawlerName=crawlerName, crawlerSeeds=seeds).save()
-            except:
-                print 'Not Created'    
-        return render(request, 'monitor.html', {'crawler': crawler})
-
-    return HttpResponse("Crawl failed")
-    
-####
-# To stop the specific crawler
-####       
-def stopCrawl(request, crawler):
-    if request.method == 'POST':
+        return HttpResponse("Crawl Started!")
+    else:
+        return HttpResponse("Crawl failed")
         
+    return redirect('/')
+    
+'''
+To stop the specific crawler
+'''      
+def stopCrawl(request):
+    if request.method == 'POST':
+        stopCrawler(request.session.get('crawlerAddr'))
+        Crawler.objects(crawlerName=request.session.get('crawlerName')).update_one(crawlerStatus='stopped')
         return HttpResponse("Crawl Stopped")
-    return HttpResponse("Failed to stop")
+    else:
+        return HttpResponse("Stop failed")
+    return redirect('/')
 
-####
-# to run the crawler
-####  
+'''
+to run the crawler
+'''  
 def runCrawler(seeds):
     commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds)]
     scrapyProcess = subprocess.Popen(commands, stderr=PIPE)    
@@ -131,9 +130,9 @@ def runCrawler(seeds):
             break;
     return scrapyWebAddr
 
-####
-# to stop the crawler
-####  
+'''
+to stop the crawler
+'''  
 def stopCrawler(addr):
     try: 
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
