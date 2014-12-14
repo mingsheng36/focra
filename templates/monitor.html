@@ -6,9 +6,17 @@
 <div id="monitorDiv" class="main">
 	<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
 	{% for seed in crawler.crawlerSeeds %}
-	
+		<p>Seeds: {{ seed }}</p>
 	{% endfor %}
-	<button id="stopBn" type="button">Stop Crawler</button>
+	
+	{% if crawler.crawlerStatus == 'running' %}
+		<button id="startBn" type="button" disabled>Start Crawler</button>
+		<button id="stopBn" type="button">Stop Crawler</button>
+	{% else %}
+   		<button id="startBn" type="button">Start Crawler</button>
+		<button id="stopBn" type="button" disabled>Stop Crawler</button>
+	{% endif %}
+	
 </div>
 
 {% endblock %}

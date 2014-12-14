@@ -9,9 +9,10 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.index, name='index'),
-    url(r'^start/$', views.startCrawl, name='startCrawl'),
-    url(r'^stop/$', views.stopCrawl, name='stopCrawl'),
-    url(r'^overview/$', views.overview, name='overview'),
-    url(r'^create/$', views.createCrawler, name='createCrawler'),
+    url(r'^create$', views.createCrawler, name='createCrawler'),
+    url(r'^start$', views.startCrawl, name='startCrawl'),
+    url(r'^stop$', views.stopCrawl, name='stopCrawl'),
+    url(r'^(?P<username>\w+)$', views.overview, name='overview'),
+    url(r'^(?P<username>\w+)/(?P<crawlerName>\w+)', views.monitor, name='monitor'),
 
 )
