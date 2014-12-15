@@ -8,6 +8,8 @@ $(document).ready(function() {
 		    data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
 		    success: function( data ){
 		    	$('#display').html(data);
+		    	$('#startBn').attr('disabled','disabled');
+		    	$('#stopBn').removeAttr('disabled');
 		    }
 		});
 	});
@@ -21,6 +23,8 @@ $(document).ready(function() {
 		    data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
 		    success: function( data ){
 		    	$('#display').html(data);
+		    	$('#stopBn').attr('disabled','disabled');
+		    	$('#startBn').removeAttr('disabled');
 		    }
 		});
 	});

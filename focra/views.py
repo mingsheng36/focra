@@ -12,9 +12,9 @@ welcome page and sign up page
 ''' 
 def index(request):
     # DEVELOPMENT PURPOSE
-    request.session['username'] = 'jayden'
-    username = 'jayden'
-    crawlers = Crawler.objects(owner='jayden')
+    request.session['username'] = 'mingsheng36'
+    username = 'mingsheng36'
+    crawlers = Crawler.objects(owner='mingsheng36')
     names = []
     for crawler in crawlers:
         names.append(crawler.crawlerName)
@@ -35,7 +35,7 @@ def index(request):
 #         return render(request, 'index.html')
 
 '''
-display home page to authenticated usernames
+Home page to authenticated usernames
 '''   
 def overview(request, username):
     if request.method == 'GET':
@@ -51,7 +51,7 @@ def overview(request, username):
             return redirect('/')
 
 '''
-Crawler profile page
+Monitor page for crawlers to show stats
 '''   
 def monitor(request, username=None, crawlerName=None):
     if request.method == 'GET':
@@ -65,7 +65,7 @@ def monitor(request, username=None, crawlerName=None):
             return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler})
     
 '''
-To create crawler
+To create crawler page
 '''
 def createCrawler(request):
     username = request.session.get('username')
@@ -79,8 +79,8 @@ def createCrawler(request):
             crawlerName = request.POST['crawlerName']
             seeds.append(request.POST['crawlerSeeds'])
             try:
-                addr = runCrawler(seeds);
-                Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerAddr=''.join(addr), crawlerStatus='running', owner=username).save()
+                crawlerAddr = runCrawler(seeds);
+                Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerAddr=crawlerAddr, crawlerStatus='running', owner=username).save()
                 request.session['crawlers'] = crawlers + [crawlerName]
                 return redirect('/' + username + '/' + crawlerName)
             except:
@@ -92,33 +92,49 @@ def updateCrawler(request):
     return
 
 def deleteCrawler(request):
+    if request.method == 'POST':  
+        crawlerName = request.session.get('crawlerName')
     return
 
 '''
-To start the crawler
+To handle start crawler requests
 '''
 def startCrawl(request):  
     if request.method == 'POST':  
-        return HttpResponse("Crawl Started!")
+        crawlerName = request.session.get('crawlerName')
+        crawlerSeeds = request.session.get('crawlerSeeds')
+        try:
+            crawlerAddr = runCrawler(crawlerSeeds)
+            Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
+            request.session['crawlerAddr'] = crawlerAddr
+        except Exception, err:
+            print err
+        return HttpResponse(crawlerName + ' is running')
     else:
         return HttpResponse("Crawl failed")
         
     return redirect('/')
     
 '''
-To stop the specific crawler
+To handle stop crawler requests
 '''      
 def stopCrawl(request):
     if request.method == 'POST':
+        print request.session.get('crawlerAddr')
+        crawlerName = request.session.get('crawlerName')
         stopCrawler(request.session.get('crawlerAddr'))
-        Crawler.objects(crawlerName=request.session.get('crawlerName')).update_one(crawlerStatus='stopped')
-        return HttpResponse("Crawl Stopped")
+        try:
+            Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped', set__crawlerAddr='')
+        except Exception, err:
+            print err
+        return HttpResponse(crawlerName + ' has been stopped')
     else:
         return HttpResponse("Stop failed")
     return redirect('/')
 
 '''
-to run the crawler
+starting the crawler through cmdline in local machine
+needs to be changed to start through http call for scalability
 '''  
 def runCrawler(seeds):
     commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds)]
@@ -128,13 +144,13 @@ def runCrawler(seeds):
         if scrapyWebAddr:
             print scrapyWebAddr
             break;
-    return scrapyWebAddr
+    return ''.join(scrapyWebAddr)
 
 '''
-to stop the crawler
+stopping crawler through jsonrpc
 '''  
 def stopCrawler(addr):
     try: 
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
-    except:
-        print 'stopped'
+    except Exception, err:
+        print err
