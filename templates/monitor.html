@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% block title %}Monitor{% endblock %}
+{% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
 
 <div id="monitorDiv" class="main">
@@ -20,7 +20,10 @@
 		<button id="startBn" type="button">Start Crawler</button>
 		<button id="stopBn" type="button" disabled>Stop Crawler</button>
 	{% endif %}
-	
+	<br/><br/>
+	<div>
+		<button id="deleteBn" type="button">Delete Crawler</button>
+	</div>	
 </div>
 
 {% endblock %}

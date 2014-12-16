@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% block title %}Create{% endblock %}
+{% block title %}Create Crawler{% endblock %}
 {% block body_block %}
 
-<div id="createDiv" class="main">
+<div id="createDiv" class="hide">
 
 	<h1 id="display">Customise Your Crawler</h1>
 	<form method="post" action="/create">
@@ -14,6 +14,18 @@
 		<br/><br/>
 		<button type="submit">Start Crawling</button>
 	</form>
+	<br/>
+	
 </div>
 
+<div id="iframeDiv">
+	
+	<form id="fakeForm">
+	Enter Seed URL: <input id="url" type="url" value="" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
+	<button id="fetchBn" type="submit">Fetch</button>
+	<button id="BackBn">Back</button>
+	</form>
+	<hr/>
+	<iframe id="iframe" src="http://forums.hardwarezone.com.sg" ></iframe>
+</div>
 {% endblock %}

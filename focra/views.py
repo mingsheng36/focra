@@ -12,27 +12,27 @@ welcome page and sign up page
 ''' 
 def index(request):
     # DEVELOPMENT PURPOSE
-    request.session['username'] = 'mingsheng36'
-    username = 'mingsheng36'
-    crawlers = Crawler.objects(owner='mingsheng36')
+    username = 'jayden'
+    request.session['username'] = username
+    crawlers = Crawler.objects(owner=username)
     names = []
     for crawler in crawlers:
         names.append(crawler.crawlerName)
     request.session['crawlers'] = names
     return redirect('/' + username)
-
-    #  FOR PRODUCTION USE
-#     if request.method == 'GET':      
-#         return render(request, 'index.html')   
-#     elif request.method == 'POST':
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         request.session['username'] = username
-#         newUser = User(username=username, password=password).save()
-#         print newUser.username
-#         return home(request)
-#     else: 
-#         return render(request, 'index.html')
+    '''
+    if request.method == 'GET':      
+        return render(request, 'index.html')   
+    elif request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        request.session['username'] = username
+        newUser = User(username=username, password=password).save()
+        print newUser.username
+        return home(request)
+    else: 
+        return render(request, 'index.html')
+    '''
 
 '''
 Home page to authenticated usernames
@@ -87,13 +87,27 @@ def createCrawler(request):
                 print 'error'
         
     return redirect('/')
-    
+ 
+'''
+To update current crawler in session
+'''    
 def updateCrawler(request):
     return
 
+'''
+To delete current crawler in session
+'''
 def deleteCrawler(request):
     if request.method == 'POST':  
-        crawlerName = request.session.get('crawlerName')
+        try:
+            crawlerName = request.session.get('crawlerName')
+            Crawler.objects(crawlerName=crawlerName).delete()
+            crawlers = request.session.get('crawlers')
+            crawlers.remove(crawlerName)
+            request.session['crawlers'] = crawlers
+            return HttpResponse(crawlerName + " has been deleted.")
+        except Exception, err:
+            print err
     return
 
 '''
@@ -138,13 +152,13 @@ needs to be changed to start through http call for scalability
 '''  
 def runCrawler(seeds):
     commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds)]
-    scrapyProcess = subprocess.Popen(commands, stderr=PIPE)    
+    crawlerProcess = subprocess.Popen(commands, stderr=PIPE)    
     while True:
-        scrapyWebAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', scrapyProcess.stderr.readline())
-        if scrapyWebAddr:
-            print scrapyWebAddr
+        crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', crawlerProcess.stderr.readline())
+        if crawlerAddr:
+            print crawlerAddr
             break;
-    return ''.join(scrapyWebAddr)
+    return ''.join(crawlerAddr)
 
 '''
 stopping crawler through jsonrpc
