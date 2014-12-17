@@ -31,7 +31,7 @@ $(document).ready(function() {
 		});
 	});
 
-	$('#deleteBn').click( function(event) {
+	$('#deleteBn').click(function(event) {
 		var r = confirm("Are you sure you want to delete?")
 		if (r == true) {
 			$('#display').html('Deleting..');
@@ -46,11 +46,17 @@ $(document).ready(function() {
 			});
 		} 
 	});
-	
+
 	$('#fakeForm').submit(function(event){
-	    // cancels the form submission
-	    event.preventDefault();
-	    $('#iframe').attr('src',$('#url').val());
+		// cancels the form submission
+		event.preventDefault();
+		$('#iframe').attr('src',$('#url').val());
 	});
 
+//	$('#fetchBn').click(function(event) {
+//		$.get("/fetch", function( data ) {
+//			alert( data );
+//		});
+//	});
+	
 });

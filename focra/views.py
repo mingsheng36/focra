@@ -43,8 +43,6 @@ def overview(request, username):
         if username:
             print 'authenticated'
             crawlers = request.session.get('crawlers')
-            # currently set to the page that i want to develop
-            #return redirect('/create')
             return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
         else:
             print 'not authorised'
@@ -168,3 +166,19 @@ def stopCrawler(addr):
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
     except Exception, err:
         print err
+        
+'''
+fetch seed url page
+'''
+# def fetch(request):
+#     if request.method == 'GET':
+#         print "hi"
+#         commands = ["scrapy", "fetch", "http://google.com.sg"]
+#         r = ''
+#         process = subprocess.Popen(commands, stdout=PIPE)    
+#         while True:
+#             res = process.stdout.readline()
+#             r += res
+#             if res == '' and process.poll() != None:
+#                 break
+#         return render(request, 'overview.html', {'page':r})

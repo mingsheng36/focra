@@ -24,13 +24,14 @@ body {
 
 #main {
 	width: 83%;
-	height: 100%; text-align : center;
+	height: 100%; 
+	text-align : center;
 	float: left;
 	min-height: 100%;
 	text-align: center;
 }
 
-#iframeDiv {
+#selectDiv {
 	width: 100%;
 	height: 100%;
 }
@@ -38,7 +39,8 @@ body {
 #iframe {
 	width: 98%;
 	height: 90%;
-	border: 0; -webkit-transform (0.5);
+	border: 0; 
+	-webkit-transform: (0.5);
 	-moz-transform-scale: (0.5);
 }
 

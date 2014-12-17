@@ -18,14 +18,17 @@
 	
 </div>
 
-<div id="iframeDiv">
+<div id="selectDiv">
 	
 	<form id="fakeForm">
 	Enter Seed URL: <input id="url" type="url" value="" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
 	<button id="fetchBn" type="submit">Fetch</button>
-	<button id="BackBn">Back</button>
 	</form>
+	<button id="backBn">Back</button>
 	<hr/>
-	<iframe id="iframe" src="http://forums.hardwarezone.com.sg" ></iframe>
+	
+	<iframe id="iframe" src="http://hardwarezone.com.sg"></iframe> 
+	
 </div>
+
 {% endblock %}
