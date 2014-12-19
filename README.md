@@ -13,7 +13,7 @@ FOCRA
 - create server for crawler to start
 - start crawler through schedule API
 
-#####WEEK 14
+#####WEEK 15
 **TYPES OF CRAWL**
 - Pagination
 - List of URLs to crawl
@@ -21,44 +21,49 @@ FOCRA
 - *whole domain name crawl*
 - *list of domain name crawl*
 
-#####WEEK 14
+#####WEEK 16
 **DATA DISPLAY**
 - display data in table format
 - *export data to excel, csv, xml or json*
 - *create a url to query data*
 
-#####WEEK 14
+#####WEEK 17 (START OF SEMESTER 2)
 **CRAWLER SETTINGS**
 - Add scheduling to crawler
 - Add updating/edit of crawler
 - *all of scrapy settings*
 
-#####WEEK 14
+#####WEEK 18
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 
-#####WEEK 14
+#####WEEK 19
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 
-#####WEEK 14
+#####WEEK 20 
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 
-#####WEEK 14
+#####WEEK 21 (ASSIGNMENTS)
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 
-#####WEEK 14
+#####WEEK 22 (ASSIGNMENTS)
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 
-#####WEEK 14
+#####WEEK 23 (ASSIGNMENTS)
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 - Report writing
 
-#####WEEK 14
+#####WEEK 24 (ASSIGNMENTS)
+**USER EVALUATION & DESIGN**
+- Improve on design based on USER evaluations
+- Report Writing
+
+#####WEEK 25 (END OF SEMESTER 2)
 **USER EVALUATION & DESIGN**
 - Improve on design based on USER evaluations
 - Report Writing
