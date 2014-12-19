@@ -72,10 +72,11 @@ $(document).ready(function() {
 	
 	$('#create').submit(function( event ) {
 		$(".row").each(function(){
-			crawlerTemplate.push("'" + $(this).find('.field').val() + "':'" + $(this).find('.xpath').val() + "'");
+			crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
 		});
-		$('#crawlerTemplate').val('{' + crawlerTemplate + '}')
-		//alert(template.toString());
+		//alert(crawlerTemplate.toString());
+		//event.preventDefault();
+		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
 	
 });
