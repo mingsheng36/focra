@@ -1,8 +1,5 @@
-Twisted>=10.0.0
-lxml
-pyOpenSSL
-cssselect>=0.9
-w3lib>=1.8.0
-queuelib
-six>=1.5.2
-django>=1.7
+Django==1.7
+Twisted==14.0.2
+Scrapy==0.24.4
+pymongo==2.7.2
+mongoengine==0.8.7

@@ -1,34 +1,49 @@
 html {
 	width: 99%;
-    height: 98%;
+	height: 98%;
 }
 
 body {
 	width: 100%;
-    height: 99%;
-}    
+	height: 99%;
+}
+
 #wrapper {
-     width: 100%;
-     height: 100%;
+	width: 100%;
+	height: 100%;
 }
-#navbar, #main {
-    border: 1% solid white;
-    float: left;
-    min-height: 100%;
-}
+
 #navbar {
-     width: 20%;
-     height: 100%;
-     text-align:center;
+	width: 17%;
+	height: 100%;
+	text-align: center;
+	background-color: #eeeeee;
+	float: left;
+	min-height: 100%;
 }
+
 #main {
-     width: 70%;
-     text-align: center;
+	width: 83%;
+	height: 100%; 
+	text-align : center;
+	float: left;
+	min-height: 100%;
+	text-align: center;
 }
-.main {
-	margin-top:5%
+
+#selectDiv {
+	width: 100%;
+	height: 100%;
 }
-.hide
-{
-  display:none;
+
+#iframe {
+	width: 98%;
+	height: 90%;
+	border: 0; 
+	-webkit-transform: (0.5);
+	-moz-transform-scale: (0.5);
+}
+
+.hide {
+	display: none;
 }

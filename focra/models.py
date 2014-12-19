@@ -1,5 +1,5 @@
 
-from mongoengine import Document, StringField, ListField
+from mongoengine import Document, StringField, ListField, DictField
  
 class User(Document):
     username = StringField(primary_key=True, unique=True, required=True)
@@ -9,5 +9,6 @@ class Crawler(Document):
     crawlerName = StringField(primary_key=True, unique=True, required=True)
     crawlerSeeds = ListField(required=True,)
     crawlerStatus = StringField(required=True)
-    crawlerPort = StringField(required=True)
-    owner = StringField(required=True)
+    crawlerAddr = StringField()
+    crawlerOwner = StringField(required=True)
+    crawlerTemplate = DictField()

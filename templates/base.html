@@ -3,7 +3,7 @@
 {% csrf_token %}
 <html>
 <head lang="en">
-<link rel="icon" href="{% static "images/icon.png" %}" type="image/png" />
+<link rel="icon" href="{% static "images/favicon.png" %}" type="image/png" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="stylesheet" type="text/css" href="{% static "css/base.css" %}" />
@@ -11,11 +11,12 @@
 </head>
 
 <body>
+
 	<div id="wrapper">
 	    <div id="navbar">
 	    	<div class="nav">
 	    		<img src="{% static "images/spider.png" %}" alt="Focra icon" width="50%" height="50%"/>
-	    		<h3>{{ username }}</h3>
+	    		<h3 id='username'>{{ username }}</h3>
 	    		<a href="/{{username}}">Overview</a>
 		    	<br/>
 		    	<a href="#">Account</a>

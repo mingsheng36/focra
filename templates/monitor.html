@@ -1,22 +1,29 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-{% block title %}Monitor{% endblock %}
+{% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
 
 <div id="monitorDiv" class="main">
-	<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
-	{% for seed in crawler.crawlerSeeds %}
-		<p>Seeds: {{ seed }}</p>
-	{% endfor %}
-	
+
 	{% if crawler.crawlerStatus == 'running' %}
+		<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
+		{% for seed in crawler.crawlerSeeds %}
+		<p>Seeds: {{ seed }}</p>
+		{% endfor %}
 		<button id="startBn" type="button" disabled>Start Crawler</button>
 		<button id="stopBn" type="button">Stop Crawler</button>
 	{% else %}
-   		<button id="startBn" type="button">Start Crawler</button>
+		<h1 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h1>
+		{% for seed in crawler.crawlerSeeds %}
+		<p>Seeds: {{ seed }}</p>
+		{% endfor %}
+		<button id="startBn" type="button">Start Crawler</button>
 		<button id="stopBn" type="button" disabled>Stop Crawler</button>
 	{% endif %}
-	
+	<br/><br/>
+	<div>
+		<button id="deleteBn" type="button">Delete Crawler</button>
+	</div>	
 </div>
 
 {% endblock %}
