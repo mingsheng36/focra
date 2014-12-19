@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	
 	// call to start crawler
 	$('#startBn').click(function(event) {
 		$('#display').html('Initializing..');
@@ -53,10 +54,28 @@ $(document).ready(function() {
 		$('#iframe').attr('src',$('#url').val());
 	});
 
-//	$('#fetchBn').click(function(event) {
-//		$.get("/fetch", function( data ) {
-//			alert( data );
-//		});
-//	});
+	$('#backBn').click(function(event) {
+		$.get("/fetch", function( data ) {
+			alert( data );
+		});
+	});
+	
+	var crawlerTemplate = []
+	
+	$('#addBn').click(function(event){
+		$('#template').append('<div class="row">' + 
+				'Field: <input class="field" type="text" value="" size="30" placeholder="e.g. MySpider">' +
+				'XPath: <input class="xpath" type="text" size="30" placeholder="e.g. MySpider">' +
+				'<br/><br/></div>'
+		);
+	});
+	
+	$('#create').submit(function( event ) {
+		$(".row").each(function(){
+			crawlerTemplate.push("'" + $(this).find('.field').val() + "':'" + $(this).find('.xpath').val() + "'");
+		});
+		$('#crawlerTemplate').val('{' + crawlerTemplate + '}')
+		//alert(template.toString());
+	});
 	
 });

@@ -1,20 +1,22 @@
 import subprocess
 from subprocess import PIPE
 from django.shortcuts import render, redirect
-#import threading
 from django.http import HttpResponse
 from scrapy.utils.jsonrpc import jsonrpc_client_call
 import re
 from models import Crawler
+import ast
 
 '''
 welcome page and sign up page
 ''' 
 def index(request):
-    # DEVELOPMENT PURPOSE
+    '''
+    Development purpose, login as jayden
+    '''
     username = 'jayden'
     request.session['username'] = username
-    crawlers = Crawler.objects(owner=username)
+    crawlers = Crawler.objects(crawlerOwner=username)
     names = []
     for crawler in crawlers:
         names.append(crawler.crawlerName)
@@ -76,9 +78,18 @@ def createCrawler(request):
             seeds = []
             crawlerName = request.POST['crawlerName']
             seeds.append(request.POST['crawlerSeeds'])
+            crawlerTemplate = ast.literal_eval(request.POST['crawlerTemplate'])
+            print crawlerTemplate['f1']
+            
             try:
-                crawlerAddr = runCrawler(seeds);
-                Crawler(crawlerName=crawlerName, crawlerSeeds=seeds, crawlerAddr=crawlerAddr, crawlerStatus='running', owner=username).save()
+                crawlerAddr = "127.0.0.1:6080"
+                #crawlerAddr = runCrawler(seeds);
+                Crawler(crawlerName=crawlerName, 
+                        crawlerSeeds=seeds, 
+                        crawlerAddr=crawlerAddr, 
+                        crawlerStatus='running', 
+                        crawlerOwner=username, 
+                        crawlerTemplate=crawlerTemplate).save()            
                 request.session['crawlers'] = crawlers + [crawlerName]
                 return redirect('/' + username + '/' + crawlerName)
             except:
@@ -88,7 +99,7 @@ def createCrawler(request):
  
 '''
 To update current crawler in session
-'''    
+'''
 def updateCrawler(request):
     return
 
@@ -116,6 +127,7 @@ def startCrawl(request):
         crawlerName = request.session.get('crawlerName')
         crawlerSeeds = request.session.get('crawlerSeeds')
         try:
+            crawlerAddr = "127.0.0.1:6080"
             crawlerAddr = runCrawler(crawlerSeeds)
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
             request.session['crawlerAddr'] = crawlerAddr
@@ -166,7 +178,7 @@ def stopCrawler(addr):
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
     except Exception, err:
         print err
-        
+
 '''
 fetch seed url page
 '''
@@ -182,3 +194,19 @@ fetch seed url page
 #             if res == '' and process.poll() != None:
 #                 break
 #         return render(request, 'overview.html', {'page':r})
+
+# def fetch(request):
+#     print 'hi' 
+#     #[os.path.join(BASE_DIR, "scripts")]
+#     try:  
+#         p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py'], stdout=PIPE)  
+#         while True:
+#             res = p.stdout.readline()
+#             if res == '' and p.poll() != None:
+#                 break
+#             print res
+#         return HttpResponse("done")
+#     except Exception, err:
+#         print err
+#     #return render(request, 'overview.html', {'page':(driver.page_source).encode('utf-8')})
+    

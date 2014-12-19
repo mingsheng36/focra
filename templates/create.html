@@ -3,32 +3,41 @@
 {% block title %}Create Crawler{% endblock %}
 {% block body_block %}
 
-<div id="createDiv" class="hide">
+<div id="createDiv">
 
 	<h1 id="display">Customise Your Crawler</h1>
-	<form method="post" action="/create">
+	<form id="create" method="post" action="/create">
 		{% csrf_token %}
-		Name : <input type="text" name="crawlerName" value="" size="45" placeholder="e.g. MySpider">
+		Name: <input type="text" name="crawlerName" value="" size="45" placeholder="e.g. MySpider">
 		<br/><br/>
-		Seeds : <input type="text" name="crawlerSeeds" value="" size="45" placeholder="e.g. http://forums.hardwarezone.com.sg">
+		URLs: <textarea name="crawlerSeeds" rows="4" cols="50" placeholder="e.g. http://forums.hardwarezone.com.sg"></textarea>
 		<br/><br/>
+		<div id="template">
+			<div class="row">
+				Field: <input class="field" type="text" value="" size="30" placeholder="e.g. MySpider">
+				XPath: <input class="xpath" type="text" size="30" placeholder="e.g. MySpider">
+				<br/><br/>
+			</div>
+		</div>
+			<button id="addBn" type="button">Add More Fields</button>
+		<br/><br/>
+		<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
 		<button type="submit">Start Crawling</button>
 	</form>
+	
 	<br/>
 	
 </div>
 
-<div id="selectDiv">
+<div id="selectDiv" class="hide">
 	
 	<form id="fakeForm">
 	Enter Seed URL: <input id="url" type="url" value="" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
-	<button id="fetchBn" type="submit">Fetch</button>
+	<button id="fetchBn" type="submit">Fetch</button> 
 	</form>
-	<button id="backBn">Back</button>
+	<button id="backBn" type="button">Back</button>
 	<hr/>
-	
-	<iframe id="iframe" src="http://hardwarezone.com.sg"></iframe> 
-	
+	<!--<iframe id="iframe" src="http://hardwarezone.com.sg"></iframe> -->
 </div>
 
 {% endblock %}
