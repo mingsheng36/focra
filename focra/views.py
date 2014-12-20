@@ -60,6 +60,7 @@ def monitor(request, username=None, crawlerName=None):
             request.session['crawlerName'] = crawler.crawlerName
             request.session['crawlerAddr'] = crawler.crawlerAddr
             request.session['crawlerSeeds'] = crawler.crawlerSeeds
+            request.session['crawlerTemplate']= crawler.crawlerTemplate
             return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler})
     
 '''
@@ -122,10 +123,11 @@ To handle start crawler requests
 def startCrawl(request):  
     if request.method == 'POST':  
         crawlerName = request.session.get('crawlerName')
-        #crawlerSeeds = request.session.get('crawlerSeeds')
+        crawlerSeeds = request.session.get('crawlerSeeds')
+        crawlerTemplate = request.session.get('crawlerTemplate')
         try:
-            crawlerAddr = "127.0.0.1:6080"
-            #crawlerAddr = runCrawler(crawlerSeeds)
+            #crawlerAddr = "127.0.0.1:6080"
+            crawlerAddr = runCrawler(crawlerSeeds, crawlerTemplate)
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
             request.session['crawlerAddr'] = crawlerAddr
         except Exception, err:
@@ -157,8 +159,9 @@ def stopCrawl(request):
 starting the crawler through cmdline in local machine
 needs to be changed to start through http call for scalability
 '''  
-def runCrawler(seeds):
-    commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds)]
+def runCrawler(seeds, template):
+    print template + " - printed on run crawler"
+    commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds), "-a", "template=" + template]
     crawlerProcess = subprocess.Popen(commands, stderr=PIPE)    
     while True:
         crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', crawlerProcess.stderr.readline())
@@ -173,8 +176,8 @@ stopping crawler through jsonrpc
 def stopCrawler(addr):
     try: 
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
-    except Exception, err:
-        print 'Expected err - ' + err
+    except:
+        print 'Expected err - ' 
 
 '''
 fetch seed url page

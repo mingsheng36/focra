@@ -2,7 +2,6 @@
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spider import Spider
 from scrapy import signals 
-from scrapy import log
 
 class FocraSpider(Spider):
 
@@ -11,6 +10,7 @@ class FocraSpider(Spider):
 	def __init__(self, *args, **kwargs):
 		super(FocraSpider, self).__init__(*args, **kwargs)
 		self.template = kwargs.get('template')
+		print self.template + ' - from spider init'
 		self.start_urls = [kwargs.get('seeds')]
 	
 	'''
@@ -39,7 +39,7 @@ class FocraSpider(Spider):
 			for key, value in self.kwargs.iteritems():
 				item.fields[key] = Field()
 				l.add_xpath(key, value)
-				log.msg(key + ' ' + value, level=log.WARNING)
+				print key + ' ' + value
 		print 'crawled response'
 		#print response.body
 	
