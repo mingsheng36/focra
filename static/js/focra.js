@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	
+
 	// call to start crawler
 	$('#startBn').click(function(event) {
 		$('#display').html('Initializing..');
@@ -32,6 +32,7 @@ $(document).ready(function() {
 		});
 	});
 
+	// call to delete crawler
 	$('#deleteBn').click(function(event) {
 		var r = confirm("Are you sure you want to delete?")
 		if (r == true) {
@@ -48,6 +49,7 @@ $(document).ready(function() {
 		} 
 	});
 
+	// testing iframe
 	$('#fakeForm').submit(function(event){
 		// cancels the form submission
 		event.preventDefault();
@@ -59,9 +61,9 @@ $(document).ready(function() {
 			alert( data );
 		});
 	});
-	
+
+	// add more fields
 	var crawlerTemplate = []
-	
 	$('#addBn').click(function(event){
 		$('#template').append('<div class="row">' + 
 				'Field: <input class="field" type="text" value="" size="30" placeholder="e.g. MySpider">' +
@@ -69,14 +71,13 @@ $(document).ready(function() {
 				'<br/><br/></div>'
 		);
 	});
-	
+
+	// add crawler template into form before submit crawler
 	$('#create').submit(function( event ) {
 		$(".row").each(function(){
 			crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
 		});
-		//alert(crawlerTemplate.toString());
-		//event.preventDefault();
 		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
-	
+
 });

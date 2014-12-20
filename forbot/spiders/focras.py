@@ -2,7 +2,7 @@
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spider import Spider
 from scrapy import signals 
-#from scrapy.crawler import CrawlerProcess
+from scrapy import log
 
 class FocraSpider(Spider):
 
@@ -10,12 +10,12 @@ class FocraSpider(Spider):
 	
 	def __init__(self, *args, **kwargs):
 		super(FocraSpider, self).__init__(*args, **kwargs)
-		#print kwargs.get('seeds')
+		self.template = kwargs.get('template')
 		self.start_urls = [kwargs.get('seeds')]
 	
-	####
-	# To access scrapy's core API. basically can modify anything in the 'crawler'
-	####	
+	'''
+	To access scrapy's core API. basically can modify anything in the 'crawler'
+	'''
 	@classmethod
 	def from_crawler(cls, crawler, **kwargs):
 		spider = cls(**kwargs)
@@ -23,9 +23,23 @@ class FocraSpider(Spider):
 		return spider
 	
 	def dont_close_me(self):
-		raise DontCloseSpider("..I prefer live spiders.")
-		
+		raise DontCloseSpider("Not Closed")
+	
+	'''
+	parse the response using itemloader
+	'''
 	def parse(self, response):
+		
+		from scrapy.contrib.loader import ItemLoader
+		from scrapy.item import Field
+		from scrapy.item import Item
+		item = Item()
+		l = ItemLoader(item=item, response=response)
+		if self.templates is not None:
+			for key, value in self.kwargs.iteritems():
+				item.fields[key] = Field()
+				l.add_xpath(key, value)
+				log.msg(key + ' ' + value, level=log.WARNING)
 		print 'crawled response'
 		#print response.body
 	
