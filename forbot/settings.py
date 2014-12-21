@@ -17,5 +17,11 @@ EXTENSIONS = {
      'scrapy.telnet.TelnetConsole': None,
 }
 
+ITEM_PIPELINES = {'forbot.pipelines.MongoDBPipeline':100,}
+
+MONGODB_SERVER = "localhost"
+MONGODB_PORT = 27017
+MONGODB_DB = "userData"
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'fobot (+http://www.yourdomain.com)'

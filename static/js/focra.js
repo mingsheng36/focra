@@ -27,7 +27,7 @@ $(document).ready(function() {
 				$('#display').html(data);
 				$('#stopBn').attr('disabled','disabled');
 				$('#startBn').removeAttr('disabled');
-				$('#deletBn').removeAttr('disabled');
+				$('#deleteBn').removeAttr('disabled');
 			}
 		});
 	});
@@ -66,8 +66,8 @@ $(document).ready(function() {
 	var crawlerTemplate = []
 	$('#addBn').click(function(event){
 		$('#template').append('<div class="row">' + 
-				'Field: <input class="field" type="text" value="" size="30" placeholder="e.g. MySpider">' +
-				'XPath: <input class="xpath" type="text" size="30" placeholder="e.g. MySpider">' +
+				'Field: <input class="field" type="text" value="" size="10" placeholder="e.g. MySpider">  ' +
+				'XPath: <input class="xpath" type="text" size="40" placeholder="e.g. MySpider">' +
 				'<br/><br/></div>'
 		);
 	});
@@ -75,7 +75,9 @@ $(document).ready(function() {
 	// add crawler template into form before submit crawler
 	$('#create').submit(function( event ) {
 		$(".row").each(function(){
-			crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
+			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
+				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
+			}
 		});
 		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});

@@ -11,4 +11,7 @@ class Crawler(Document):
     crawlerStatus = StringField(required=True)
     crawlerAddr = StringField()
     crawlerOwner = StringField(required=True)
+    '''
+    Because mongoengine does not support ordered-dict-field yet. store as string to maintain order
+    '''
     crawlerTemplate = StringField()

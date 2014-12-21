@@ -10,12 +10,12 @@
 		{% csrf_token %}
 		Name: <input type="text" name="crawlerName" value="" size="45" placeholder="e.g. MySpider">
 		<br/><br/>
-		URLs: <textarea name="crawlerSeeds" rows="4" cols="50" placeholder="e.g. http://forums.hardwarezone.com.sg"></textarea>
+		URLs: <textarea id="crawlerSeeds" name="crawlerSeeds" rows="4" cols="50" placeholder="e.g. http://forums.hardwarezone.com.sg"></textarea>
 		<br/><br/>
 		<div id="template">
 			<div class="row">
-				Field: <input class="field" type="text" value="" size="30" placeholder="e.g. MySpider">
-				XPath: <input class="xpath" type="text" size="30" placeholder="e.g. MySpider">
+				Field: <input class="field" type="text" value="" size="10" placeholder="e.g. MySpider">
+				XPath: <input class="xpath" type="text" size="40" placeholder="e.g. MySpider">
 				<br/><br/>
 			</div>
 		</div>

@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from scrapy.utils.jsonrpc import jsonrpc_client_call
 from models import Crawler
+import json, collections
 
 '''
 welcome page and sign up page
@@ -61,7 +62,8 @@ def monitor(request, username=None, crawlerName=None):
             request.session['crawlerAddr'] = crawler.crawlerAddr
             request.session['crawlerSeeds'] = crawler.crawlerSeeds
             request.session['crawlerTemplate']= crawler.crawlerTemplate
-            return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler})
+            t = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
+            return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
     
 '''
 To create crawler page
@@ -74,10 +76,10 @@ def createCrawler(request):
             return render(request, 'create.html', {'username': username, 'crawlers': crawlers})
     if request.method == 'POST':   
         if username:
-            seeds = []
             crawlerName = request.POST['crawlerName']
-            seeds.append(request.POST['crawlerSeeds'])
-            print request.POST['crawlerTemplate']
+            seeds = request.POST['crawlerSeeds'].split('\n')
+            print seeds
+            print "from create crawler " + request.POST['crawlerTemplate']
             crawlerTemplate = request.POST['crawlerTemplate']      
             try:
                 crawlerAddr = "127.0.0.1:6080"
@@ -88,7 +90,7 @@ def createCrawler(request):
                         crawlerStatus='running', 
                         crawlerOwner=username, 
                         crawlerTemplate=crawlerTemplate).save()            
-            except Exception, err:
+            except Exception as err:
                 print err
             request.session['crawlers'] = crawlers + [crawlerName]
             return redirect('/' + username + '/' + crawlerName)
@@ -113,7 +115,7 @@ def deleteCrawler(request):
             crawlers.remove(crawlerName)
             request.session['crawlers'] = crawlers
             return HttpResponse(crawlerName + " has been deleted.")
-        except Exception, err:
+        except Exception as err:
             print err
     return
 
@@ -126,11 +128,10 @@ def startCrawl(request):
         crawlerSeeds = request.session.get('crawlerSeeds')
         crawlerTemplate = request.session.get('crawlerTemplate')
         try:
-            #crawlerAddr = "127.0.0.1:6080"
             crawlerAddr = runCrawler(crawlerSeeds, crawlerTemplate)
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
             request.session['crawlerAddr'] = crawlerAddr
-        except Exception, err:
+        except Exception as err:
             print err
         return HttpResponse(crawlerName + ' is running')
     else:
@@ -143,12 +144,12 @@ To handle stop crawler requests
 '''      
 def stopCrawl(request):
     if request.method == 'POST':
-        print request.session.get('crawlerAddr')
+        print 'stopping ' + request.session.get('crawlerAddr')
         crawlerName = request.session.get('crawlerName')
         stopCrawler(request.session.get('crawlerAddr'))
         try:
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped', set__crawlerAddr='')
-        except Exception, err:
+        except Exception as err:
             print err
         return HttpResponse(crawlerName + ' has been stopped')
     else:
@@ -160,13 +161,14 @@ starting the crawler through cmdline in local machine
 needs to be changed to start through http call for scalability
 '''  
 def runCrawler(seeds, template):
-    print template + " - printed on run crawler"
-    commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ''.join(seeds), "-a", "template=" + template]
+    print seeds
+    print ','.join(seeds)
+    commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ','.join(seeds), "-a", "template=" + template]
     crawlerProcess = subprocess.Popen(commands, stderr=PIPE)    
     while True:
         crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', crawlerProcess.stderr.readline())
         if crawlerAddr:
-            print crawlerAddr
+            print ''.join(crawlerAddr)
             break;
     return ''.join(crawlerAddr)
 
@@ -177,7 +179,7 @@ def stopCrawler(addr):
     try: 
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
     except:
-        print 'Expected err - ' 
+        print 'Expected stop error, dont worry'
 
 '''
 fetch seed url page
@@ -206,7 +208,7 @@ fetch seed url page
 #                 break
 #             print res
 #         return HttpResponse("done")
-#     except Exception, err:
+#     except Exception as err:
 #         print err
 #     #return render(request, 'overview.html', {'page':(driver.page_source).encode('utf-8')})
     
