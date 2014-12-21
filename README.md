@@ -5,8 +5,11 @@ FOCRA
 #####WEEK 14 (22-28/12/2014)
 IMMEDIATE
 - let user choose xpath
-~~- create the template object for crawler~~
-~~- store template xpath in crawler {field:xpath}~~
+- ~~create the template object for crawler~~
+- ~~store template xpath in crawler {field:xpath}~~
+- load data into the xpath according to fields
+- store into database
+- visually choose xpath
 - create server for crawler to start
 - start crawler through schedule API
 
@@ -20,8 +23,8 @@ TYPES OF CRAWL
 
 #####WEEK 16 (05-11/01/2014)
 DATA DISPLAY
-- display data in table format
-- *export data to excel, csv, xml or json*
+- load and display data in table format
+- export data to excel, csv, xml or json
 - *create a url to query data*
 
 #####WEEK 17 (START OF SEMESTER 2, 12-18/01/2015)
