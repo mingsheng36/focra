@@ -29,7 +29,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 from mongoengine import connect
-MONGO_DATABASE_NAME = 'mydb'
+MONGO_DATABASE_NAME = 'FocraDB'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
 connect(MONGO_DATABASE_NAME, host=MONGO_HOST, port=MONGO_PORT)
@@ -74,6 +74,8 @@ AUTHENTICATION_BACKENDS = (
     'mongoengine.django.auth.MongoEngineBackend',
  )
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 AUTH_USER_MODEL = 'mongo_auth.MongoUser'
 MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
 SESSION_ENGINE = 'mongoengine.django.sessions'
@@ -101,5 +103,3 @@ STATIC_URL = '/static/'
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True

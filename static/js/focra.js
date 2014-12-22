@@ -62,8 +62,8 @@ $(document).ready(function() {
 		});
 	});
 
+	
 	// add more fields
-	var crawlerTemplate = []
 	$('#addBn').click(function(event){
 		$('#template').append('<div class="row">' + 
 				'Field: <input class="field" type="text" value="" size="10" placeholder="e.g. MySpider">  ' +
@@ -74,6 +74,7 @@ $(document).ready(function() {
 
 	// add crawler template into form before submit crawler
 	$('#create').submit(function( event ) {
+		var crawlerTemplate = []
 		$(".row").each(function(){
 			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
 				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
@@ -82,4 +83,21 @@ $(document).ready(function() {
 		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
 
+	$('#monitorLink').click(function(){
+		  $('#dataDiv').hide();
+		  $('#settingsDiv').hide();
+		  $('#monitorDiv').show();
+	});
+	$('#dataLink').click(function(){
+		  $('#monitorDiv').hide();
+		  $('#settingsDiv').hide();
+		  $('#dataDiv').show();
+	});
+	$('#settingsLink').click(function(){
+		  $('#monitorDiv').hide();
+		  $('#dataDiv').hide();
+		  $('#settingsDiv').show();
+	});
+	
+	
 });

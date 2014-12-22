@@ -1,5 +1,5 @@
 
-from mongoengine import Document, StringField, ListField
+from mongoengine import Document, StringField, ListField, DateTimeField
  
 class User(Document):
     username = StringField(primary_key=True, unique=True, required=True)
@@ -11,6 +11,7 @@ class Crawler(Document):
     crawlerStatus = StringField(required=True)
     crawlerAddr = StringField()
     crawlerOwner = StringField(required=True)
+    crawlerDateTime = DateTimeField()
     '''
     Because mongoengine does not support ordered-dict-field yet. store as string to maintain order
     '''

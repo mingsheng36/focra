@@ -3,41 +3,39 @@
 {% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
 
-<div id="monitorDiv" class="main">
+<div id="mainDiv" class="main">
 
-	<div id="createDiv">
-		{% if crawler.crawlerStatus == 'running' %}
+	<a id="monitorLink" href="#monitor">Monitor</a> | <a id="dataLink" href="#data">Data</a> | <a id="settingsLink" href="#settings">Settings</a>
+	{% if crawler.crawlerStatus == 'running' %}
 			<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
-			Seeds:<br/>
-			{% for seed in crawler.crawlerSeeds %}
-			{{ seed }}<br/>
-			{% endfor %}
-			<br/>
 			<button id="startBn" type="button" disabled>Start Crawler</button>
 			<button id="stopBn" type="button">Stop Crawler</button>
 		{% else %}
 			<h1 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h1>
-			{% for seed in crawler.crawlerSeeds %}
-			<p>Seeds: {{ seed }}</p>
-			{% endfor %}
 			<button id="startBn" type="button">Start Crawler</button>
 			<button id="stopBn" type="button" disabled>Stop Crawler</button>
-		{% endif %}
-		<br/><br/>
+	{% endif %}
+	
+	<div id="monitorDiv">
+		{% for seed in crawler.crawlerSeeds %}
+			<p>Seeds: {{ seed }}</p>
+		{% endfor %}
 		{% for key, value in t.items %}
     		{{ key }} : 
-    		<input type="text" placeholder="{{ value }}" size="100">
+    		<input type="text" placeholder="{{ value }}" size="80">
     		<br/><br/>
 		{% endfor %}
 	</div>
 	
-	<div id="settingsDiv">
+	<div id="dataDiv" class="hide">
+		<p>DATA</p>
+	</div>	
+	
+	<div id="settingsDiv" class="hide">
+		<br/>
 		<button id="deleteBn" type="button">Delete Crawler</button>
 	</div>
 	
-	<div id="dataDiv" class="hide">
-		DATA
-	</div>	
 </div>
 
 {% endblock %}
