@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from scrapy.utils.jsonrpc import jsonrpc_client_call
 from models import Crawler
 import json, collections
+from datetime import datetime
 
 '''
 welcome page and sign up page
@@ -50,9 +51,9 @@ def overview(request, username):
             return redirect('/')
 
 '''
-Monitor page for crawlers to show stats
+Crawler page for crawlers to show stats
 '''   
-def monitor(request, username=None, crawlerName=None):
+def crawler(request, username=None, crawlerName=None):
     if request.method == 'GET':
         username = request.session.get('username');
         if username:
@@ -63,7 +64,7 @@ def monitor(request, username=None, crawlerName=None):
             request.session['crawlerSeeds'] = crawler.crawlerSeeds
             request.session['crawlerTemplate']= crawler.crawlerTemplate
             t = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
-            return render(request, 'monitor.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
+            return render(request, 'crawler.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
     
 '''
 To create crawler page
@@ -77,19 +78,16 @@ def createCrawler(request):
     if request.method == 'POST':   
         if username:
             crawlerName = request.POST['crawlerName']
-            seeds = request.POST['crawlerSeeds'].split('\n')
-            print seeds
-            print "from create crawler " + request.POST['crawlerTemplate']
-            crawlerTemplate = request.POST['crawlerTemplate']      
             try:
                 crawlerAddr = "127.0.0.1:6080"
-                #crawlerAddr = runCrawler(seeds);
+                #crawlerAddr = runCrawler(crawlerName, seeds, crawlerTemplate);
                 Crawler(crawlerName=crawlerName, 
-                        crawlerSeeds=seeds, 
+                        crawlerSeeds=request.POST['crawlerSeeds'].split('\r\n'), 
                         crawlerAddr=crawlerAddr, 
                         crawlerStatus='running', 
                         crawlerOwner=username, 
-                        crawlerTemplate=crawlerTemplate).save()            
+                        crawlerTemplate=request.POST['crawlerTemplate'],
+                        crawlerDateTime=datetime.now()).save()            
             except Exception as err:
                 print err
             request.session['crawlers'] = crawlers + [crawlerName]
@@ -128,7 +126,7 @@ def startCrawl(request):
         crawlerSeeds = request.session.get('crawlerSeeds')
         crawlerTemplate = request.session.get('crawlerTemplate')
         try:
-            crawlerAddr = runCrawler(crawlerSeeds, crawlerTemplate)
+            crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate)
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
             request.session['crawlerAddr'] = crawlerAddr
         except Exception as err:
@@ -160,10 +158,8 @@ def stopCrawl(request):
 starting the crawler through cmdline in local machine
 needs to be changed to start through http call for scalability
 '''  
-def runCrawler(seeds, template):
-    print seeds
-    print ','.join(seeds)
-    commands = ["scrapy", "crawl", "focras", "-a", "seeds=" + ','.join(seeds), "-a", "template=" + template]
+def runCrawler(name, seeds, template):
+    commands = ["scrapy", "crawl", "focras", "-a", "name=" + name, "-a", "seeds=" + ','.join(seeds), "-a", "template=" + template]
     crawlerProcess = subprocess.Popen(commands, stderr=PIPE)    
     while True:
         crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', crawlerProcess.stderr.readline())
