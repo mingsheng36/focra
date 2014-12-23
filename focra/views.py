@@ -193,18 +193,24 @@ fetch seed url page
 #                 break
 #         return render(request, 'overview.html', {'page':r})
 
-# def fetch(request):
-#     print 'hi' 
-#     #[os.path.join(BASE_DIR, "scripts")]
-#     try:  
-#         p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py'], stdout=PIPE)  
-#         while True:
-#             res = p.stdout.readline()
-#             if res == '' and p.poll() != None:
-#                 break
-#             print res
-#         return HttpResponse("done")
-#     except Exception as err:
-#         print err
-#     #return render(request, 'overview.html', {'page':(driver.page_source).encode('utf-8')})
-    
+def fetch(request):
+    try:  
+        import os
+        p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py'], stdout=PIPE)  
+        r = ''
+        while True:
+            res = p.stdout.readline()
+            if res == '' and p.poll() != None:
+                break
+            r = r + res
+            
+        from bs4 import BeautifulSoup
+        import urlparse
+        soup = BeautifulSoup(r)
+        
+        for tag in soup.findAll('a', href=True):
+            tag['href'] = urlparse.urljoin('https://www.google.com.sg/', tag['href'])
+
+        return HttpResponse(soup)
+    except Exception as err:
+        print err

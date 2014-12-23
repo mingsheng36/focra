@@ -3,7 +3,7 @@
 {% block title %}Create Crawler{% endblock %}
 {% block body_block %}
 
-<div id="createDiv">
+<div id="createDiv" class="hide">
 
 	<h1 id="display">Customise Your Crawler</h1>
 	<form id="create" method="post" action="/create">
@@ -29,15 +29,15 @@
 	
 </div>
 
-<div id="selectDiv" class="hide">
+<div id="selectDiv">
 	
 	<form id="fakeForm">
 	Enter Seed URL: <input id="url" type="url" value="" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
 	<button id="fetchBn" type="submit">Fetch</button> 
 	</form>
 	<button id="backBn" type="button">Back</button>
-	<hr/>
-	<!--<iframe id="iframe" src="http://hardwarezone.com.sg"></iframe> -->
+	
+	<iframe id="iframe" srcdoc="" sandbox></iframe>
 </div>
 
 {% endblock %}

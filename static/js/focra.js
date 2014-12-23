@@ -49,20 +49,6 @@ $(document).ready(function() {
 		} 
 	});
 
-	// testing iframe
-	$('#fakeForm').submit(function(event){
-		// cancels the form submission
-		event.preventDefault();
-		$('#iframe').attr('src',$('#url').val());
-	});
-
-	$('#backBn').click(function(event) {
-		$.get("/fetch", function( data ) {
-			alert( data );
-		});
-	});
-
-	
 	// add more fields
 	$('#addBn').click(function(event){
 		$('#template').append('<div class="row">' + 
@@ -99,5 +85,17 @@ $(document).ready(function() {
 		  $('#settingsDiv').show();
 	});
 	
-	
+	// testing iframe
+//	$('#fakeForm').submit(function(event){
+//		// cancels the form submission
+//		event.preventDefault();
+//		$('#iframe').attr('src',$('#url').val());
+//	});
+
+	$('#backBn').click(function(event) {
+		$.get('/fetch', function( data ) {
+			$('#iframe').attr('srcdoc',data);  
+		});
+	});
+
 });
