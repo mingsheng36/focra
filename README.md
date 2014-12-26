@@ -1,6 +1,6 @@
 FOCRA
 =====
-**A Cloud Web Crawler** built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
+**A Visual, Distributed and Cloud based Web Crawler** built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 
 #####WEEK 14 (22-28/12/2014)
 IMMEDIATE

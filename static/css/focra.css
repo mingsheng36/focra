@@ -1,0 +1,7 @@
+.outline-element {
+	border: 1px solid red;
+}
+
+.outline-element-clicked {
+	border: 1px solid green;
+}

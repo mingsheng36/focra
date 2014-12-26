@@ -180,37 +180,89 @@ def stopCrawler(addr):
 '''
 fetch seed url page
 '''
-# def fetch(request):
-#     if request.method == 'GET':
-#         print "hi"
-#         commands = ["scrapy", "fetch", "http://google.com.sg"]
-#         r = ''
-#         process = subprocess.Popen(commands, stdout=PIPE)    
-#         while True:
-#             res = process.stdout.readline()
-#             r += res
-#             if res == '' and process.poll() != None:
-#                 break
-#         return render(request, 'overview.html', {'page':r})
-
 def fetch(request):
-    try:  
-        import os
-        p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py'], stdout=PIPE)  
-        r = ''
-        while True:
-            res = p.stdout.readline()
-            if res == '' and p.poll() != None:
-                break
-            r = r + res
-            
-        from bs4 import BeautifulSoup
-        import urlparse
-        soup = BeautifulSoup(r)
+    
+    if request.method == 'GET':
         
-        for tag in soup.findAll('a', href=True):
-            tag['href'] = urlparse.urljoin('https://www.google.com.sg/', tag['href'])
+        try: 
+            from urlparse import urljoin
+            url = request.GET['url']  
+            
+            '''
+            Javascript support but very slow
+            '''
+#             import os
+#             p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py', url], stdout=PIPE)  
+#             cleaned = ''
+#             while True:
+#                 res = p.stdout.readline()
+#                      
+#                 if res == '' and p.poll() != None:
+#                     break
+#                 a = re.findall('url\((.*?)\)', res)   
+#                 if a:
+#                     for link in a:           
+#                         if 'http' not in link:
+#                             link = link.replace("'","")
+#                             link = link.replace('"',"")
+#                             res = re.sub("url\((.*?)\)", 'url(' + str(urljoin(parsed_url.scheme + "://" + parsed_url.netloc + "/", ''.join(link))) + ')' , res)
+#                             print res
+#                 cleaned = cleaned + str(res)
+            
+            '''
+            No javascript support, fast
+            '''
+            import urllib2
+            #r = urllib2.urlopen(url)
+            req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            r = urllib2.urlopen(req)
+            cleaned = ''
+            for line in r:
+                a = re.findall('url\((.*?)\)', line)
 
-        return HttpResponse(soup)
-    except Exception as err:
-        print err
+                if a:
+                    for link in a:  
+                        if 'http' not in link:
+                            link = link.replace("'","")
+                            link = link.replace('"',"")
+                            line = re.sub("url\((.*?)\)"
+                                          , 'url(' + str(url) + ''.join(link) + ')' 
+                                          , line) 
+                    
+                cleaned = cleaned + line
+
+            
+            from bs4 import BeautifulSoup
+            soup = BeautifulSoup(cleaned)
+            
+            for tag in soup.find_all('a', href=True):
+                if 'http' not in tag['href']:
+                    tag['href'] = urljoin(url + "/", tag['href'])
+          
+            for tag in soup.find_all('link', href=True):
+                if 'http' not in tag['href']:
+                    tag['href'] = urljoin(url, tag['href'])
+                    print tag['href']
+                    
+            for tag in soup.find_all('img', src=True):
+                if 'http' not in tag['src']:
+                    tag['src'] = urljoin(url, tag['src'])
+                    #print tag['src'] 
+                    
+            for tag in soup.find_all('script', src=True):
+                if 'http' not in tag['src']:
+                    tag['src'] = urljoin(url, tag['src'])
+                    #print tag['src']
+            
+            for tag in soup.find_all('script', async=True):
+                tag.decompose()
+                
+            for tag in soup.find_all('iframe', src=True):
+                tag.decompose()
+            
+            from django.utils.safestring import mark_safe
+            return HttpResponse(mark_safe(soup.prettify()))
+    
+        except Exception as err:
+            print err
+            

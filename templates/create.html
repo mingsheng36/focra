@@ -31,13 +31,13 @@
 
 <div id="selectDiv">
 	
-	<form id="fakeForm">
-	Enter Seed URL: <input id="url" type="url" value="" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
+	<form id="fetchForm">
+	Enter Seed URL: <input id="url" type="url" value="https://www.facebook.com/" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
 	<button id="fetchBn" type="submit">Fetch</button> 
-	</form>
 	<button id="backBn" type="button">Back</button>
+	</form>
 	
-	<iframe id="iframe" srcdoc="" sandbox></iframe>
+	<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
 </div>
 
 {% endblock %}

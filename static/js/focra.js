@@ -70,32 +70,39 @@ $(document).ready(function() {
 	});
 
 	$('#monitorLink').click(function(){
-		  $('#dataDiv').hide();
-		  $('#settingsDiv').hide();
-		  $('#monitorDiv').show();
+		$('#dataDiv').hide();
+		$('#settingsDiv').hide();
+		$('#monitorDiv').show();
 	});
 	$('#dataLink').click(function(){
-		  $('#monitorDiv').hide();
-		  $('#settingsDiv').hide();
-		  $('#dataDiv').show();
+		$('#monitorDiv').hide();
+		$('#settingsDiv').hide();
+		$('#dataDiv').show();
 	});
 	$('#settingsLink').click(function(){
-		  $('#monitorDiv').hide();
-		  $('#dataDiv').hide();
-		  $('#settingsDiv').show();
+		$('#monitorDiv').hide();
+		$('#dataDiv').hide();
+		$('#settingsDiv').show();
 	});
-	
-	// testing iframe
-//	$('#fakeForm').submit(function(event){
-//		// cancels the form submission
-//		event.preventDefault();
-//		$('#iframe').attr('src',$('#url').val());
-//	});
+
+	$('#fetchForm').submit(function(event){
+		event.preventDefault();
+		$.ajax({
+			url: "/fetch",
+			data: { 
+				"url": $('#url').val(), 
+			},
+			type: "GET",
+			success: function(res) {
+				var iframe = document.createElement('iframe');
+				$('#iframe').attr('srcdoc', res);
+			}
+		});
+
+	});
 
 	$('#backBn').click(function(event) {
-		$.get('/fetch', function( data ) {
-			$('#iframe').attr('srcdoc',data);  
-		});
+
 	});
 
 });
