@@ -49,15 +49,6 @@ $(document).ready(function() {
 		} 
 	});
 
-	// add more fields
-	$('#addBn').click(function(event){
-		$('#template').append('<div class="row">' + 
-				'Field: <input class="field" type="text" value="" size="10" placeholder="e.g. MySpider">  ' +
-				'XPath: <input class="xpath" type="text" size="40" placeholder="e.g. MySpider">' +
-				'<br/><br/></div>'
-		);
-	});
-
 	// add crawler template into form before submit crawler
 	$('#create').submit(function( event ) {
 		var crawlerTemplate = []
@@ -69,6 +60,79 @@ $(document).ready(function() {
 		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
 
+	$('#fetchBn').click(function(event){
+		event.preventDefault();
+		$.ajax({
+			url: "/fetch",
+			data: { 
+				"url": $('#url').val(), 
+			},
+			type: "GET",
+			success: function(res) {
+				$('#iframe').attr('srcdoc', res);
+			}
+		});
+
+	});
+
+	var fieldnum = 0
+	$('#iframe').load(function(){
+		$(this.contentWindow.document).mouseover(function (event) {
+			$(event.target).addClass( "outline-element" );
+		}).mouseout(function (event) {
+			$(event.target).removeClass('outline-element');
+		}).click(function (event) {
+			$(event.target).toggleClass('outline-element-clicked');
+			//alert(getXPath(event.target));
+			fieldnum += 1;
+			$('#template').append('<div class="row">' + 
+					'Field: <input class="field" type="text" value="field' + fieldnum +'" size="10" placeholder="e.g. MySpider">  ' +
+					'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="40" placeholder="e.g. MySpider">' +
+					'<br/><br/></div>'
+			);
+		});
+	});	
+	
+	function getElementTreeXPath(element) {
+		return "/" + $(element).parents().andSelf().map(function() {
+			var $this = $(this);
+			var tagName = this.nodeName;
+			
+			if (tagName.toLowerCase() == 'tbody') {
+				return null;
+			} else if ($this.siblings(tagName).length > 0) {
+				tagName += "[" + ($this.prevAll(tagName).length + 1) + "]";
+			}
+			return tagName;
+		}).get().join("/").toLowerCase() + "/text()";
+	};
+	
+// 	Firebug implementation of getting XPath
+//	function getElementTreeXPath(element)
+//	{
+//	    var paths = [];
+//	    // Use nodeName (instead of localName) so namespace prefix is included (if any).
+//	    for (; element && element.nodeType == 1; element = element.parentNode)
+//	    {
+//	        var index = 0;
+//	        for (var sibling = element.previousSibling; sibling; sibling = sibling.previousSibling)
+//	        {
+//	            // Ignore document type declaration.
+//	            if (sibling.nodeType == Node.DOCUMENT_TYPE_NODE)
+//	                continue;
+//
+//	            if (sibling.nodeName == element.nodeName)
+//	                ++index;
+//	        }
+//
+//	        var tagName = element.nodeName.toLowerCase();
+//	        var pathIndex = (index ? "[" + (index+1) + "]" : "");
+//	        paths.splice(0, 0, tagName + pathIndex);
+//	    }
+//	    return paths.length ? "/" + paths.join("/") : null;
+//	};	
+	
+	
 	$('#monitorLink').click(function(){
 		$('#dataDiv').hide();
 		$('#settingsDiv').hide();
@@ -83,26 +147,6 @@ $(document).ready(function() {
 		$('#monitorDiv').hide();
 		$('#dataDiv').hide();
 		$('#settingsDiv').show();
-	});
-
-	$('#fetchForm').submit(function(event){
-		event.preventDefault();
-		$.ajax({
-			url: "/fetch",
-			data: { 
-				"url": $('#url').val(), 
-			},
-			type: "GET",
-			success: function(res) {
-				var iframe = document.createElement('iframe');
-				$('#iframe').attr('srcdoc', res);
-			}
-		});
-
-	});
-
-	$('#backBn').click(function(event) {
-
 	});
 
 });

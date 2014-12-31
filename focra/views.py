@@ -162,9 +162,12 @@ def runCrawler(name, seeds, template):
     commands = ["scrapy", "crawl", "focras", "-a", "name=" + name, "-a", "seeds=" + ','.join(seeds), "-a", "template=" + template]
     crawlerProcess = subprocess.Popen(commands, stderr=PIPE)    
     while True:
-        crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', crawlerProcess.stderr.readline())
+        line = crawlerProcess.stderr.readline()
+        crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
         if crawlerAddr:
             print ''.join(crawlerAddr)
+            break;
+        if line == '' and crawlerProcess.poll() != None:
             break;
     return ''.join(crawlerAddr)
 
@@ -187,7 +190,7 @@ def fetch(request):
         try: 
             from urlparse import urljoin
             url = request.GET['url']  
-            
+
             '''
             Javascript support but very slow
             '''
@@ -213,7 +216,6 @@ def fetch(request):
             No javascript support, fast
             '''
             import urllib2
-            #r = urllib2.urlopen(url)
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             r = urllib2.urlopen(req)
             cleaned = ''
@@ -231,34 +233,35 @@ def fetch(request):
                     
                 cleaned = cleaned + line
 
-            
             from bs4 import BeautifulSoup
             soup = BeautifulSoup(cleaned)
             
             for tag in soup.find_all('a', href=True):
-                if 'http' not in tag['href']:
-                    tag['href'] = urljoin(url + "/", tag['href'])
-          
+                tag['href'] = "javascript:void(0)"
+                tag['rel'] = "javascript:void(0)"
+                tag['onclick'] = "javascript:void(0)"
+                tag['target'] = "javascript:void(0)"
+                
             for tag in soup.find_all('link', href=True):
                 if 'http' not in tag['href']:
                     tag['href'] = urljoin(url, tag['href'])
-                    print tag['href']
                     
             for tag in soup.find_all('img', src=True):
                 if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
-                    #print tag['src'] 
                     
             for tag in soup.find_all('script', src=True):
                 if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
-                    #print tag['src']
             
-            for tag in soup.find_all('script', async=True):
-                tag.decompose()
-                
-            for tag in soup.find_all('iframe', src=True):
-                tag.decompose()
+#             for tag in soup.find_all('script', async=True):
+#                 tag.decompose()
+#                   
+#             for tag in soup.find_all('iframe', src=True):
+#                 tag['src'] = ""
+            
+            css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
+            soup.head.append(css_tag)
             
             from django.utils.safestring import mark_safe
             return HttpResponse(mark_safe(soup.prettify()))

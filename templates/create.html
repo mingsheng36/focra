@@ -3,7 +3,28 @@
 {% block title %}Create Crawler{% endblock %}
 {% block body_block %}
 
-<div id="createDiv" class="hide">
+<div id="selectDiv">
+	<form id="create" method="post" action="/create">
+	{% csrf_token %}
+		<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
+		Name: <input type="text" name="crawlerName" value="testspider" size="30" placeholder="e.g. MySpider">
+		<button id="create" type="submit" style="margin-right:10px;">Create</button>
+		URL : <input id="url" name="crawlerSeeds"type="url" value="http://forums.hardwarezone.com.sg/eat-drink-man-woman-16/glgt-lady-has-over-500k-stock-portfolio-older-blog-post-shows-cdp-statement-4917251.html" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
+		<button id="fetchBn" type="button" >Fetch</button>
+	</form>
+	<br/>
+	
+	<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
+	
+	<div id="template">
+
+	</div>
+</div>
+
+{% endblock %}
+		
+<!---
+<div id="createDiv">
 
 	<h1 id="display">Customise Your Crawler</h1>
 	<form id="create" method="post" action="/create">
@@ -26,18 +47,14 @@
 	</form>
 	
 	<br/>
-	
-</div>
 
-<div id="selectDiv">
-	
-	<form id="fetchForm">
-	Enter Seed URL: <input id="url" type="url" value="https://www.facebook.com/" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
-	<button id="fetchBn" type="submit">Fetch</button> 
-	<button id="backBn" type="button">Back</button>
-	</form>
-	
-	<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
 </div>
+--->
 
-{% endblock %}
+		<!---
+		<div class="row">
+			Field: <input class="field" type="text" value="field1" size="10" placeholder="field1">
+			XPath: <input class="xpath" type="text" size="40" placeholder="xpath1">
+			<br/><br/>
+		</div>
+		--->

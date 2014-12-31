@@ -22,11 +22,15 @@ class FocraSpider(Spider):
 	
 	def __init__(self, **kwargs):
 		super(FocraSpider, self).__init__(**kwargs)
-		print 'focras init() kwargs ' + kwargs.get('seeds')
-		print 'focras init() kwargs '+ self.template
-		self.template = json.loads(self.template, object_pairs_hook=collections.OrderedDict)
-		self.start_urls =  kwargs.get('seeds').split(',')
-		self.item = Item()
+		print 'focras init() kwargs seeds ' + kwargs.get('seeds')
+		print 'focras init() kwargs template '+ self.template
+		try:
+			self.template = json.loads(self.template, object_pairs_hook=collections.OrderedDict)
+			self.start_urls =  kwargs.get('seeds').split(',')
+			self.item = Item()
+		except Exception as error:
+			print error
+		
 	
 	def dont_close_me(self):
 		raise DontCloseSpider("Not Closed")
@@ -39,7 +43,6 @@ class FocraSpider(Spider):
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
-				
 			yield dynamicItemLoader.load_item()
 			
 		except Exception as err:
