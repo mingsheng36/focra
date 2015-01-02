@@ -6,7 +6,10 @@ from scrapy.utils.jsonrpc import jsonrpc_client_call
 from models import Crawler
 import json, collections
 from datetime import datetime
-
+from bson.json_util import dumps
+from pymongo import MongoClient
+client = MongoClient('localhost', 27017)
+db = client['CrawlerDB']
 '''
 welcome page and sign up page
 ''' 
@@ -63,6 +66,7 @@ def crawler(request, username=None, crawlerName=None):
             request.session['crawlerAddr'] = crawler.crawlerAddr
             request.session['crawlerSeeds'] = crawler.crawlerSeeds
             request.session['crawlerTemplate']= crawler.crawlerTemplate
+            # Retrieve and convert template into an ordered dict
             t = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
             return render(request, 'crawler.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
     
@@ -112,7 +116,10 @@ def deleteCrawler(request):
             crawlers = request.session.get('crawlers')
             crawlers.remove(crawlerName)
             request.session['crawlers'] = crawlers
+            collection = db[crawlerName]
+            collection.drop()
             return HttpResponse(crawlerName + " has been deleted.")
+        
         except Exception as err:
             print err
     return
@@ -181,7 +188,7 @@ def stopCrawler(addr):
         print 'Expected stop error, dont worry'
 
 '''
-fetch seed url page
+fetch seed url page plus HTML pre processing
 '''
 def fetch(request):
     
@@ -269,3 +276,10 @@ def fetch(request):
         except Exception as err:
             print err
             
+def data(request):
+    try: 
+        crawlerName = request.session.get('crawlerName')
+        collection = db[crawlerName]
+        return HttpResponse(dumps(collection.find()))
+    except Exception as e:
+        print e

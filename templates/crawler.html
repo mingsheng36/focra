@@ -16,21 +16,28 @@
 			<button id="stopBn" type="button" disabled>Stop Crawler</button>
 	{% endif %}
 	
-	<div id="monitorDiv">
+	<div id="monitorDiv" >
 		{% for seed in crawler.crawlerSeeds %}
 			<p>Seeds: {{ seed }}</p>
 		{% endfor %}
 		{% for key, value in t.items %}
-    		{{ key }} : 
+    		{{ key }} :
     		<input type="text" value="{{ value }}" size="80">
     		<br/><br/>
 		{% endfor %}
 	</div>
-	
+
 	<div id="dataDiv" class="hide">
-		<p>DATA</p>
-	</div>	
-	
+		<br />
+		<table id="crawlerData" class="hide" style="width: 100%">
+			<tr>
+				{% for key in t.keys %}
+				<th class="fields">{{ key }}</th>
+				{% endfor %}
+			</tr>
+		</table>
+	</div>
+
 	<div id="settingsDiv" class="hide">
 		<br/>
 		<button id="deleteBn" type="button">Delete Crawler</button>

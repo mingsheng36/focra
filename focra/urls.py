@@ -8,6 +8,7 @@ urlpatterns = patterns('',
     url(r'^stop$', views.stopCrawl, name='stopCrawl'),
     url(r'^delete$', views.deleteCrawler, name='deleteCrawler'),
     url(r'^fetch$', views.fetch, name='fetch'),
+    url(r'^data$', views.data, name='data'),
     url(r'^(?P<username>\w+)$', views.overview, name='overview'),
     url(r'^(?P<username>\w+)/(?P<crawlerName>\w+)$', views.crawler, name='crawler'),
 )

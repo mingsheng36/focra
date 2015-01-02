@@ -60,6 +60,7 @@ $(document).ready(function() {
 		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
 
+	// fetch a page based on url
 	$('#fetchBn').click(function(event){
 		event.preventDefault();
 		$.ajax({
@@ -75,10 +76,17 @@ $(document).ready(function() {
 
 	});
 
+	// iframe event handlers for visual selection
 	var fieldnum = 0
 	$('#iframe').load(function(){
 		$(this.contentWindow.document).mouseover(function (event) {
-			$(event.target).addClass( "outline-element" );
+			if ($(event.target).prop("tagName").toLowerCase() == 'img') {
+				$(event.target).addClass( "outline-element" );
+			} 
+			else if ($(event.target).clone().children().remove().end().text().trim()) {
+				$('#display').html($(event.target).clone().children().remove().end().text());
+				$(event.target).addClass( "outline-element" );
+			}
 		}).mouseout(function (event) {
 			$(event.target).removeClass('outline-element');
 		}).click(function (event) {
@@ -93,8 +101,10 @@ $(document).ready(function() {
 		});
 	});	
 	
+	// function to get xpath from the iframe DOM object
 	function getElementTreeXPath(element) {
-		return "/" + $(element).parents().andSelf().map(function() {
+		var xpath_length = $(element).parents().andSelf().length;
+		return "/" + $(element).parents().andSelf().map(function(i, obj) {
 			var $this = $(this);
 			var tagName = this.nodeName;
 			
@@ -103,8 +113,15 @@ $(document).ready(function() {
 			} else if ($this.siblings(tagName).length > 0) {
 				tagName += "[" + ($this.prevAll(tagName).length + 1) + "]";
 			}
+			if (i == xpath_length-1) {
+				if (tagName.toLowerCase() == 'img') {
+					tagName = tagName + "/@src";
+				} else {
+					tagName = tagName + "/text()";
+				}
+			}
 			return tagName;
-		}).get().join("/").toLowerCase() + "/text()";
+		}).get().join("/").toLowerCase();
 	};
 	
 // 	Firebug implementation of getting XPath
@@ -132,17 +149,56 @@ $(document).ready(function() {
 //	    return paths.length ? "/" + paths.join("/") : null;
 //	};	
 	
-	
+	// monitor section
 	$('#monitorLink').click(function(){
 		$('#dataDiv').hide();
 		$('#settingsDiv').hide();
 		$('#monitorDiv').show();
 	});
+	
+	// load data section
+	var loaded = false;
+	var fields = [];
+	$(".fields").each(function(){
+		fields.push($(this).html());
+	});
+	
 	$('#dataLink').click(function(){
 		$('#monitorDiv').hide();
 		$('#settingsDiv').hide();
 		$('#dataDiv').show();
+		
+		if (!loaded) {
+			$.ajax({
+				url: "/data",
+				type: "GET",
+				success: function(res) {
+					//empty not loaded
+					if (res.length == 2) {
+						loaded = false;
+					}
+					else {
+						var data = $.parseJSON(res);
+						$.each(data, function(i, obj) {
+							var rowData = "";
+							for (i = 0; i < fields.length; i++) { 
+							    rowData = rowData + "<td>" + obj[fields[i]] + "</td>"
+							}
+							
+							$('#crawlerData').append(
+								"<tr>" + rowData + "</tr>"		
+							);
+						});
+						loaded = true;
+						$('#crawlerData').show();
+					}
+				}
+			});
+			
+		}
 	});
+	
+	// settings section
 	$('#settingsLink').click(function(){
 		$('#monitorDiv').hide();
 		$('#dataDiv').hide();

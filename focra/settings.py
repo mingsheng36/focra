@@ -29,10 +29,13 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 from mongoengine import connect
-MONGO_DATABASE_NAME = 'FocraDB'
+FOCRA_DB = 'FocraDB'
+CRAWLER_DB = 'CrawlerDB'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
-connect(MONGO_DATABASE_NAME, host=MONGO_HOST, port=MONGO_PORT)
+
+connect(FOCRA_DB, 'default' ,host=MONGO_HOST, port=MONGO_PORT)
+connect(CRAWLER_DB, 'crawler_db' ,host=MONGO_HOST, port=MONGO_PORT)
 
 # Application definition
 
@@ -60,7 +63,6 @@ ROOT_URLCONF = 'focra.urls'
 
 WSGI_APPLICATION = 'focra.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -81,7 +83,7 @@ MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
 SESSION_ENGINE = 'mongoengine.django.sessions'
 SESSION_SERIALIZER = 'mongoengine.django.sessions.BSONSerializer'
 
-# Internationalization
+# Internationalisation
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'

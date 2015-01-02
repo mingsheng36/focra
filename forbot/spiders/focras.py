@@ -39,8 +39,9 @@ class FocraSpider(Spider):
 		try:
 			print "Focras - parsing item"
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
-			
 			for key, value in self.template.iteritems():
+				print key
+				#print key, value
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
 			yield dynamicItemLoader.load_item()
