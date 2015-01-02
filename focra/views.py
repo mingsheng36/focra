@@ -54,7 +54,7 @@ def overview(request, username):
             return redirect('/')
 
 '''
-Crawler page for crawlers to show stats
+Crawler page to manage crawler
 '''   
 def crawler(request, username=None, crawlerName=None):
     if request.method == 'GET':
@@ -71,7 +71,7 @@ def crawler(request, username=None, crawlerName=None):
             return render(request, 'crawler.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
     
 '''
-To create crawler page
+Create a new crawler
 '''
 def createCrawler(request):
     username = request.session.get('username')
@@ -100,13 +100,13 @@ def createCrawler(request):
     return redirect('/')
  
 '''
-To update current crawler in session
+Update current crawler in session
 '''
 def updateCrawler(request):
     return
 
 '''
-To delete current crawler in session
+Delete current crawler in session
 '''
 def deleteCrawler(request):
     if request.method == 'POST':  
@@ -125,7 +125,7 @@ def deleteCrawler(request):
     return
 
 '''
-To handle start crawler requests
+Handle start crawler requests
 '''
 def startCrawl(request):  
     if request.method == 'POST':  
@@ -145,7 +145,7 @@ def startCrawl(request):
     return redirect('/')
     
 '''
-To handle stop crawler requests
+Handle stop crawler requests
 '''      
 def stopCrawl(request):
     if request.method == 'POST':
@@ -162,8 +162,8 @@ def stopCrawl(request):
     return redirect('/')
 
 '''
-starting the crawler through cmdline in local machine
-needs to be changed to start through http call for scalability
+Starting the crawler through cmdline in local machine
+Needs to be changed to start through HTTP call for scalability
 '''  
 def runCrawler(name, seeds, template):
     commands = ["scrapy", "crawl", "focras", "-a", "name=" + name, "-a", "seeds=" + ','.join(seeds), "-a", "template=" + template]
@@ -179,16 +179,16 @@ def runCrawler(name, seeds, template):
     return ''.join(crawlerAddr)
 
 '''
-stopping crawler through jsonrpc
+Stopping crawler through JSONRPC
 '''  
 def stopCrawler(addr):
     try: 
         jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
     except:
-        print 'Expected stop error, dont worry'
+        print 'Expected stop error, don\'t worry'
 
 '''
-fetch seed url page plus HTML pre processing
+Fetch seed URl and do HTML pre-processing
 '''
 def fetch(request):
     
@@ -199,7 +199,7 @@ def fetch(request):
             url = request.GET['url']  
 
             '''
-            Javascript support but very slow
+            JavaScript support but very slow
             '''
 #             import os
 #             p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py', url], stdout=PIPE)  
@@ -220,7 +220,7 @@ def fetch(request):
 #                 cleaned = cleaned + str(res)
             
             '''
-            No javascript support, fast
+            No JavaScript support, fast
             '''
             import urllib2
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -260,13 +260,15 @@ def fetch(request):
             for tag in soup.find_all('script', src=True):
                 if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
+                               
+            for tag in soup.find_all('iframe', src=True):
+                tag['src'] = ""
             
 #             for tag in soup.find_all('script', async=True):
 #                 tag.decompose()
-#                   
-#             for tag in soup.find_all('iframe', src=True):
-#                 tag['src'] = ""
-            
+            '''
+            Inject Focra CSS into the HTMLl response
+            '''
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
             soup.head.append(css_tag)
             
@@ -275,7 +277,10 @@ def fetch(request):
     
         except Exception as err:
             print err
-            
+
+'''
+Display Crawler data from CrawlerDB
+'''
 def data(request):
     try: 
         crawlerName = request.session.get('crawlerName')

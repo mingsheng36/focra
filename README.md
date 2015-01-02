@@ -3,34 +3,30 @@ FOCRA
 **A Visual, Distributed and Cloud based Web Crawler** built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 
 #####WEEK 14 (22-28/12/2014)
-- ~~Create the template object for crawler~~
-- ~~Store template xpath in crawler~~
-- ~~Load data into the xpath according to fields~~
-- ~~Store into database~~
+- ~~Create the template object for Crawler~~
+- ~~Store template XPath in Crawler~~
+- ~~Load data with XPath according to fields~~
+- ~~Store into external database~~
 
 #####WEEK 15 (29-04/01/2015)
-- ~~Allow user to visually choose xpath~~
+- ~~Allow user to visually choose XPath~~
 - ~~Load and display data in table format~~
-- Algorithms to detect similar xpaths and retrieve them (important)
-- Export data to excel, csv, xml or json
-- Create server for json query
-- Create server for crawler to start
+- Algorithms to detect similar XPaths and retrieve them (important)
 - Start crawler through schedule API
-- *Create a url to query data*
+- Export data to Excel, CSV, or JSON
+- *Create a URL to query data*
 
 #####WEEK 16 (05-11/01/2014)
-(TYPES OF CRAWL)
 - Pagination
 - List of URLs to crawl
 - *Whole domain name crawl*
 - *List of domain name crawl*
-- *Javascript/Ajax*
+- *JavaScript or AJAX*
 
 #####WEEK 17 (START OF SEMESTER 2, 12-18/01/2015)
-CRAWLER SETTINGS
-- Add scheduling to crawler
-- Add updating/edit of crawler
-- *all of scrapy settings*
+- Scheduling the Crawler
+- Editing the Crawler
+- *All of Scrapy's settings*
 
 #####WEEK 18 (19-25/01/2015)
 - Improve on design based on USER evaluation

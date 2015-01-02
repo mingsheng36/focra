@@ -182,11 +182,11 @@ $(document).ready(function() {
 						$.each(data, function(i, obj) {
 							var rowData = "";
 							for (i = 0; i < fields.length; i++) { 
-							    rowData = rowData + "<td>" + obj[fields[i]] + "</td>"
+								rowData = rowData + "<td>" + obj[fields[i]] + "</td>"
 							}
-							
+
 							$('#crawlerData').append(
-								"<tr>" + rowData + "</tr>"		
+									"<tr>" + rowData + "</tr>"		
 							);
 						});
 						loaded = true;
