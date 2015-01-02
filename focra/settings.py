@@ -30,12 +30,10 @@ ALLOWED_HOSTS = []
 
 from mongoengine import connect
 FOCRA_DB = 'FocraDB'
-CRAWLER_DB = 'CrawlerDB'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
 
 connect(FOCRA_DB, 'default' ,host=MONGO_HOST, port=MONGO_PORT)
-connect(CRAWLER_DB, 'crawler_db' ,host=MONGO_HOST, port=MONGO_PORT)
 
 # Application definition
 
