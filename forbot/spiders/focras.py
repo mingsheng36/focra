@@ -44,6 +44,10 @@ class FocraSpider(Spider):
 				#print key, value
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
+				'''
+				data extracted per xpath are in a list format, separated by '\r\n' or maybe '\n'
+				need to join them together
+				'''
 			yield dynamicItemLoader.load_item()
 			
 		except Exception as err:

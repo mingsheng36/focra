@@ -82,15 +82,16 @@ def createCrawler(request):
     if request.method == 'POST':   
         if username:
             crawlerName = request.POST['crawlerName']
+            crawlerSeeds=request.POST['crawlerSeeds'].split('\r\n')
+            crawlerTemplate=request.POST['crawlerTemplate']
             try:
-                crawlerAddr = "127.0.0.1:6080"
-                #crawlerAddr = runCrawler(crawlerName, seeds, crawlerTemplate);
+                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate)
                 Crawler(crawlerName=crawlerName, 
-                        crawlerSeeds=request.POST['crawlerSeeds'].split('\r\n'), 
+                        crawlerSeeds=crawlerSeeds, 
                         crawlerAddr=crawlerAddr, 
                         crawlerStatus='running', 
                         crawlerOwner=username, 
-                        crawlerTemplate=request.POST['crawlerTemplate'],
+                        crawlerTemplate=crawlerTemplate,
                         crawlerDateTime=datetime.now()).save()            
             except Exception as err:
                 print err
@@ -267,7 +268,7 @@ def fetch(request):
 #             for tag in soup.find_all('script', async=True):
 #                 tag.decompose()
             '''
-            Inject Focra CSS into the HTMLl response
+            Inject Focra CSS into the HTML response
             '''
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
             soup.head.append(css_tag)

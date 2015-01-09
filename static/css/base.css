@@ -1,53 +1,15 @@
-html {
-	width: 99%;
-	height: 98%;
-}
-
 body {
-	width: 100%;
-	height: 99%;
-}
-
-#wrapper {
-	width: 100%;
-	height: 100%;
-}
-
-#navbar {
-	width: 17%;
-	height: 100%;
-	text-align: center;
-	background-color: #eeeeee;
-	float: left;
-	min-height: 100%;
-}
-
-#main {
-	width: 83%;
-	height: 100%; 
-	text-align : center;
-	float: left;
-	min-height: 100%;
-	text-align: center;
-}
-
-#selectDiv {
-	width: 100%;
-	height: 100%;
+	padding-top:70px;
 }
 
 #iframe {
-	width: 98%;
-	height: 90%;
+	width: 100%;
+	height: 50vh;
 	border: 0; 
 	-webkit-transform: (0.5);
 	-moz-transform-scale: (0.5);
 }
 
-.hide {
+.hides {
 	display: none;
-}
-
-table, th, td {
-    border: 1px solid black;
 }

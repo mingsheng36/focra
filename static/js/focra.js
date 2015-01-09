@@ -79,25 +79,39 @@ $(document).ready(function() {
 	// iframe event handlers for visual selection
 	var fieldnum = 0
 	$('#iframe').load(function(){
+		var contain_texts;
 		$(this.contentWindow.document).mouseover(function (event) {
+			contain_texts = $(event.target).clone().children().remove().end().text();
 			if ($(event.target).prop("tagName").toLowerCase() == 'img') {
+				$('#display').html($(event.target).attr("src").toLowerCase());
 				$(event.target).addClass( "outline-element" );
 			} 
-			else if ($(event.target).clone().children().remove().end().text().trim()) {
-				$('#display').html($(event.target).clone().children().remove().end().text());
+			else if (contain_texts.trim()) {
+				$('#display').html(contain_texts);
 				$(event.target).addClass( "outline-element" );
 			}
 		}).mouseout(function (event) {
 			$(event.target).removeClass('outline-element');
 		}).click(function (event) {
-			$(event.target).toggleClass('outline-element-clicked');
-			//alert(getXPath(event.target));
-			fieldnum += 1;
-			$('#template').append('<div class="row">' + 
-					'Field: <input class="field" type="text" value="field' + fieldnum +'" size="10" placeholder="e.g. MySpider">  ' +
-					'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="40" placeholder="e.g. MySpider">' +
-					'<br/><br/></div>'
-			);
+			if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts.trim()) {
+				$(event.target).toggleClass('outline-element-clicked');
+				fieldnum += 1;
+				$('#templates').append('<div class="row">' + 
+						'Field: <input class="field" type="text" value="field' + fieldnum +'" size="10" placeholder="e.g. MySpider">  ' +
+						'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="80" placeholder="e.g. MySpider">' +
+						'<br/><br/></div>'
+				);
+				
+//				alert($('#iframe').contents().xpath(getElementTreeXPathNode(event.target)).html());
+//				alert(
+//						document.getElementById('iframe').contentWindow.document.evaluate(
+//								getElementTreeXPathNode(event.target),
+//								document.getElementById('iframe').contentWindow.document,
+//								null,
+//								XPathResult.FIRST_ORDERED_NODE_TYPE,
+//								null).singleNodeValue.textContent
+//					);
+			}
 		});
 	});	
 	
@@ -120,6 +134,26 @@ $(document).ready(function() {
 					tagName = tagName + "/text()";
 				}
 			}
+			return tagName;
+		}).get().join("/").toLowerCase();
+	};
+	
+	function getElementTreeXPathNode(element) {
+		var xpath_length = $(element).parents().andSelf().length;
+		return "/" + $(element).parents().andSelf().map(function(i, obj) {
+			var $this = $(this);
+			var tagName = this.nodeName;
+			
+			if ($this.siblings(tagName).length > 0) {
+				tagName += "[" + ($this.prevAll(tagName).length + 1) + "]";
+			}
+//			if (i == xpath_length-1) {
+//				if (tagName.toLowerCase() == 'img') {
+//					tagName = tagName + "/@src";
+//				} else {
+//					tagName = tagName + "/text()";
+//				}
+//			}
 			return tagName;
 		}).get().join("/").toLowerCase();
 	};

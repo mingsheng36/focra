@@ -27,9 +27,9 @@
 		{% endfor %}
 	</div>
 
-	<div id="dataDiv" class="hide">
+	<div id="dataDiv">
 		<br />
-		<table id="crawlerData" class="hide" style="width: 100%">
+		<table id="crawlerData" class="hides table" style="width: 100%">
 			<tr>
 				{% for key in t.keys %}
 				<th class="fields">{{ key }}</th>
@@ -38,7 +38,7 @@
 		</table>
 	</div>
 
-	<div id="settingsDiv" class="hide">
+	<div id="settingsDiv" class="hides">
 		<br/>
 		<button id="deleteBn" type="button">Delete Crawler</button>
 	</div>
