@@ -5,17 +5,21 @@
 
 <div id="mainDiv" class="main">
 
-	<a id="monitorLink" href="#monitor">Monitor</a> | <a id="dataLink" href="#data">Data</a> | <a id="settingsLink" href="#settings">Settings</a>
+	<div class="btn-group btn-group-sm">
+  		<button id="monitorLink" type="button" class="btn btn-default">Monitor</button>
+  		<button id="dataLink" type="button" class="btn btn-default">Data</button>
+  		<button id="settingsLink" type="button" class="btn btn-default">Settings</button>
+	</div>
 	{% if crawler.crawlerStatus == 'running' %}
 			<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
-			<button id="startBn" type="button" disabled>Start Crawler</button>
+			<button id="startBn" type="button" disabled >Start Crawler</button>
 			<button id="stopBn" type="button">Stop Crawler</button>
 		{% else %}
 			<h1 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h1>
-			<button id="startBn" type="button">Start Crawler</button>
+			<button id="startBn" type="button" >Start Crawler</button>
 			<button id="stopBn" type="button" disabled>Stop Crawler</button>
 	{% endif %}
-	
+		
 	<div id="monitorDiv" >
 		{% for seed in crawler.crawlerSeeds %}
 			<p>Seeds: {{ seed }}</p>
@@ -27,9 +31,9 @@
 		{% endfor %}
 	</div>
 
-	<div id="dataDiv">
+	<div id="dataDiv" class="table-responsive">
 		<br />
-		<table id="crawlerData" class="hides table" style="width: 100%">
+		<table id="crawlerData" class="hides table table-bordered table-striped" style="width: 100%">
 			<tr>
 				{% for key in t.keys %}
 				<th class="fields">{{ key }}</th>
@@ -38,9 +42,9 @@
 		</table>
 	</div>
 
-	<div id="settingsDiv" class="hides">
+	<div id="settingsDiv" class="hides" >
 		<br/>
-		<button id="deleteBn" type="button">Delete Crawler</button>
+		<button id="deleteBn" class="btn btn-danger" type="button" data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete Crawler</button>
 	</div>
 	
 </div>

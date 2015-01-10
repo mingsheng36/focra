@@ -62,7 +62,8 @@ $(document).ready(function() {
 
 	// fetch a page based on url
 	$('#fetchBn').click(function(event){
-		event.preventDefault();
+		//event.preventDefault();
+		alert('hi');
 		$.ajax({
 			url: "/fetch",
 			data: { 
@@ -115,7 +116,7 @@ $(document).ready(function() {
 		});
 	});	
 	
-	// function to get xpath from the iframe DOM object
+	// function to get absolute xpath from the iframe DOM object
 	function getElementTreeXPath(element) {
 		var xpath_length = $(element).parents().andSelf().length;
 		return "/" + $(element).parents().andSelf().map(function(i, obj) {
@@ -138,6 +139,7 @@ $(document).ready(function() {
 		}).get().join("/").toLowerCase();
 	};
 	
+	// function to get xpath node from the iframe DOM object
 	function getElementTreeXPathNode(element) {
 		var xpath_length = $(element).parents().andSelf().length;
 		return "/" + $(element).parents().andSelf().map(function(i, obj) {
@@ -147,42 +149,10 @@ $(document).ready(function() {
 			if ($this.siblings(tagName).length > 0) {
 				tagName += "[" + ($this.prevAll(tagName).length + 1) + "]";
 			}
-//			if (i == xpath_length-1) {
-//				if (tagName.toLowerCase() == 'img') {
-//					tagName = tagName + "/@src";
-//				} else {
-//					tagName = tagName + "/text()";
-//				}
-//			}
 			return tagName;
 		}).get().join("/").toLowerCase();
 	};
-	
-// 	Firebug implementation of getting XPath
-//	function getElementTreeXPath(element)
-//	{
-//	    var paths = [];
-//	    // Use nodeName (instead of localName) so namespace prefix is included (if any).
-//	    for (; element && element.nodeType == 1; element = element.parentNode)
-//	    {
-//	        var index = 0;
-//	        for (var sibling = element.previousSibling; sibling; sibling = sibling.previousSibling)
-//	        {
-//	            // Ignore document type declaration.
-//	            if (sibling.nodeType == Node.DOCUMENT_TYPE_NODE)
-//	                continue;
-//
-//	            if (sibling.nodeName == element.nodeName)
-//	                ++index;
-//	        }
-//
-//	        var tagName = element.nodeName.toLowerCase();
-//	        var pathIndex = (index ? "[" + (index+1) + "]" : "");
-//	        paths.splice(0, 0, tagName + pathIndex);
-//	    }
-//	    return paths.length ? "/" + paths.join("/") : null;
-//	};	
-	
+		
 	// monitor section
 	$('#monitorLink').click(function(){
 		$('#dataDiv').hide();
