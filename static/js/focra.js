@@ -49,21 +49,9 @@ $(document).ready(function() {
 		} 
 	});
 
-	// add crawler template into form before submit crawler
-	$('#create').submit(function( event ) {
-		var crawlerTemplate = []
-		$(".row").each(function(){
-			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
-				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
-			}
-		});
-		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
-	});
-
 	// fetch a page based on url
 	$('#fetchBn').click(function(event){
 		//event.preventDefault();
-		alert('hi');
 		$.ajax({
 			url: "/fetch",
 			data: { 
@@ -72,9 +60,21 @@ $(document).ready(function() {
 			type: "GET",
 			success: function(res) {
 				$('#iframe').attr('srcdoc', res);
+				$('#templates').empty();
 			}
 		});
 
+	});
+	
+	// add crawler template into form before submit crawler
+	$('#create').submit(function( event ) {
+		var crawlerTemplate = []
+		$(".template_field").each(function(){
+			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
+				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
+			}
+		});
+		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
 
 	// iframe event handlers for visual selection
@@ -97,7 +97,7 @@ $(document).ready(function() {
 			if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts.trim()) {
 				$(event.target).toggleClass('outline-element-clicked');
 				fieldnum += 1;
-				$('#templates').append('<div class="row">' + 
+				$('#templates').append('<div class="template_field">' + 
 						'Field: <input class="field" type="text" value="field' + fieldnum +'" size="10" placeholder="e.g. MySpider">  ' +
 						'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="80" placeholder="e.g. MySpider">' +
 						'<br/><br/></div>'
@@ -153,13 +153,6 @@ $(document).ready(function() {
 		}).get().join("/").toLowerCase();
 	};
 		
-	// monitor section
-	$('#monitorLink').click(function(){
-		$('#dataDiv').hide();
-		$('#settingsDiv').hide();
-		$('#monitorDiv').show();
-	});
-	
 	// load data section
 	var loaded = false;
 	var fields = [];
@@ -167,10 +160,7 @@ $(document).ready(function() {
 		fields.push($(this).html());
 	});
 	
-	$('#dataLink').click(function(){
-		$('#monitorDiv').hide();
-		$('#settingsDiv').hide();
-		$('#dataDiv').show();
+	$('#data_tab').click(function(){
 		
 		if (!loaded) {
 			$.ajax({
@@ -194,7 +184,6 @@ $(document).ready(function() {
 							);
 						});
 						loaded = true;
-						$('#crawlerData').show();
 					}
 				}
 			});
@@ -202,11 +191,4 @@ $(document).ready(function() {
 		}
 	});
 	
-	// settings section
-	$('#settingsLink').click(function(){
-		$('#monitorDiv').hide();
-		$('#dataDiv').hide();
-		$('#settingsDiv').show();
-	});
-
 });

@@ -113,6 +113,7 @@ def deleteCrawler(request):
     if request.method == 'POST':  
         try:
             crawlerName = request.session.get('crawlerName')
+            stopCrawler(request.session.get('crawlerAddr'))
             Crawler.objects(crawlerName=crawlerName).delete()
             crawlers = request.session.get('crawlers')
             crawlers.remove(crawlerName)

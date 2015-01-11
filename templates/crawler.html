@@ -3,50 +3,59 @@
 {% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
 
-<div id="mainDiv" class="main">
-
-	<div class="btn-group btn-group-sm">
-  		<button id="monitorLink" type="button" class="btn btn-default">Monitor</button>
-  		<button id="dataLink" type="button" class="btn btn-default">Data</button>
-  		<button id="settingsLink" type="button" class="btn btn-default">Settings</button>
-	</div>
-	{% if crawler.crawlerStatus == 'running' %}
-			<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
-			<button id="startBn" type="button" disabled >Start Crawler</button>
-			<button id="stopBn" type="button">Stop Crawler</button>
-		{% else %}
-			<h1 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h1>
-			<button id="startBn" type="button" >Start Crawler</button>
-			<button id="stopBn" type="button" disabled>Stop Crawler</button>
-	{% endif %}
-		
-	<div id="monitorDiv" >
-		{% for seed in crawler.crawlerSeeds %}
-			<p>Seeds: {{ seed }}</p>
-		{% endfor %}
-		{% for key, value in t.items %}
-    		{{ key }} :
-    		<input type="text" value="{{ value }}" size="80">
-    		<br/><br/>
-		{% endfor %}
-	</div>
-
-	<div id="dataDiv" class="table-responsive">
-		<br />
-		<table id="crawlerData" class="hides table table-bordered table-striped" style="width: 100%">
-			<tr>
-				{% for key in t.keys %}
-				<th class="fields">{{ key }}</th>
-				{% endfor %}
-			</tr>
-		</table>
-	</div>
-
-	<div id="settingsDiv" class="hides" >
-		<br/>
-		<button id="deleteBn" class="btn btn-danger" type="button" data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete Crawler</button>
+	<div class="jumbotron">
+		{% if crawler.crawlerStatus == 'running' %}
+				<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
+				<button id="startBn" type="button" disabled >Start Crawler</button>
+				<button id="stopBn" type="button">Stop Crawler</button>
+			{% else %}
+				<h1 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h1>
+				<button id="startBn" type="button" >Start Crawler</button>
+				<button id="stopBn" type="button" disabled>Stop Crawler</button>
+		{% endif %}
 	</div>
 	
-</div>
+	<div role="tabpanel">
+
+		<ul class="nav nav-tabs" role="tablist">
+			<li id="monitor_tab" role="presentation" class="active"><a href="#monitor" aria-controls="monitor" role="tab" data-toggle="tab">Monitor</a></li>
+			<li id="data_tab" role="presentation"><a href="#data" aria-controls="data" role="tab" data-toggle="tab">Data</a></li>
+			<li id="settings_tab" role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+		</ul>
+
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="monitor">
+				<br/>
+				{% for seed in crawler.crawlerSeeds %}
+					<p>Seeds: {{ seed }}</p>
+				{% endfor %}
+				{% for key, value in t.items %}
+		    		{{ key }} :
+		    		<input type="text" value="{{ value }}" size="80">
+		    		<br/><br/>
+				{% endfor %}				
+			</div>
+			
+			<div role="tabpanel" class="tab-pane fade table-responsive" id="data">
+				<br />
+				<table id="crawlerData" class="table table-bordered table-striped"
+					style="width: 100%">
+					<tr>
+						{% for key in t.keys %}
+						<th class="fields">{{ key }}</th>
+						{% endfor %}
+					</tr>
+				</table>
+			</div>
+			
+			<div role="tabpanel" class="tab-pane fade" id="settings">
+				<br />
+				<button id="deleteBn" class="btn btn-danger" type="button"
+					data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete
+					Crawler</button>
+			</div>
+		</div>
+
+	</div>
 
 {% endblock %}
