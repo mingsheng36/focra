@@ -49,8 +49,20 @@ $(document).ready(function() {
 		} 
 	});
 
-	// fetch a page based on url
-	$('#fetchBn').click(function(event){
+	// step 1 (fetch page)
+	if ($('#url').val() != "") {
+		$('#step_one_bn').fadeIn('fast');
+	}
+	
+	$('#url').on('input propertychange', function(event) {
+		if ($('#url').val() != "") {
+			$('#step_one_bn').fadeIn('fast');
+		} else {
+			$('#step_one_bn').fadeOut('fast');
+		}
+	});
+
+	$('#step_one_bn').click(function(event) {
 		//event.preventDefault();
 		$.ajax({
 			url: "/fetch",
@@ -61,9 +73,31 @@ $(document).ready(function() {
 			success: function(res) {
 				$('#iframe').attr('srcdoc', res);
 				$('#templates').empty();
+				$('#iframe').load(function(){
+					$('#step_one').fadeOut('fast', function(event){
+						$('#step_two').fadeIn('fast');
+						$('.field').focus();
+					});
+				});
 			}
 		});
 
+	});
+	
+	var xpath = []
+	// step 2 (select fields)
+	$('.field').on('input propertychange', function(event){
+		if ($('.field').val() != "" || $('.xpath'),val() != "") {
+			$('#step_two_bn').fadeIn('fast');
+		} else {
+			$('#step_two_bn').fadeOut('fast');
+		}
+	});
+	
+	$('#step_two_bn').click(function(event) {
+		$('#step_two').fadeOut('fast', function(event){
+			$("#step_three").fadeIn('fast');
+		});
 	});
 	
 	// add crawler template into form before submit crawler
@@ -80,6 +114,7 @@ $(document).ready(function() {
 	// iframe event handlers for visual selection
 	var fieldnum = 0
 	$('#iframe').load(function(){
+		
 		var contain_texts;
 		$(this.contentWindow.document).mouseover(function (event) {
 			contain_texts = $(event.target).clone().children().remove().end().text();
@@ -99,9 +134,10 @@ $(document).ready(function() {
 				fieldnum += 1;
 				$('#templates').append('<div class="template_field">' + 
 						'Field: <input class="field" type="text" value="field' + fieldnum +'" size="10" placeholder="e.g. MySpider">  ' +
-						'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="80" placeholder="e.g. MySpider">' +
+						'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="80">' +
 						'<br/><br/></div>'
 				);
+				
 				
 //				alert($('#iframe').contents().xpath(getElementTreeXPathNode(event.target)).html());
 //				alert(
