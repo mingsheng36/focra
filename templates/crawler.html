@@ -3,7 +3,7 @@
 {% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
 
-	<div class="jumbotron">
+	<div class="jumbotron text-center">
 		{% if crawler.crawlerStatus == 'running' %}
 				<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
 				<button id="startBn" type="button" disabled >Start Crawler</button>

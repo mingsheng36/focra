@@ -2,6 +2,7 @@
 {% load staticfiles %}
 {% block title %}Create Crawler{% endblock %}
 {% block body_block %}
+ <!-- 
 	<form id="create" method="post" action="/create">
 	{% csrf_token %}
 		<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
@@ -20,8 +21,66 @@
 		</div>
 	</form>
 	<br/>
-	<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
-	<div id="templates"></div>
-	<h4 id="display"></h4>
+-->
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<form class="form-inline">
+				<div class="form-group">
+					<!-- STEP 1 -->
+					<div class="input-group hidden">
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-info dropdown-toggle"
+								data-toggle="dropdown" aria-expanded="false">Step 1</button>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="#">Step 2</a></li>
+								<li><a href="#">Step 3</a></li>
+								<li><a href="#">Step 4</a></li>
+							</ul>
+						</div>
+						<input id="url" size="100" autofocus name="crawlerSeeds" type="url"
+							class="form-control "
+							placeholder="e.g. http://forums.hardwarezone.com.sg" required
+							pattern="https?://.+"> <span class="input-group-btn">
+							<button id="fetchBn" class="btn btn-info" type="button">Next
+								Step</button>
+						</span>
+					</div>
+	
+					<!-- STEP 2 -->
+					<div class="input-group">
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-info dropdown-toggle"
+								data-toggle="dropdown" aria-expanded="false">Step 2</button>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="#">Step 1</a></li>
+								<li><a href="#">Step 3</a></li>
+								<li><a href="#">Step 4</a></li>
+							</ul>
+						</div>
+						<input id="url" size="100" autofocus name="crawlerSeeds" type="url"
+							class="form-control "
+							placeholder="e.g. http://forums.hardwarezone.com.sg" required
+							pattern="https?://.+"> <span class="input-group-btn">
+							<button id="fetchBn" class="btn btn-info" type="button">Next
+								Step</button>
+						</span>
+					</div>
+
+				</div>
+			</form>
+		</div>
+	
+		<div class="panel-body">
+	
+			<iframe id="iframe" srcdoc=""
+				sandbox="allow-scripts allow-same-origin"></iframe>
+			<div id="templates"></div>
+			<h4 id="display"></h4>
+	
+		</div>
+	
+	</div>
+
+
 {% endblock %}
 		
