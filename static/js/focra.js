@@ -56,9 +56,14 @@ $(document).ready(function() {
 	
 	$('#url').on('input propertychange', function(event) {
 		if ($('#url').val() != "") {
-			$('#step_one_bn').fadeIn('fast');
+			$('#step_one_instruction').fadeOut('fast', function(event){
+				$('#step_one_bn').fadeIn('fast');
+			});
+			
 		} else {
-			$('#step_one_bn').fadeOut('fast');
+			$('#step_one_bn').fadeOut('fast', function(event) {
+				$('#step_one_instruction').fadeIn('fast');	
+			});
 		}
 	});
 
@@ -84,15 +89,21 @@ $(document).ready(function() {
 
 	});
 	
-	var xpath = []
+	//$('.field').popover({ title: 'Twitter Bootstrap Popover', content: "It's so simple to create a tooltop for my website!" }).popover('show');
 	// step 2 (select fields)
+	var xpath = []
 	$('.field').on('input propertychange', function(event){
-		if ($('.field').val() != "" || $('.xpath'),val() != "") {
-			$('#step_two_bn').fadeIn('fast');
+		if ($('.field').val() != "") {
+			$('#step_two_instruction_1').fadeOut('fast', function(event){
+				$('#step_two_instruction_2').fadeIn('fast');
+			});
 		} else {
-			$('#step_two_bn').fadeOut('fast');
+			$('#step_two_instruction_2').fadeOut('fast', function(event){
+				$('#step_two_instruction_1').fadeIn('fast');
+			});
 		}
 	});
+	
 	
 	$('#step_two_bn').click(function(event) {
 		$('#step_two').fadeOut('fast', function(event){
@@ -100,21 +111,10 @@ $(document).ready(function() {
 		});
 	});
 	
-	// add crawler template into form before submit crawler
-	$('#create').submit(function( event ) {
-		var crawlerTemplate = []
-		$(".template_field").each(function(){
-			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
-				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
-			}
-		});
-		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
-	});
-
 	// iframe event handlers for visual selection
 	var fieldnum = 0
 	$('#iframe').load(function(){
-		
+
 		var contain_texts;
 		$(this.contentWindow.document).mouseover(function (event) {
 			contain_texts = $(event.target).clone().children().remove().end().text();
@@ -137,8 +137,14 @@ $(document).ready(function() {
 						'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="80">' +
 						'<br/><br/></div>'
 				);
-				
-				
+
+				xpath.push(getElementTreeXPath(event.target));
+				if ($('.field').val() != "" && xpath[0] != "" ){
+					$('#step_two_instruction_2').fadeOut('fast', function(event){
+						$('#add_field_bn').fadeIn('fast');
+						$('#step_two_bn').fadeIn('fast');
+					});
+				}
 //				alert($('#iframe').contents().xpath(getElementTreeXPathNode(event.target)).html());
 //				alert(
 //						document.getElementById('iframe').contentWindow.document.evaluate(
@@ -151,6 +157,17 @@ $(document).ready(function() {
 			}
 		});
 	});	
+	
+	// add crawler template into form before submit crawler
+	$('#create').submit(function( event ) {
+		var crawlerTemplate = []
+		$(".template_field").each(function(){
+			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
+				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
+			}
+		});
+		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
+	});
 	
 	// function to get absolute xpath from the iframe DOM object
 	function getElementTreeXPath(element) {

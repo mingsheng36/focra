@@ -47,6 +47,9 @@
 								placeholder="Copy and Paste Your URL here." required
 								pattern="https?://.+"> 
 						</div>
+						&nbsp;
+						<button id="step_one_instruction" class="btn btn-info" type="button">Enter Your Seed URL.</button>
+						
 						<button id="step_one_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
 					</div>
 	
@@ -62,12 +65,16 @@
 						</div>
 						<div class="form-group">	
 							<input class="field form-control" type="text" size="20" size="10" placeholder="Field Name Here">
-							<input class="xpath" type="hidden" name="crawlerTemplate" value="">
 						</div>
-
-						<button id="add_bn" style="display:none;" class="btn btn-primary" type="button">Add More Field +</button>
+						&nbsp;
+						<button id="step_two_instruction_1" class="btn btn-info" type="button">Enter a field name</button>
 						
+						<button id="step_two_instruction_2" style="display:none;" class="btn btn-info" type="button">After you are done, select data for this field below.</button>
+						
+						<button id="add_field_bn" style="display:none;" class="btn btn-primary" type="button">Add More Field +</button>
+						&nbsp;
 						<button id="step_two_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
+						
 						
 					</div>
 
