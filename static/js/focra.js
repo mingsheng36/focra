@@ -70,6 +70,7 @@ $(document).ready(function() {
 
 	$('#step_one_bn').click(function(event) {
 		$('#step_one_bn').fadeOut('fast', function(event){
+			$('#url').prop('disabled', true);
 			$('#loader').fadeIn('fast');
 		});
 		$.ajax({
@@ -83,6 +84,7 @@ $(document).ready(function() {
 				$('#templates').empty();
 				$('#iframe').load(function(){
 					$('#loader').fadeOut('fast');
+					$('#url').prop('disabled', false);
 					$('#step_one').fadeOut('fast', function(event){
 						$('#step_two').fadeIn('fast');
 						$('.field').focus();
@@ -95,27 +97,66 @@ $(document).ready(function() {
 	
 	// step 2 (select fields)
 	var xpath = []
-	if($('.field').val() != "") {
+	if ($('.field').val() != "") {
 		$('#step_two_instruction_1').hide();
 		$('#step_two_instruction_2').fadeIn('fast');
 	}
-	$('.field').on('input propertychange', function(event){
-		if ($('.field').val() != "") {
+	
+	$('#fields').on('input propertychange','.field', function(event){
+		//alert($(this).val() + $(this).index('.field'));
+		if ($(this).val() != "") {
 			$('#step_two_instruction_1').fadeOut('fast', function(event){
 				$('#step_two_instruction_2').fadeIn('fast');
 			});
-		} else if($('.field').val() != "" && xpath.length > 0){
+		} else {
 			$('#step_two_instruction_2').fadeOut('fast', function(event){
-				$('#add_field_bn').fadeOut('fast');
-				$('#step_two_bn').fadeOut('fast');
 				$('#step_two_instruction_1').fadeIn('fast');
 			});
 		}
 	});
 	
+	$('#done_bn').click(function(event) {
+		$('#done_bn').fadeOut('fast', function(event){
+			$('.field').attr('disabled','disabled');
+			$('#add_field_bn').fadeIn('fast');
+			$('#step_two_bn').fadeIn('fast');
+		});
+	});
+	
 	$('#add_field_bn').click(function(event){
-		$('.field-div').append('<input class="field form-control" type="text" size="20" size="10" placeholder="Field Name Here">' +
-			'<div class="form-control"><span class="badge">0</span></div>');
+		$('#add_field_bn').fadeOut('fast');
+		$('#step_two_bn').fadeOut('fast', function(event) {
+			$('.field-div').append(
+				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
+				'<div class="field-badge form-control">' +
+					'<span class="badge">0</span>' +
+				'</div>' +
+				'<div class="field-delete form-control" style="cursor: pointer">' +
+					'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
+				'</div>');
+			$('.field').last().focus();
+			$('#step_two_instruction_1').show();
+		});
+	});
+	
+	
+	$('#fields').on('click', '.field-delete', function(event){
+		var curr_i = $(this).index('.field-delete');
+		$('.field:eq(' + curr_i + ')').remove();
+		$('.field-badge:eq(' + curr_i + ')').empty();
+		$('.field-badge:eq(' + curr_i + ')').remove();
+		$('.field-delete:eq(' + curr_i + ')').remove();
+		xpath.splice(curr_i, 1);
+		
+		if ($('.field').length == 0) {
+			$('#step_two_bn').hide();
+			$('#done_bn').hide();
+			$('#step_two_instruction_2').hide();
+			$('#step_two_instruction_1').fadeOut('fast', function(event){
+				$('#add_field_bn').fadeIn('fast');
+			});
+		}
+
 	});
 	
 	$('#step_two_bn').click(function(event) {
@@ -130,15 +171,6 @@ $(document).ready(function() {
 		$('#step_two').fadeOut('fast', function(event){
 			$("#step_three").fadeIn('fast');
 		});
-	});
-	
-	// step 3 (crawler name)
-	$('#crawlerName').on('input propertychange', function(event){
-		if ($('#crawlerName').val() != "") {
-			$('#step_three_bn').fadeIn('fast');
-		} else {
-			$('#step_three_bn').fadeOut('fast');
-		}
 	});
 
 	// iframe event handlers for visual selection
@@ -161,11 +193,10 @@ $(document).ready(function() {
 				$(event.target).toggleClass('outline-element-clicked');
 				getElementTreeXPath(event.target)
 				xpath.push(getElementTreeXPath(event.target));
-				getRows();
+				$('.badge').last().html(getRows());
 				if ($('.field').val() != "" && xpath[0] != ""){
 					$('#step_two_instruction_2').fadeOut('fast', function(event){
-						$('#add_field_bn').fadeIn('fast');
-						$('#step_two_bn').fadeIn('fast');
+						$('#done_bn').fadeIn('fast');
 					});
 				}
 //				alert($('#iframe').contents().xpath(getElementTreeXPathNode(event.target)).html());
@@ -181,6 +212,7 @@ $(document).ready(function() {
 		});
 	});
 	
+	// Simple Tree Matching Algorithm here
 	function getRows() {
 		return 1;
 	}
@@ -221,7 +253,17 @@ $(document).ready(function() {
 			return tagName;
 		}).get().join("/").toLowerCase();
 	};
-		
+	
+	// step 3 (crawler name)
+	$('#crawlerName').on('input propertychange', function(event){
+		if ($('#crawlerName').val() != "") {
+			$('#step_three_bn').fadeIn('fast');
+		} else {
+			$('#step_three_bn').fadeOut('fast');
+		}
+	});
+	
+	/* DATA SECTION */	
 	// load data section
 	var loaded = false;
 	var fields = [];

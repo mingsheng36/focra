@@ -45,25 +45,26 @@
 								<li><a href="#">Step 3</a></li>
 							</ul>
 						</div>
-						<div class="field-div form-group">
-							<input class="field form-control" type="text" size="20" placeholder="Field Name Here">
-							<div class="form-control">
+						<div id="fields" class="field-div form-group">
+						
+							<input class="field form-control" type="text" size="15" placeholder="fieldname">
+							<div class="field-badge form-control">
 								<span class="badge">0</span>
 							</div>
+							<div class="field-delete form-control" style="cursor: pointer">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+							</div>
+							&nbsp;						
 						</div>
+	
+						<button id="step_two_instruction_1" class="btn btn-info" type="button">Enter field name</button>
 						
-						<div class="form-group">
-							&nbsp;
-						</div>
+						<button id="step_two_instruction_2" style="display:none;" class="btn btn-info" type="button">Select data by clicking on them below.</button>
 						
-						<button id="step_two_instruction_1" class="btn btn-info" type="button">Enter a field name</button>
-						
-						<button id="step_two_instruction_2" style="display:none;" class="btn btn-info" type="button">After you are done, select data for this field below.</button>
+						<button id="done_bn" style="display:none;" class="btn btn-info" type="button">Done</button>
 						
 						<button id="add_field_bn" style="display:none;" class="btn btn-primary" type="button">Add More Field +</button>
-						<div class="form-group">
-							&nbsp;
-						</div>
+						
 						<button id="step_two_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
 						
 					</div>
