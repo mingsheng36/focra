@@ -2,31 +2,12 @@
 {% load staticfiles %}
 {% block title %}Create Crawler{% endblock %}
 {% block body_block %}
- <!-- 
-	<form id="create" method="post" action="/create">
-	{% csrf_token %}
-		<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
-		Name: <input type="text" name="crawlerName" value="testspider" size="30" placeholder="e.g. MySpider">
-		<button id="create" type="submit" style="margin-right:10px;">Create</button>
-		
-		<div class="row">
-  			<div class="col-lg-5">
-	    		<div class="input-group">
-	    			<input id="url" class="form-control" name="crawlerSeeds" type="url" value="http://forums.hardwarezone.com.sg/eat-drink-man-woman-16/melody-low-damn-fap-4873943-2.html" size="50" placeholder="e.g. http://forums.hardwarezone.com.sg" required pattern="https?://.+">
-		      		<span class="input-group-btn">
-		        	<button id="fetchBn" class="btn btn-default" type="button">Go!</button>
-		      		</span>
-	    		</div>
-  			</div>
-		</div>
-	</form>
-	<br/>
--->
+
 	<div class="panel panel-default">
 		<div class="panel-heading">
 		
 			<form id="create" method="post" action="/create" class="form-inline">
-				
+				{% csrf_token %}
 				<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
 				
 				<div class="form-group">
@@ -46,13 +27,14 @@
 								class="form-control "
 								placeholder="Copy and Paste Your URL here." required
 								pattern="https?://.+"> 
+								&nbsp;
 						</div>
-						&nbsp;
+						
 						<button id="step_one_instruction" class="btn btn-info" type="button">Enter Your Seed URL.</button>
 						
 						<button id="step_one_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
 					</div>
-	
+					
 					<!-- STEP 2 -->
 					<div id="step_two" class="input-group" style="display:none;">
 						<div class="input-group-btn">
@@ -63,18 +45,26 @@
 								<li><a href="#">Step 3</a></li>
 							</ul>
 						</div>
-						<div class="form-group">	
-							<input class="field form-control" type="text" size="20" size="10" placeholder="Field Name Here">
+						<div class="field-div form-group">
+							<input class="field form-control" type="text" size="20" placeholder="Field Name Here">
+							<div class="form-control">
+								<span class="badge">0</span>
+							</div>
 						</div>
-						&nbsp;
+						
+						<div class="form-group">
+							&nbsp;
+						</div>
+						
 						<button id="step_two_instruction_1" class="btn btn-info" type="button">Enter a field name</button>
 						
 						<button id="step_two_instruction_2" style="display:none;" class="btn btn-info" type="button">After you are done, select data for this field below.</button>
 						
 						<button id="add_field_bn" style="display:none;" class="btn btn-primary" type="button">Add More Field +</button>
-						&nbsp;
+						<div class="form-group">
+							&nbsp;
+						</div>
 						<button id="step_two_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
-						
 						
 					</div>
 
@@ -89,19 +79,14 @@
 							</ul>
 						</div>
 						<div class="form-group">
-							<input class="form-control " autofocus type="text" size="30" name="crawlerName" size="30" placeholder="Your Crawler Name">
+							<input id="crawlerName" name="crawlerName" class="form-control" autofocus type="text" size="30" placeholder="Your Crawler Name">
 						</div>
-						
-						<button id="step_three_bn" class="btn btn-info" type="submit">Done!</button>
-					
+						<div class="form-group">
+							&nbsp;
+						</div>
+						<button id="step_three_bn" class="btn btn-info" style="display:none;" type="submit">Done !</button>
 					</div>
-					
-					<!-- Instructions Label 
-					
-					<div id="instructions" class="form-group">
-						<mark><strong >Enter your url e.g 'http://forums.hardwarezone.com.sg'</strong></mark>
-					</div>
-					-->
+					<img id="loader" style="display:none;" src="{% static 'images/loader.gif' %}" alt="Loading..">
 				</div>
 			</form>
 			
@@ -111,13 +96,11 @@
 	
 			<iframe id="iframe" srcdoc=""
 				sandbox="allow-scripts allow-same-origin"></iframe>
-			<div id="templates"></div>
-			<h4 id="display"></h4>
+			
+			<!-- <h4 id="display"></h4>  -->
 	
 		</div>
 	
 	</div>
-
-
 {% endblock %}
 		

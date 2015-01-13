@@ -3,16 +3,18 @@
 {% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
 
-	<div class="jumbotron text-center">
+	<div class="alert alert-success">
+		
 		{% if crawler.crawlerStatus == 'running' %}
-				<h1 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h1>
+				<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
 				<button id="startBn" type="button" disabled >Start Crawler</button>
 				<button id="stopBn" type="button">Stop Crawler</button>
 			{% else %}
-				<h1 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h1>
+				<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
 				<button id="startBn" type="button" >Start Crawler</button>
 				<button id="stopBn" type="button" disabled>Stop Crawler</button>
 		{% endif %}
+		
 	</div>
 	
 	<div role="tabpanel">

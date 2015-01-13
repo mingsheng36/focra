@@ -49,8 +49,9 @@ $(document).ready(function() {
 		} 
 	});
 
-	// step 1 (fetch page)
+	// step 1 (fetch url)
 	if ($('#url').val() != "") {
+		$('#step_one_instruction').hide();
 		$('#step_one_bn').fadeIn('fast');
 	}
 	
@@ -68,7 +69,9 @@ $(document).ready(function() {
 	});
 
 	$('#step_one_bn').click(function(event) {
-		//event.preventDefault();
+		$('#step_one_bn').fadeOut('fast', function(event){
+			$('#loader').fadeIn('fast');
+		});
 		$.ajax({
 			url: "/fetch",
 			data: { 
@@ -79,6 +82,7 @@ $(document).ready(function() {
 				$('#iframe').attr('srcdoc', res);
 				$('#templates').empty();
 				$('#iframe').load(function(){
+					$('#loader').fadeOut('fast');
 					$('#step_one').fadeOut('fast', function(event){
 						$('#step_two').fadeIn('fast');
 						$('.field').focus();
@@ -89,32 +93,56 @@ $(document).ready(function() {
 
 	});
 	
-	//$('.field').popover({ title: 'Twitter Bootstrap Popover', content: "It's so simple to create a tooltop for my website!" }).popover('show');
 	// step 2 (select fields)
 	var xpath = []
+	if($('.field').val() != "") {
+		$('#step_two_instruction_1').hide();
+		$('#step_two_instruction_2').fadeIn('fast');
+	}
 	$('.field').on('input propertychange', function(event){
 		if ($('.field').val() != "") {
 			$('#step_two_instruction_1').fadeOut('fast', function(event){
 				$('#step_two_instruction_2').fadeIn('fast');
 			});
-		} else {
+		} else if($('.field').val() != "" && xpath.length > 0){
 			$('#step_two_instruction_2').fadeOut('fast', function(event){
+				$('#add_field_bn').fadeOut('fast');
+				$('#step_two_bn').fadeOut('fast');
 				$('#step_two_instruction_1').fadeIn('fast');
 			});
 		}
 	});
 	
+	$('#add_field_bn').click(function(event){
+		$('.field-div').append('<input class="field form-control" type="text" size="20" size="10" placeholder="Field Name Here">' +
+			'<div class="form-control"><span class="badge">0</span></div>');
+	});
 	
 	$('#step_two_bn').click(function(event) {
+		var crawlerTemplate = []
+		$(".field").each(function(i){
+			if ($(this).val() != "" && xpath[i] != "") {
+				crawlerTemplate.push('"' + $(this).val() + '":"' + xpath[i] + '"');
+			}
+		});
+		// add crawler template into form
+		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 		$('#step_two').fadeOut('fast', function(event){
 			$("#step_three").fadeIn('fast');
 		});
 	});
 	
-	// iframe event handlers for visual selection
-	var fieldnum = 0
-	$('#iframe').load(function(){
+	// step 3 (crawler name)
+	$('#crawlerName').on('input propertychange', function(event){
+		if ($('#crawlerName').val() != "") {
+			$('#step_three_bn').fadeIn('fast');
+		} else {
+			$('#step_three_bn').fadeOut('fast');
+		}
+	});
 
+	// iframe event handlers for visual selection
+	$('#iframe').load(function(){
 		var contain_texts;
 		$(this.contentWindow.document).mouseover(function (event) {
 			contain_texts = $(event.target).clone().children().remove().end().text();
@@ -131,15 +159,10 @@ $(document).ready(function() {
 		}).click(function (event) {
 			if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts.trim()) {
 				$(event.target).toggleClass('outline-element-clicked');
-				fieldnum += 1;
-				$('#templates').append('<div class="template_field">' + 
-						'Field: <input class="field" type="text" value="field' + fieldnum +'" size="10" placeholder="e.g. MySpider">  ' +
-						'XPath: <input class="xpath" type="text" value="' + getElementTreeXPath(event.target) +'"size="80">' +
-						'<br/><br/></div>'
-				);
-
+				getElementTreeXPath(event.target)
 				xpath.push(getElementTreeXPath(event.target));
-				if ($('.field').val() != "" && xpath[0] != "" ){
+				getRows();
+				if ($('.field').val() != "" && xpath[0] != ""){
 					$('#step_two_instruction_2').fadeOut('fast', function(event){
 						$('#add_field_bn').fadeIn('fast');
 						$('#step_two_bn').fadeIn('fast');
@@ -156,18 +179,11 @@ $(document).ready(function() {
 //					);
 			}
 		});
-	});	
-	
-	// add crawler template into form before submit crawler
-	$('#create').submit(function( event ) {
-		var crawlerTemplate = []
-		$(".template_field").each(function(){
-			if ($(this).find('.field').val() != "" || $(this).find('.xpath').val() != "") {
-				crawlerTemplate.push('"' + $(this).find('.field').val() + '":"' + $(this).find('.xpath').val() + '"');
-			}
-		});
-		$('#crawlerTemplate').val('{' + crawlerTemplate.toString() + '}');
 	});
+	
+	function getRows() {
+		return 1;
+	}
 	
 	// function to get absolute xpath from the iframe DOM object
 	function getElementTreeXPath(element) {
@@ -243,5 +259,6 @@ $(document).ready(function() {
 			
 		}
 	});
+	
 	
 });

@@ -1,9 +1,7 @@
 .outline-element {
-	/* border: 1px solid red; */
-	background-color: orange;
+	border: 2px solid orange;
 }
 
 .outline-element-clicked {
-	/* border: 1px solid green; */
-	background-color: orange;
+	border: 2px solid orange;
 }
