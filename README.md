@@ -12,22 +12,20 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 #####WEEK 15 (29-04/01/2015)
 - ~~Allow user to visually choose XPath~~
 - ~~Load and display data in table format~~
-- Algorithms to detect similar XPaths and retrieve them (important)
-- Start crawler through schedule API
-- Export data to Excel, CSV, or JSON
-- *Create a URL to query data*
 
 #####WEEK 16 (05-11/01/2014)
-- Pagination
-- List of URLs to crawl
-- *Specific domain name crawling*
-- *List of different specific domain name crawling*
-- *Loading JavaScript and AJAX contents*
+- Break
 
 #####WEEK 17 (START OF SEMESTER 2, 12-18/01/2015)
-- Scheduling the Crawler
-- Editing the Crawler
+- Algorithms to detect similar XPaths and retrieve them (important)
+- Start crawler through schedule API
+- Export data to Excel / CSV / JSON URL 
+- Pagination
+- List of URLs to crawl
+- *Schedule Crawl Frequency*
+- *Edit Fields and XPaths of the Crawler*
 - *All of Scrapy's settings*
+- *Crawl JavaScript and AJAX contents*
 
 #####WEEK 18 (19-25/01/2015)
 - Improve on design based on user evaluation
