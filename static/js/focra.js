@@ -99,6 +99,7 @@ $(document).ready(function() {
 	var xpath = []
 	if ($('.field').val() != "") {
 		$('#step_two_instruction_1').hide();
+		$('#ifb').hide();
 		$('#step_two_instruction_2').fadeIn('fast');
 	}
 	
@@ -107,10 +108,12 @@ $(document).ready(function() {
 		if ($(this).val() != "") {
 			$('#step_two_instruction_1').fadeOut('fast', function(event){
 				$('#step_two_instruction_2').fadeIn('fast');
+				$('#ifb').hide();
 			});
 		} else {
 			$('#step_two_instruction_2').fadeOut('fast', function(event){
 				$('#step_two_instruction_1').fadeIn('fast');
+				$('#ifb').show();
 			});
 		}
 	});
@@ -118,6 +121,7 @@ $(document).ready(function() {
 	$('#done_bn').click(function(event) {
 		$('#done_bn').fadeOut('fast', function(event){
 			$('.field').attr('disabled','disabled');
+			$('#ifb').show();
 			$('#add_field_bn').fadeIn('fast');
 			$('#step_two_bn').fadeIn('fast');
 		});
@@ -136,6 +140,7 @@ $(document).ready(function() {
 				'</div>');
 			$('.field').last().focus();
 			$('#step_two_instruction_1').show();
+			$('#ifb').show();
 		});
 	});
 	

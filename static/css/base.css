@@ -9,3 +9,7 @@ body {
 	-webkit-transform: (0.5);
 	-moz-transform-scale: (0.5);
 }
+
+#ifb {
+	background:rgba(255,255,255,0.5);
+}

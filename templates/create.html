@@ -32,7 +32,7 @@
 						
 						<button id="step_one_instruction" class="btn btn-info" type="button">Enter Your Seed URL.</button>
 						
-						<button id="step_one_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
+						<button id="step_one_bn" style="display:none;" class="btn btn-primary" type="button">Next Step</button>
 					</div>
 					
 					<!-- STEP 2 -->
@@ -61,11 +61,11 @@
 						
 						<button id="step_two_instruction_2" style="display:none;" class="btn btn-info" type="button">Select data by clicking on them below.</button>
 						
-						<button id="done_bn" style="display:none;" class="btn btn-info" type="button">Done</button>
+						<button id="done_bn" style="display:none;" class="btn btn-primary" type="button">Done</button>
 						
 						<button id="add_field_bn" style="display:none;" class="btn btn-primary" type="button">Add More Field +</button>
 						
-						<button id="step_two_bn" style="display:none;" class="btn btn-info" type="button">Next Step</button>
+						<button id="step_two_bn" style="display:none;" class="btn btn-primary" type="button">Next Step</button>
 						
 					</div>
 
@@ -94,10 +94,10 @@
 		</div>
 	
 		<div class="panel-body">
-	
-			<iframe id="iframe" srcdoc=""
-				sandbox="allow-scripts allow-same-origin"></iframe>
-			
+			<div id="ifw" style="position:relative;">
+				<div id="ifb" style="position:absolute; top: 0; left: 0; width: 100%; height: 69vh;"></div>
+				<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
+			</div>
 			<!-- <h4 id="display"></h4>  -->
 	
 		</div>
