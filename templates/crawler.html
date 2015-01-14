@@ -52,9 +52,17 @@
 			
 			<div role="tabpanel" class="tab-pane fade" id="settings">
 				<br />
-				<button id="deleteBn" class="btn btn-danger" type="button"
-					data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete
-					Crawler</button>
+				<form id="delete" method="post" action="/delete">
+				{% csrf_token %}
+				{% if crawler.crawlerStatus == 'running' %}
+				
+					<button id="deleteBn" class="btn btn-danger" type="submit"
+						data-toggle="tooltip" data-placement="top" title="Delete Crawler" disabled>Delete Crawler</button>
+				{% else %}
+					<button id="deleteBn" class="btn btn-danger" type="submit"
+						data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete Crawler</button>
+				{% endif %}
+				</form>
 			</div>
 		</div>
 

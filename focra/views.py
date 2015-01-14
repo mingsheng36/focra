@@ -17,7 +17,7 @@ def index(request):
     '''
     Development purpose, login as jayden
     '''
-    username = 'jayden'
+    username = 'Jayden'
     request.session['username'] = username
     crawlers = Crawler.objects(crawlerOwner=username)
     names = []
@@ -112,6 +112,7 @@ Delete current crawler in session
 def deleteCrawler(request):
     if request.method == 'POST':  
         try:
+            username = request.session.get('username')
             crawlerName = request.session.get('crawlerName')
             stopCrawler(request.session.get('crawlerAddr'))
             Crawler.objects(crawlerName=crawlerName).delete()
@@ -119,9 +120,10 @@ def deleteCrawler(request):
             crawlers.remove(crawlerName)
             request.session['crawlers'] = crawlers
             collection = db[crawlerName]
-            collection.drop()
-            return HttpResponse(crawlerName + " has been deleted.")
-        
+            collection.drop()     
+            #return HttpResponse(crawlerName + " has been deleted.")
+            #return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
+            return redirect('/' + username)
         except Exception as err:
             print err
     return
@@ -152,9 +154,9 @@ Handle stop crawler requests
 def stopCrawl(request):
     if request.method == 'POST':
         print 'stopping ' + request.session.get('crawlerAddr')
-        crawlerName = request.session.get('crawlerName')
-        stopCrawler(request.session.get('crawlerAddr'))
         try:
+            crawlerName = request.session.get('crawlerName')
+            stopCrawler(request.session.get('crawlerAddr'))
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped', set__crawlerAddr='')
         except Exception as err:
             print err
