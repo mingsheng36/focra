@@ -117,12 +117,12 @@ $(document).ready(function() {
 			if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts.trim()) {
 				$(event.target).toggleClass('outline-element-clicked');
 
-				sample_xpaths.push(getElementTreeXPath(event.target));
+				sample_xpaths.push(getElementTreeXPathNode(event.target));
 				candidate_xpaths = get_candidate_xpaths(sample_xpaths);
 				
 				$('.badge').last().html(candidate_xpaths.length);
 				
-				if ($('.field').val() != "" && field_xpaths[0] != ""){
+				if ($('.field').val() != "" && field_xpaths[0] != "") {
 					$('#step_two_instruction_2').fadeOut('fast', function(event){
 						$('#done_bn').fadeIn('fast');
 					});
@@ -131,26 +131,93 @@ $(document).ready(function() {
 		});
 	});
 	
-	// Simple Tree Matching Algorithm here (returns a list of candidate_xpaths
+	// Interactive Web-Wrapper Construction for Extracting Relational Information from Web documents 
+	// returns a list of candidate_xpaths
 	function get_candidate_xpaths(sample_xpaths) {
+		
+		var candidate_xpaths = [];
 		
 		if (sample_xpaths.length == 1) {
 			
-			
 			// always update refined_xpath before returning candidates
 			refined_xpath = sample_xpaths[0];
-			return sample_xpaths;
+			candidate_xpaths = sample_xpaths;
+			return candidate_xpaths;
 			
-		} else if (sample_xpaths.length > 1) {
-			for (i = 0; i < sample_xpaths.length; i++) {
-				
+		} else if (sample_xpaths.length == 2) {
+			
+			// Generalization
+			// break down into individual nodes
+			var node1 = sample_xpaths[0].split('/');
+			var node2 = sample_xpaths[1].split('/');
+			node1.splice(0, 1);
+			node2.splice(0, 1);
+			
+			var diff = [];
+			for (i = 0; i < node1.length; i++) {
+				if (node1[i] != node2[i]) {
+					diff.push(i);
+				}
 			}
-			refined_xpath = sample_xpaths[0];
-			return sample_xpaths;
+			
+			var x = '';
+			var sub_x = '';
+			
+			if (diff.length == 0) {
+				
+				// probably selecting the same element to 'deselect' that element
+				// clear the sample_xpath
+				sample_xpaths = [];
+				refined_xpath = "";
+				candidate_xpaths = "";
+				
+			} else if (diff.length == 1) {
+				
+				for (j = 0; j <= diff[0]; j++) {
+					if (j == diff[0]) {
+						x = x + "/" + node1[j].replace(/[^a-z]/g,'');
+					} else {
+						x = x + "/" + node1[j];
+					}
+				}
+				
+				for (k = diff[0] + 1; k < node1.length; k++) {
+					sub_x = sub_x + '/' + node1[k];
+				}
+				$('#iframe').contents().xpath(x).each(function(i) {
+					// because div[1] always start from 1
+					candidate_xpaths.push(x + '[' + (i+1) + ']' + sub_x)
+					$('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).addClass('outline-element-clicked');
+				});
+				
+				// remove tbody because its generated from mozilla
+				absolute = x + sub_x;
+				refined_xpath = absolute.replace(/\/tbody/g, '');
+
+			} else {
+				
+				//if diff > 1 for (node1, node2) we deselect and remove node1
+				$('#iframe').contents().xpath(sample_xpaths[0]).removeClass('outline-element-clicked');
+				sample_xpaths.splice(0, 1);
+				
+				// node2 will take over node1
+				refined_xpath = sample_xpaths[0].replace(/\/tbody/g, '');
+				// no candidates, return a single node
+				candidate_xpaths = sample_xpaths;
+			}
+
 		} else {
-			return null;
+			
+			// sample_xpaths == 3, user not satisfied with candidate results
+			// deselect all candidate_xpaths and remove them but exclude the newly select xpath
+			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
+			sample_xpaths.splice(0, 2);
+			$('#iframe').contents().xpath(sample_xpaths[0]).addClass('outline-element-clicked');
+			
+			refined_xpath = sample_xpaths[0].replace(/\/tbody/g, '');
+			candidate_xpaths = sample_xpaths;
 		}
-		
+		return candidate_xpaths;
 	}
 	
 	// function to get absolute xpath from the iframe DOM object
@@ -232,6 +299,7 @@ $(document).ready(function() {
 			$('#step_two_instruction_1').hide();
 			$('#add_field_bn').fadeIn('fast');
 			$('#step_two_bn').fadeIn();
+			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 			$('#ifb').show();
 		}
 		$('.field:eq(' + curr_i + ')').remove();
@@ -253,15 +321,6 @@ $(document).ready(function() {
 				$('#add_field_bn').fadeIn('fast');
 			});
 		}
-//		alert($('#iframe').contents().xpath(getElementTreeXPathNode(event.target)).html());
-//		alert(
-//				document.getElementById('iframe').contentWindow.document.evaluate(
-//						getElementTreeXPathNode(event.target),
-//						document.getElementById('iframe').contentWindow.document,
-//						null,
-//						XPathResult.FIRST_ORDERED_NODE_TYPE,
-//						null).singleNodeValue.textContent
-//			);
 	});
 	
 	// done selecting datas
@@ -332,13 +391,14 @@ $(document).ready(function() {
 					else {
 						var data = $.parseJSON(res);
 						$.each(data, function(i, obj) {
+							
 							var rowData = "";
-							for (i = 0; i < fields.length; i++) { 
-								rowData = rowData + "<td>" + obj[fields[i]] + "</td>"
+							for (j = 0; j < fields.length; j++) { 
+								rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
 							}
-
+									
 							$('#crawlerData').append(
-									"<tr>" + rowData + "</tr>"		
+									"<tr>" + rowData + "</tr>"	
 							);
 						});
 						loaded = true;
@@ -348,6 +408,5 @@ $(document).ready(function() {
 			
 		}
 	});
-	
 	
 });

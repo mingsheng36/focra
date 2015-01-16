@@ -271,6 +271,9 @@ def fetch(request):
 #             for tag in soup.find_all('script', async=True):
 #                 tag.decompose()
             '''
+            Can implement injection of javascript into the HTML response to 'clean' the response
+            '''
+            '''
             Inject Focra CSS into the HTML response
             '''
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
