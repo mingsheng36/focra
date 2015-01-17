@@ -23,6 +23,11 @@ class MongoDBPipeline(object):
             collection = self.db[spider.name]
             print "pipline - processing item"
             print item.keys()
+            for value in item:
+                print value
             collection.insert(dict(item))
+#             for value in dict(item):
+#                 print value
+            
         except Exception as err:
             print err
