@@ -4,8 +4,8 @@ FOCRA
 built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 
 #####WEEK 14 (22-28/12/2014)
-- ~~Create the template object for Crawler~~
-- ~~Store template XPath in Crawler~~
+- ~~Create the template object for crawler~~
+- ~~Store template XPath in crawler~~
 - ~~Load data with XPath according to fields~~
 - ~~Store into external database~~
 
@@ -17,18 +17,20 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - Break
 
 #####WEEK 17 (START OF SEMESTER 2, 12-18/01/2015)
-- Algorithms to detect similar XPaths and retrieve them (important)
-- Start crawler through schedule API
-- Export data to Excel / CSV / JSON URL 
-- Pagination
-- List of URLs to crawl
-- *Schedule Crawl Frequency*
-- *Edit Fields and XPaths of the Crawler*
-- *All of Scrapy's settings*
-- *Crawl JavaScript and AJAX contents*
+- ~~Algorithms to detect similar XPaths~~
 
 #####WEEK 18 (19-25/01/2015)
-- Improve on design based on user evaluation
+- Improve on algorithms (aggregation + alignment)
+- Change database architecture
+- Pagination
+- List of URLs to crawl
+- Schedule crawl frequency
+- Start crawler through schedule API
+- *Crawl JavaScript generated contents*
+- *Export data to Excel / CSV / JSON URL* 
+- *Monitor performance of crawler*
+- *All of Scrapy's settings*
+- *Edit fields names and field columns of the Crawler*
 
 #####WEEK 19 (26-01/02/2015)
 - Improve on design based on user evaluation

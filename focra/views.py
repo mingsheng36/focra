@@ -203,7 +203,7 @@ def fetch(request):
             url = request.GET['url']  
 
             '''
-            JavaScript support but very slow
+            Should be implemented with scrapy
             '''
 #             import os
 #             p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py', url], stdout=PIPE)  

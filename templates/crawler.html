@@ -2,7 +2,6 @@
 {% load staticfiles %}
 {% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
-
 	<div class="alert alert-success">
 		
 		{% if crawler.crawlerStatus == 'running' %}
@@ -67,5 +66,4 @@
 		</div>
 
 	</div>
-
 {% endblock %}

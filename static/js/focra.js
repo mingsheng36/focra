@@ -1,13 +1,13 @@
 $(document).ready(function() {
 	
-	/************* Create Crawler Events **************/
+	/************* Create Crawler Steps **************/
 	function showStepOne() {
 		$('#step_two').hide();
 		$('#step_three').hide();
 		$('#step_one').fadeIn();
 		$('#step_one_bn').fadeIn();
 		$('#url').fadeIn();
-		$('#url').prop('disabled', false);
+		$('#url').attr('readonly', false);
 		if ($('#url').val() != "") {
 			$('#step_one_instruction').hide();
 			$('#step_one_bn').fadeIn('fast');
@@ -16,7 +16,7 @@ $(document).ready(function() {
 		// reset step 2
 		$('#iframe').attr('srcdoc', "");
 		$('#fields').empty();
-		$('.field-div').append(
+		$('#fields').append(
 				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
 				'<div class="field-badge form-control">' +
 				'<span class="badge">0</span>' +
@@ -46,26 +46,18 @@ $(document).ready(function() {
 		});
 	}
 	
-	// step 1 (url)
-	$('#step_one_bn').click(function(event) {
-		if ($('#url').val() != '') {
-			$('#step_one_bn').fadeOut('fast', function(event) {
-				fetchURL()
-			});
-		} else {
-			alert('Please enter your URL');
-		}
-	});
-	
+	/*********** STEP 1 ************/
+	// step 1 on page load
 	if ($('#url').val() != '') {
-		$('#url').prop('disabled', false);
+		$('#url').attr('readonly', false);
 		$('#step_one_instruction').hide();
 		$('#step_one_bn').show();
 	}
 	
+	// url input change
 	$('#url').on('input propertychange', function(event) {
 		if ($('#url').val() != "") {
-			$('#step_one_instruction').fadeOut('fast', function(event){
+			$('#step_one_instruction').fadeOut('fast', function(event) {
 				$('#step_one_bn').fadeIn('fast');
 			});
 		} else {
@@ -75,48 +67,72 @@ $(document).ready(function() {
 		}
 	});
 
-	// step 2 (select fields)
-	if ($('.field').val() != "") {
-		$('#step_two_instruction_1').hide();
-		$('#ifb').hide();
-		$('#step_two_instruction_2').fadeIn('fast');
+	// step 1 (url)
+	$('#step_one_bn').click(function(event) {
+		if ($('#url').val() != '') {
+			$('#step_one_bn').fadeOut('fast', function(event) {
+				$('#url').attr('readonly', true);
+				$('#step_one_bn').hide();
+				$('#step_one_instruction').hide();
+				$('#loader').fadeIn('fast');
+				fetchURL()
+			});
+		} else {
+			alert('Please enter your URL');
+		}
+	});
+	
+	/*********** STEP 2 ************/
+	var field_xpaths = [];
+	var selected_xpaths = [];
+	var general_xpath = "";
+	
+	// step 2 on page load
+	if ($('.field').length > 1 || $('.field').attr('readonly') == true) {
+		$('#fields').empty();
+		$('#fields').append(
+				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
+				'<div class="field-badge form-control">' +
+				'<span class="badge">0</span>' +
+				'</div>' +
+				'<div class="field-delete form-control" style="cursor: pointer">' +
+				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
+		'</div>');
+		$('#step_two_instruction_1').show();
+		$('#step_two_instruction_2').hide();
+		$('#done_bn').hide();
+		$('#add_field_bn').hide();
+		$('#step_two_bn').hide();
+	} else {
+		// only 1 .field
+		$('.field').attr('readonly', false);
+		$('.field').val('');
 	}
 	
-	// iframe event handlers for visual selection
-	var field_xpaths = []
-	var refined_xpath = "";
-	var sample_xpaths = [];
-	var candidate_xpaths = [];
-	
+	// iframe on load
 	$('#iframe').load(function(){
 		if ($('#iframe').attr('srcdoc') != '') {
 			$('#loader').fadeOut('fast', function(event) {	
 				showStepTwo();
-				$('#url').prop('disabled', false);
+				$('#url').attr('readonly', false);
 			});
 			var contain_texts;
 			$(this.contentWindow.document).mouseover(function (event) {
-				contain_texts = $(event.target).clone().children().remove().end().text();
+				contain_texts = $(event.target).clone().children().remove().end().text().trim();
 				if ($(event.target).prop("tagName").toLowerCase() == "img") {
-					//$('#display').html($(event.target).attr("src").toLowerCase());
 					$(event.target).addClass( "outline-element" );
 				} 
-				else if (contain_texts.trim()) {
-					//$('#display').html(contain_texts);
+				else if (contain_texts) {
 					$(event.target).addClass( "outline-element" );
 				}
 			}).mouseout(function (event) {
 				$(event.target).removeClass('outline-element');
 			}).click(function (event) {
-				if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts.trim()) {
+				if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts) {
 					$(event.target).toggleClass('outline-element-clicked');
-
-					sample_xpaths.push(getElementTreeXPathNode(event.target));
-					candidate_xpaths = get_candidate_xpaths(sample_xpaths);
-
-					$('.badge').last().html(candidate_xpaths.length);
-
-					if ($('.field').val() != "" && field_xpaths[0] != "") {
+					selected_xpaths.push(getElementTreeXPath(event.target));
+					$('.badge').last().html(get_candidate_xpaths(selected_xpaths).length);
+					if ($('.field').last().val() != "" && field_xpaths[0] != "") {
 						$('#step_two_instruction_2').fadeOut('fast', function(event){
 							$('#done_bn').fadeIn('fast');
 						});
@@ -144,8 +160,8 @@ $(document).ready(function() {
 	
 	// add fields
 	$('#add_field_bn').click(function(event){
-		$('#add_field_bn').fadeOut('fast');
-		$('#step_two_bn').fadeOut('fast', function(event) {
+		$('#step_two_bn').fadeOut('fast');
+		$('#add_field_bn').fadeOut('fast', function(event) {
 			$('.field-div').append(
 				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
 				'<div class="field-badge form-control">' +
@@ -163,7 +179,7 @@ $(document).ready(function() {
 	// delete fields
 	$('#fields').on('click', '.field-delete', function(event){
 		var curr_i = $(this).index('.field-delete');
-		if ($('.field:eq(' + curr_i + ')').prop('disabled') == false) {
+		if ($('.field:eq(' + curr_i + ')').attr('readonly') == false) {
 			$('#done_bn').hide();
 			$('#step_two_instruction_2').hide();
 			$('#step_two_instruction_1').hide();
@@ -179,8 +195,8 @@ $(document).ready(function() {
 		if (field_xpaths.length != 0) {
 			field_xpaths.splice(curr_i, 1);
 		}
-		refined_xpath = "";
-		sample_xpaths = [];
+		general_xpath = "";
+		selected_xpaths = [];
 		candidate_xpaths = [];
 		if ($('.field').length == 0) {
 			$('#step_two_bn').hide();
@@ -192,14 +208,14 @@ $(document).ready(function() {
 		}
 	});
 	
-	// done selecting datas
+	// done selecting data
 	$('#done_bn').click(function(event) {
 		$('#done_bn').fadeOut('fast', function(event){
-			field_xpaths.push(refined_xpath);
-			refined_xpath = "";
-			sample_xpaths = [];
+			field_xpaths.push(general_xpath);
+			general_xpath = "";
+			selected_xpaths = [];
 			candidate_xpaths = [];
-			$('.field').attr('disabled','disabled');
+			$('.field').attr('readonly', true);
 			$('#ifb').show();
 			$('#add_field_bn').fadeIn('fast');
 			$('#step_two_bn').fadeIn('fast');
@@ -220,7 +236,13 @@ $(document).ready(function() {
 		showStepThree();
 	});
 	
-	// step 3 (crawler name)
+	/*********** STEP 3 ************/
+	// step 3 on page load
+	if ($('#crawlerName') != '') {
+		$('#crawlerName').attr('readonly', false);
+		$('#step_three_bn').show();
+	}
+	
 	$('#crawlerName').on('input propertychange', function(event){
 		if ($('#crawlerName').val() != "") {
 			$('#step_three_bn').fadeIn('fast');
@@ -231,13 +253,14 @@ $(document).ready(function() {
 
 	$('#step_three_bn').click(function(event) {
 		$('#step_three_bn').fadeOut('fast', function(event) {
+			$('#crawlerName').attr('readonly', true);
 			$('#loader').fadeIn('fast');
 			$('#create').submit();
 		});
 	});
 
 	/**************** Key Press Events **************/
-	$(document).keydown(function(event){
+	$(document).keydown(function(event) {
 		switch(event.which) {
 		case 8:	
 			if(event.target.tagName.toLowerCase() != 'input' && $('#step_two').attr('style') != 'display: none;') {
@@ -263,7 +286,7 @@ $(document).ready(function() {
 				}
 			}
 			break;
-		default: 
+		default:
 			break
 		}
 	});
@@ -271,50 +294,44 @@ $(document).ready(function() {
 	/*********** Helper functions **************/	
 	// fetch URLs
 	function fetchURL() {
-		$('#step_one_bn').fadeOut('fast', function(event){
-			$('#step_one_bn').hide();
-			$('#url').prop('disabled', true);
-			$('#loader').fadeIn('fast');
-			$.ajax({
-				url: "/fetch",
-				data: { 
-					"url": $('#url').val(), 
-				},
-				type: "GET",
-				success: function(res) {
-					$('#iframe').attr('srcdoc', res);
-				}
-			});
+		$.ajax({
+			url: '/fetch',
+			data: { 
+				'url': $('#url').val(), 
+			},
+			type: 'GET',
+			success: function(res) {
+				$('#iframe').attr('srcdoc', res);
+			}
 		});
 	}
 	
 	// function to get xpath node from the iframe DOM object
-	function getElementTreeXPathNode(element) {
+	function getElementTreeXPath(element) {
 		var xpath_length = $(element).parents().andSelf().length;
-		return "/" + $(element).parents().andSelf().map(function(i, obj) {
+		return '/' + $(element).parents().andSelf().map(function(i, obj) {
 			var $this = $(this);
 			var tagName = this.nodeName;
 			if ($this.siblings(tagName).length > 0) {
-				tagName += "[" + ($this.prevAll(tagName).length + 1) + "]";
+				tagName += '[' + ($this.prevAll(tagName).length + 1) + ']';
 			}
 			return tagName;
-		}).get().join("/").toLowerCase();
+		}).get().join('/').toLowerCase();
 	};
 	
 	// Interactive Web-Wrapper Construction for Extracting Relational Information from Web documents 
 	// returns a list of candidate_xpaths
-	function get_candidate_xpaths(sample_xpaths) {
+	function get_candidate_xpaths(selected_xpaths) {
 		var candidate_xpaths = [];
-		if (sample_xpaths.length == 1) {
-			// always update refined_xpath before returning candidates
-			refined_xpath = sample_xpaths[0];
-			candidate_xpaths = sample_xpaths;
+		if (selected_xpaths.length == 1) {
+			// general_xpath need to remove tbody
+			general_xpath = selected_xpaths[0].replace(/\/tbody/g, '');
+			candidate_xpaths = selected_xpaths;
 			return candidate_xpaths;
-		} else if (sample_xpaths.length == 2) {
+		} else if (selected_xpaths.length == 2) {
 			// Generalization
-			// break down into individual nodes
-			var node1 = sample_xpaths[0].split('/');
-			var node2 = sample_xpaths[1].split('/');
+			var node1 = selected_xpaths[0].split('/');
+			var node2 = selected_xpaths[1].split('/');
 			node1.splice(0, 1);
 			node2.splice(0, 1);
 			var diff = [];
@@ -327,52 +344,55 @@ $(document).ready(function() {
 			var sub_x = '';
 			if (diff.length == 0) {
 				// probably selecting the same element to 'deselect' that element
-				// clear the sample_xpath
-				sample_xpaths = [];
-				refined_xpath = "";
-				candidate_xpaths = "";
+				// clear the selected_xpath
+				selected_xpaths = [];
+				general_xpath = '';
+				candidate_xpaths = '';
 			} else if (diff.length == 1) {
+				// we can find similar xpaths if diff is just one node
 				for (j = 0; j <= diff[0]; j++) {
 					if (j == diff[0]) {
-						x = x + "/" + node1[j].replace(/[^a-z]/g,'');
+						x = x + '/' + node1[j].replace(/[^a-z]/g,'');
 					} else {
-						x = x + "/" + node1[j];
+						x = x + '/' + node1[j];
 					}
 				}
+				// add the rest of the xpath into the generalized xpath
 				for (k = diff[0] + 1; k < node1.length; k++) {
 					sub_x = sub_x + '/' + node1[k];
 				}
 				$('#iframe').contents().xpath(x).each(function(i) {
-					// because div[1] always start from 1
-					console.log( $('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).html() );
-					candidate_xpaths.push(x + '[' + (i+1) + ']' + sub_x);		
-					$('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).addClass('outline-element-clicked');		
+					// because div[x] always start from x = 1
+					if (node1[node1.length - 1].toLowerCase() == 'img') {
+						if (typeof $('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x + '/@src').val() != 'undefined') {
+							candidate_xpaths.push(x + '[' + (i+1) + ']' + sub_x);
+							$('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).addClass('outline-element-clicked');
+						}
+					} else if ($('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).text().trim() != '') {
+						candidate_xpaths.push(x + '[' + (i+1) + ']' + sub_x);
+						$('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).addClass('outline-element-clicked');
+					}		
 				});
-				for (z = 0; z < candidate_xpaths.length; z++) {
-					console.log(candidate_xpaths[z]);
-				}
 				// remove tbody because its generated from mozilla
-				absolute = x + sub_x;
-				refined_xpath = absolute.replace(/\/tbody/g, '');
+				general_xpath = (x + sub_x).replace(/\/tbody/g, '');
 			} else {
 				//if diff > 1 for (node1, node2) we deselect and remove node1
-				$('#iframe').contents().xpath(sample_xpaths[0]).removeClass('outline-element-clicked');
-				sample_xpaths.splice(0, 1);
-				
+				$('#iframe').contents().xpath(selected_xpaths[0]).removeClass('outline-element-clicked');
+				selected_xpaths.splice(0, 1);
 				// node2 will take over node1
-				refined_xpath = sample_xpaths[0].replace(/\/tbody/g, '');
+				general_xpath = selected_xpaths[0].replace(/\/tbody/g, '');
 				// no candidates, return a single node
-				candidate_xpaths = sample_xpaths;
+				candidate_xpaths = selected_xpaths;
 			}
 		} else {	
-			// sample_xpaths == 3, user not satisfied with candidate results
+			// selected_xpaths == 3, user not satisfied with candidate results
 			// deselect all candidate_xpaths and remove them but exclude the newly select xpath
 			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
-			sample_xpaths.splice(0, 2);
-			$('#iframe').contents().xpath(sample_xpaths[0]).addClass('outline-element-clicked');
-			
-			refined_xpath = sample_xpaths[0].replace(/\/tbody/g, '');
-			candidate_xpaths = sample_xpaths;
+			// remove the two old selected xpath
+			selected_xpaths.splice(0, 2);
+			$('#iframe').contents().xpath(selected_xpaths[0]).addClass('outline-element-clicked');
+			general_xpath = selected_xpaths[0].replace(/\/tbody/g, '');
+			candidate_xpaths = selected_xpaths;
 		}
 		return candidate_xpaths;
 	}
@@ -381,8 +401,8 @@ $(document).ready(function() {
 	// call to start crawler
 	$('#startBn').click(function(event) {
 		$('#display').html('Initializing..');
-		$('#startBn').attr('disabled','disabled');
-		$('#deleteBn').attr('disabled', 'disabled');
+		$('#startBn').attr('disabled', true);
+		$('#deleteBn').attr('disabled', true);
 		$.ajax({
 			url : '/start',
 			type: 'POST',
@@ -403,7 +423,7 @@ $(document).ready(function() {
 			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
 			success: function( data ){
 				$('#display').html(data);
-				$('#stopBn').attr('disabled','disabled');
+				$('#stopBn').attr('disabled',true);
 				$('#startBn').removeAttr('disabled');
 				$('#deleteBn').removeAttr('disabled');
 			}

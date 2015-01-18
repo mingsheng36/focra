@@ -30,8 +30,7 @@ class FocraSpider(Spider):
 			self.item = Item()
 		except Exception as error:
 			print error
-		
-	
+
 	def dont_close_me(self):
 		raise DontCloseSpider("Not Closed")
 	
@@ -40,8 +39,6 @@ class FocraSpider(Spider):
 			print "Focras - parsing item"
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 			for key, value in self.template.iteritems():
-				print key
-				#print key, value
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
 				'''
@@ -49,6 +46,5 @@ class FocraSpider(Spider):
 				need to join them together
 				'''
 			yield dynamicItemLoader.load_item()
-			
 		except Exception as err:
 			print err
