@@ -20,11 +20,11 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - ~~Algorithms to detect similar XPaths~~
 
 #####WEEK 18 (19-25/01/2015)
-- Improve on algorithms (aggregation + alignment)
-- Change database architecture
 - Pagination
 - List of URLs to crawl
 - Schedule crawl frequency
+- Improve on algorithms (aggregation + alignment)
+- Change database architecture
 - Start crawler through schedule API
 - *Crawl JavaScript generated contents*
 - *Export data to Excel / CSV / JSON URL* 

@@ -9,6 +9,7 @@
 #
 
 BOT_NAME = 'forbot'
+USER_AGENT = 'Mozilla/5.0'
 
 SPIDER_MODULES = ['forbot.spiders']
 NEWSPIDER_MODULE = 'forbot.spiders'

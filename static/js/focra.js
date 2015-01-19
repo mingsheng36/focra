@@ -132,9 +132,13 @@ $(document).ready(function() {
 					$(event.target).toggleClass('outline-element-clicked');
 					selected_xpaths.push(getElementTreeXPath(event.target));
 					$('.badge').last().html(get_candidate_xpaths(selected_xpaths).length);
-					if ($('.field').last().val() != "" && field_xpaths[0] != "") {
+					if ($('.field').last().val() != '' && $('.badge').last().text() != 0) {
 						$('#step_two_instruction_2').fadeOut('fast', function(event){
 							$('#done_bn').fadeIn('fast');
+						});
+					} else {
+						$('#done_bn').fadeOut('fast', function(event){
+							$('#step_two_instruction_2').fadeIn('fast');
 						});
 					}
 				}
@@ -144,7 +148,7 @@ $(document).ready(function() {
 	
 	// fields input change detector
 	$('#fields').on('input propertychange','.field', function(event){	
-		if ($(this).val() != "") {
+		if ($(this).val() != '') {
 			$('#step_two_instruction_1').fadeOut('fast', function(event){
 				$('#step_two_instruction_2').fadeIn('fast');
 				$('#ifb').hide();
@@ -152,7 +156,7 @@ $(document).ready(function() {
 		} else {
 			$('#step_two_instruction_2').fadeOut('fast', function(event){
 				$('#step_two_instruction_1').fadeIn('fast');
-				$('#ifb').show();
+				$('#ifb').fadeIn('fast');
 				$('#done_bn').hide();
 			});
 		}
@@ -179,44 +183,65 @@ $(document).ready(function() {
 	// delete fields
 	$('#fields').on('click', '.field-delete', function(event){
 		var curr_i = $(this).index('.field-delete');
-		if (typeof $('.field:eq(' + curr_i + ')').attr('readonly') == 'undefined') {
-			$('#done_bn').hide();
-			$('#step_two_instruction_2').hide();
-			$('#step_two_instruction_1').hide();
-			$('#add_field_bn').fadeIn('fast');
-			$('#step_two_bn').fadeIn();
-			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
-			$('#ifb').show();
-		}
 		$('.field:eq(' + curr_i + ')').remove();
 		$('.field-badge:eq(' + curr_i + ')').empty();
 		$('.field-badge:eq(' + curr_i + ')').remove();
 		$('.field-delete:eq(' + curr_i + ')').remove();
-		if ($('.field').length == 0) {
+		general_xpath = '';
+		selected_xpaths = [];
+		if (field_xpaths.length != 0 && typeof field_xpaths[curr_i] != 'undefined') {
+			field_xpaths.splice(curr_i, 1);
+		}
+		if (($('.field').length == 0 && field_xpaths.length == 0)) {
 			$('#step_two_bn').hide();
 			$('#done_bn').hide();
 			$('#step_two_instruction_2').hide();
 			$('#step_two_instruction_1').hide();
 			$('#add_field_bn').fadeIn('fast');
+			$('#ifb').fadeIn('fast');
+			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 		} else if ($('.field').length > 0) {
-			$('#step_two_instruction_1').hide();
-			$('#step_two_instruction_2').hide();
-			$('#done_bn').hide();
-			$('#add_field_bn').fadeIn('fast');
-			$('#step_two_bn').fadeIn('fast');
+			if ($('.field').last().attr('readonly') == 'readonly') {
+				$('#step_two_instruction_2').hide();
+				$('#step_two_instruction_1').hide();
+				$('#add_field_bn').fadeIn('fast');
+				$('#step_two_bn').show();
+				$('#done_bn').hide();
+				$('#ifb').fadeIn('fast');
+				$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
+			} else {
+				if ($('.field').last().val() != '' && $('.badge').last().text() == 0) {
+					$('#step_two_instruction_1').hide();
+					$('#step_two_instruction_2').show();
+					$('#done_bn').hide();
+					$('#add_field_bn').hide();
+					$('#step_two_bn').hide();
+					$('#ifb').fadeOut('fast');
+				} else if ($('.field').last().val() != '' && $('.badge').last().text() != 0) {
+					$('#step_two_instruction_1').hide();
+					$('#step_two_instruction_2').hide();
+					$('#done_bn').fadeIn('fast');
+					$('#add_field_bn').hide();
+					$('#step_two_bn').hide();
+					$('#ifb').hide();
+				} else {
+					$('#step_two_instruction_1').show();
+					$('#step_two_instruction_2').hide();
+					$('#done_bn').hide();
+					$('#add_field_bn').hide();
+					$('#step_two_bn').hide();
+					$('#ifb').hide();
+				}
+			}
 		}
-		general_xpath = '';
-		selected_xpaths = [];
-		if (field_xpaths.length != 0) {
-			field_xpaths.splice(curr_i, 1);
-		}
+		
 	});
 	
 	// done selecting data
 	$('#done_bn').click(function(event) {
 		$('#done_bn').fadeOut('fast', function(event){
 			field_xpaths.push(general_xpath);
-			general_xpath = "";
+			general_xpath = '';
 			selected_xpaths = [];
 			candidate_xpaths = [];
 			$('.field').attr('readonly', true);
@@ -230,7 +255,7 @@ $(document).ready(function() {
 	$('#step_two_bn').click(function(event) {
 		var crawlerTemplate = []
 		$(".field").each(function(i){
-			if ($(this).val() != "" && field_xpaths[i] != "") {
+			if ($(this).val() != '' && field_xpaths[i] != '') {
 				// push to field_xpaths
 				crawlerTemplate.push('"' + $(this).val() + '":"' + field_xpaths[i] + '"');
 			}
@@ -242,13 +267,15 @@ $(document).ready(function() {
 	
 	/*********** STEP 3 ************/
 	// step 3 on page load
-	if ($('#crawlerName') != '') {
+	if ($('#crawlerName').val() != '') {
 		$('#crawlerName').attr('readonly', false);
 		$('#step_three_bn').show();
+	} else {
+		$('#step_three_bn').hide();
 	}
 	
 	$('#crawlerName').on('input propertychange', function(event){
-		if ($('#crawlerName').val() != "") {
+		if ($('#crawlerName').val() != '') {
 			$('#step_three_bn').fadeIn('fast');
 		} else {
 			$('#step_three_bn').fadeOut('fast');
