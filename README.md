@@ -24,10 +24,10 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - List of URLs to crawl
 - Schedule crawl frequency
 - Improve on algorithms (aggregation + alignment)
-- Change database architecture
 - Start crawler through schedule API
+- Change database architecture
+- *Export data to Excel / CSV / JSON URL*
 - *Crawl JavaScript generated contents*
-- *Export data to Excel / CSV / JSON URL* 
 - *Monitor performance of crawler*
 - *All of Scrapy's settings*
 - *Edit fields names and field columns of the Crawler*

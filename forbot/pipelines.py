@@ -18,6 +18,7 @@ class MongoDBPipeline(object):
 
     def process_item(self, item, spider):
         try:
+            # 'name' passed in from views.py
             collection = self.db[spider.name]
             print "pipline - processing item"
             print item.keys()

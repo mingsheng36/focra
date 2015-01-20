@@ -46,5 +46,8 @@ class FocraSpider(Spider):
 				need to join them together
 				'''
 			yield dynamicItemLoader.load_item()
+			
+			#yield scrapy.Request(url, callback=self.parse)
+			
 		except Exception as err:
 			print err

@@ -127,19 +127,17 @@ $(document).ready(function() {
 				}
 			}).mouseout(function (event) {
 				$(event.target).removeClass('outline-element');
-			}).click(function (event) {
+			}).on('click dblclick', function (event) {
 				if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts) {
 					$(event.target).toggleClass('outline-element-clicked');
 					selected_xpaths.push(getElementTreeXPath(event.target));
 					$('.badge').last().html(get_candidate_xpaths(selected_xpaths).length);
 					if ($('.field').last().val() != '' && $('.badge').last().text() != 0) {
-						$('#step_two_instruction_2').fadeOut('fast', function(event){
-							$('#done_bn').fadeIn('fast');
-						});
+						$('#step_two_instruction_2').hide();
+						$('#done_bn').fadeIn('fast');
 					} else {
-						$('#done_bn').fadeOut('fast', function(event){
-							$('#step_two_instruction_2').fadeIn('fast');
-						});
+						$('#done_bn').hide();
+						$('#step_two_instruction_2').fadeIn('fast');
 					}
 				}
 			});
@@ -166,7 +164,7 @@ $(document).ready(function() {
 	$('#add_field_bn').click(function(event){
 		$('#step_two_bn').fadeOut('fast');
 		$('#add_field_bn').fadeOut('fast', function(event) {
-			$('.field-div').append(
+			$('#fields').append(
 				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
 				'<div class="field-badge form-control">' +
 					'<span class="badge">0</span>' +

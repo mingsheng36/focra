@@ -14,12 +14,7 @@
 				<!-- STEP 1 -->
 				<div id="step_one" class="input-group">
 					<div class="input-group-btn">
-						<button type="button" class="btn btn-info dropdown-toggle"
-							data-toggle="dropdown" aria-expanded="false">Step 1 of 3</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">Step 2</a></li>
-							<li><a href="#">Step 3</a></li>
-						</ul>
+						<button type="button" class="btn btn-info">Step 1 of 3</button>
 					</div>
 					<div class="form-group">
 						<input id="url" size="100" autofocus name="crawlerSeeds"
@@ -32,21 +27,16 @@
 						type="button">Enter Your Seed URL.</button>
 
 					<button id="step_one_bn" style="display: none;"
-						class="btn btn-primary" type="button">Next Step</button>
+						class="btn btn-primary" type="button">Next Step &gt;</button>
 
 				</div>
 
 				<!-- STEP 2 -->
 				<div id="step_two" class="input-group" style="display: none;">
 					<div class="input-group-btn">
-						<button type="button" class="btn btn-info dropdown-toggle"
-							data-toggle="dropdown" aria-expanded="false">Step 2 of 3</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">Step 1</a></li>
-							<li><a href="#">Step 3</a></li>
-						</ul>
+						<button type="button" class="btn btn-info">Step 2 of 3</button>
 					</div>
-					<div id="fields" class="field-div form-group">
+					<div id="fields" class="form-group">
 						<input class="field form-control" type="text" size="15"
 							placeholder="fieldname">
 						<div class="field-badge form-control">
@@ -55,9 +45,10 @@
 						<div class="field-delete form-control" style="cursor: pointer">
 							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 						</div>
-						&nbsp;
 					</div>
-
+					
+					<div class="form-group">&nbsp;</div>
+					
 					<button id="step_two_instruction_1" class="btn btn-info"
 						type="button">Enter Field Name</button>
 
@@ -66,25 +57,27 @@
 						The Data Below</button>
 
 					<button id="done_bn" style="display: none;" class="btn btn-primary"
-						type="button">Done Selecting</button>
+						type="button">Done !</button>
 
 					<button id="add_field_bn" style="display: none;"
-						class="btn btn-primary" type="button">Add More Field +</button>
+						class="btn btn-primary" type="button">Add Field +</button>
+						
 					<div class="form-group">&nbsp;</div>
+					
+					<button id="pagination" style="display: none;"
+						class="btn btn-primary" type="button">&lt; Pager &gt;</button>
+					
+					<div class="form-group">&nbsp;</div>
+					
 					<button id="step_two_bn" style="display: none;"
-						class="btn btn-primary" type="button">Next Step</button>
+						class="btn btn-primary" type="button">Next Step &gt;</button>
 
 				</div>
 
 				<!-- STEP 3 -->
 				<div id="step_three" class="input-group" style="display: none;">
 					<div class="input-group-btn">
-						<button type="button" class="btn btn-info dropdown-toggle"
-							data-toggle="dropdown" aria-expanded="false">Step 3 of 3</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">Step 1</a></li>
-							<li><a href="#">Step 2</a></li>
-						</ul>
+						<button type="button" class="btn btn-info">Step 3 of 3</button>
 					</div>
 					<div class="form-group">
 						<input id="crawlerName" name="crawlerName" class="form-control"
@@ -92,7 +85,7 @@
 					</div>
 					<div class="form-group">&nbsp;</div>
 					<button id="step_three_bn" class="btn btn-primary"
-						style="display: none;" type="button">Done !</button>
+						style="display: none;" type="button">Finish !</button>
 				</div>
 				<img id="loader" style="display: none;"
 					src="{% static 'images/loader.gif' %}" alt="Loading..">

@@ -10,13 +10,12 @@ from bson.json_util import dumps
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 db = client['CrawlerDB']
+
 '''
 welcome page and sign up page
 ''' 
 def index(request):
-    '''
-    Development purpose, login as jayden
-    '''
+    # Development purpose, login as Jayden
     username = 'Jayden'
     request.session['username'] = username
     crawlers = Crawler.objects(crawlerOwner=username)
@@ -25,19 +24,19 @@ def index(request):
         names.append(crawler.crawlerName)
     request.session['crawlers'] = names
     return redirect('/' + username)
-    '''
-    if request.method == 'GET':      
-        return render(request, 'index.html')   
-    elif request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        request.session['username'] = username
-        newUser = User(username=username, password=password).save()
-        print newUser.username
-        return home(request)
-    else: 
-        return render(request, 'index.html')
-    '''
+    
+#     if request.method == 'GET':      
+#         return render(request, 'index.html')   
+#     elif request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         request.session['username'] = username
+#         newUser = User(username=username, password=password).save()
+#         print newUser.username
+#         return home(request)
+#     else: 
+#         return render(request, 'index.html')
+    
 
 '''
 Home page to authenticated usernames
@@ -121,8 +120,6 @@ def deleteCrawler(request):
             request.session['crawlers'] = crawlers
             collection = db[crawlerName]
             collection.drop()     
-            #return HttpResponse(crawlerName + " has been deleted.")
-            #return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
             return redirect('/' + username)
         except Exception as err:
             print err
@@ -200,11 +197,9 @@ def fetch(request):
         
         try: 
             from urlparse import urljoin
-            url = request.GET['url']  
-
-            '''
-            Should be implemented with scrapy
-            '''
+            url = request.GET['url']
+            
+            # Should be implemented with scrapy
 #             import os
 #             p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py', url], stdout=PIPE)  
 #             cleaned = ''
@@ -223,16 +218,16 @@ def fetch(request):
 #                             print res
 #                 cleaned = cleaned + str(res)
             
-            '''
-            No JavaScript support, fast
-            '''
+            # No JavaScript support, fast
             import urllib2
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             r = urllib2.urlopen(req)
             cleaned = ''
             for line in r:
+                # fix for some forums
+                line = line.replace('popupctrl', '')
+                line = line.replace('popupmenu', '')
                 a = re.findall('url\((.*?)\)', line)
-
                 if a:
                     for link in a:  
                         if 'http' not in link:
@@ -246,7 +241,7 @@ def fetch(request):
 
             from bs4 import BeautifulSoup
             soup = BeautifulSoup(cleaned)
-            
+
             for tag in soup.find_all('a', href=True):
                 tag['href'] = "javascript:void(0)"
                 tag['rel'] = "javascript:void(0)"
@@ -264,18 +259,17 @@ def fetch(request):
             for tag in soup.find_all('script', src=True):
                 if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
-                               
-            for tag in soup.find_all('iframe', src=True):
-                tag['src'] = ""
             
-#             for tag in soup.find_all('script', async=True):
-#                 tag.decompose()
-            '''
-            Can implement injection of javascript into the HTML response to 'clean' the response
-            '''
-            '''
-            Inject Focra CSS into the HTML response
-            '''
+            # fix for some forums, disable in-line scripts that prevents page from loading
+            # e.g http://www.kiasuparents.com/kiasu/forum/index.php
+            for tag in soup.find_all('script', src=False):
+                tag.decompose()
+
+            for tag in soup.find_all('iframe', src=True):
+                tag['src'] = ''
+                
+            #Can implement injection of javascript into the HTML response to 'clean' the response   
+            #Inject Focra CSS into the HTML response
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
             soup.head.append(css_tag)
             
