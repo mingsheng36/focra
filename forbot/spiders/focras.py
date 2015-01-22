@@ -1,10 +1,11 @@
 
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spider import Spider
-from scrapy import signals 
+from scrapy import signals, Request
 from scrapy.contrib.loader import ItemLoader
 from scrapy.item import Item, Field
 import json, collections
+from bs4 import BeautifulSoup
 
 class FocraSpider(Spider):
 
@@ -37,6 +38,10 @@ class FocraSpider(Spider):
 	def parse(self, response):		
 		try:
 			print "Focras - parsing item"
+			body = BeautifulSoup(response.body)
+			for t in body.find_all('tbody'):
+				t.unwrap()
+			response = response.replace(body=str(body))
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
@@ -47,7 +52,12 @@ class FocraSpider(Spider):
 				'''
 			yield dynamicItemLoader.load_item()
 			
-			#yield scrapy.Request(url, callback=self.parse)
+# 			pager = response.xpath('/html/body/div[4]/div[2]/div/div/table/tr/td[1]/div/div/table[2]/tr/td[2]/div/ul/li[6]/a/@href').extract()
+# 			from urlparse import urljoin
+# 			pager_sanitized = urljoin(self.start_urls[0], pager.pop())
+# 			print self.start_urls[0]
+# 			print pager_sanitized
+# 			yield Request(pager_sanitized, callback=self.parse)
 			
 		except Exception as err:
 			print err

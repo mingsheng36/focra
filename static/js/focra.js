@@ -145,21 +145,34 @@ $(document).ready(function() {
 	});
 	
 	// fields input change detector
-	$('#fields').on('input propertychange','.field', function(event){	
-		if ($(this).val() != '') {
-			$('#step_two_instruction_1').fadeOut('fast', function(event){
-				$('#step_two_instruction_2').fadeIn('fast');
-				$('#ifb').hide();
-			});
-		} else {
+	$('#fields').on('input propertychange','.field', function(event){
+		var curr_field_index = $(this).index('.field');		
+		//alert($('.field-badge:eq(' + curr_field_index + ')').html());
+		if ($(this).val() != '' && $('.field-badge:eq(' + curr_field_index + ')').text() == 0) {
+			$('#step_two_instruction_1').hide()
+			$('#step_two_instruction_2').fadeIn('fast');
+			$('#done_bn').hide();
+			$('#ifb').hide();
+		} else if ($(this).val() != '' && $('.field-badge:eq(' + curr_field_index + ')').text() != 0){
 			$('#step_two_instruction_2').fadeOut('fast', function(event){
-				$('#step_two_instruction_1').fadeIn('fast');
-				$('#ifb').fadeIn('fast');
-				$('#done_bn').hide();
+				$('#step_two_instruction_1').hide();
+				$('#step_two_instruction_2').hide();
+				$('#ifb').fadeOut('fast');
+				$('#done_bn').show();
 			});
+		} else if ($(this).val() == '' && $('.field-badge:eq(' + curr_field_index + ')').text() != 0){
+			$('#step_two_instruction_1').fadeIn('fast');
+			$('#step_two_instruction_2').hide();
+			$('#done_bn').hide();
+			$('#ifb').fadeIn('fast');
+		} else {
+			$('#step_two_instruction_1').fadeIn('fast');
+			$('#step_two_instruction_2').hide();
+			$('#done_bn').hide();
+			$('#ifb').fadeIn('fast');
 		}
 	});
-	
+
 	// add fields
 	$('#add_field_bn').click(function(event){
 		$('#step_two_bn').fadeOut('fast');
@@ -249,7 +262,7 @@ $(document).ready(function() {
 			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 		});
 	});
-	
+
 	$('#step_two_bn').click(function(event) {
 		var crawlerTemplate = []
 		$(".field").each(function(i){

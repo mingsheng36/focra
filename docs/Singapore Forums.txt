@@ -1,0 +1,87 @@
+List of Singapore forums - robots.txt
+======================================
+0. http://www.onetonline.org/
+1. http://forums.hardwarezone.com.sg/ - allow
+2. http://sgforums.com/forums - did not specify
+3. http://www.mycarforum.com/ - did not specify 
+4. http://forums.vr-zone.com/ - allow 
+5. http://thenewageparents.com/forum/ - allow
+6. http://forum.singaporeexpats.com/ - allow
+7. http://www.kiasuparents.com/kiasu/forum/index.php - allow
+8. http://forums.sgclub.com/ - allow - too much flash
+9. http://www.arofanatics.com/forums
+10. http://www.pinoysg.com/forum/index.php - allow
+11. http://www.clubsnap.com/ - allow
+12. http://forum.brightsparks.com.sg/ - allow
+
+URL ERROR http://www.discuss.com.sg/forum.php - allow
+URL ERROR http://singaporemotherhood.com/forum/ - did not specify
+URL ERROR http://forums.condosingapore.com/ - allow
+
+HEADER PROBLEM http://www.singaporebikes.com/ - allow
+
+REQUIRES LOGIN http://forum.shareinvestor.com/forum/ - allow
+
+List of Foreign forums
+======================================
+1. http://forum.xda-developers.com/
+2. http://www.warriorforum.com/
+3. http://www.engadget.com/discuss/
+4. http://www.tomshardware.com/forum/
+
+http://www.onetonline.org/link/summary/15-1199.08
+
+http://forums.hardwarezone.com.sg/eat-drink-man-woman-16/edmw-seems-have-many-malaysians-4922529.html
+http://forums.hardwarezone.com.sg/eat-drink-man-woman-16/edmw-seems-have-many-malaysians-4922529-2.html
+http://forums.hardwarezone.com.sg/eat-drink-man-woman-16/edmw-seems-have-many-malaysians-4922529-3.html
+
+http://sgforums.com/forums/8/topics/462502
+http://sgforums.com/forums/8/topics/462502?page=2
+http://sgforums.com/forums/8/topics/462502?page=3
+
+http://www.mycarforum.com/topic/2697240-airasia-flight-from-indonesia-to-singapore-missing-qz8501/
+http://www.mycarforum.com/topic/2697240-airasia-flight-from-indonesia-to-singapore-missing-qz8501/page-2
+http://www.mycarforum.com/topic/2697240-airasia-flight-from-indonesia-to-singapore-missing-qz8501/page-3
+
+http://forums.vr-zone.com/singapore-marketplace-garage-sales/3186802-razer-blackwidow-fire-sale.html
+http://forums.vr-zone.com/singapore-marketplace-garage-sales/3186802-razer-blackwidow-fire-sale-2.html
+http://forums.vr-zone.com/singapore-marketplace-garage-sales/3186802-razer-blackwidow-fire-sale-3.html
+
+http://thenewageparents.com/forum/showthread.php?3260-Advice-on-bumps-seen-on-children-s-hand
+http://thenewageparents.com/forum/showthread.php?3260-Advice-on-bumps-seen-on-children-s-hand/page2
+http://thenewageparents.com/forum/showthread.php?3260-Advice-on-bumps-seen-on-children-s-hand/page3
+
+http://forum.singaporeexpats.com/viewtopic.php?t=51684
+http://forum.singaporeexpats.com/viewtopic.php?f=16&t=51684&start=15
+http://forum.singaporeexpats.com/viewtopic.php?f=16&t=51684&start=30
+
+http://www.kiasuparents.com/kiasu/forum/viewtopic.php?f=1&t=66876
+http://www.kiasuparents.com/kiasu/forum/viewtopic.php?f=1&t=66876&start=10
+http://www.kiasuparents.com/kiasu/forum/viewtopic.php?f=1&t=66876&start=20
+
+http://forums.sgclub.com/singapore/behind_scene_look_289182.html
+http://forums.sgclub.com/singapore/behind_scene_look_289182_2.html
+http://forums.sgclub.com/singapore/behind_scene_look_289182_3.html
+
+http://www.singaporebikes.com/forums/showthread.php/103298-Discussion-What-s-bugging-you-now
+http://www.singaporebikes.com/forums/showthread.php/103298-Discussion-What-s-bugging-you-now/page2
+http://www.singaporebikes.com/forums/showthread.php/103298-Discussion-What-s-bugging-you-now/page3
+
+http://www.daddyhobby.com/forum/showthread.php?t=77926
+http://www.daddyhobby.com/forum/showthread.php?t=77926&page=2
+http://www.daddyhobby.com/forum/showthread.php?t=77926&page=3
+
+http://www.arofanatics.com/forums/showthread.php?t=526504
+http://www.arofanatics.com/forums/showthread.php?t=526504&page=2
+http://www.arofanatics.com/forums/showthread.php?t=526504&page=3
+
+http://www.singapolitics.sg/news
+http://www.singapolitics.sg/news/page/1/0
+http://www.singapolitics.sg/news/page/2/0
+
+http://www.pinoysg.com/forum/viewtopic.php?f=85&t=11187
+http://www.pinoysg.com/forum/viewtopic.php?f=85&t=11187&start=15
+http://www.pinoysg.com/forum/viewtopic.php?f=85&t=11187&start=30
+
+
+

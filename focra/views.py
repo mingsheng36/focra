@@ -81,8 +81,8 @@ def createCrawler(request):
     if request.method == 'POST':   
         if username:
             crawlerName = request.POST['crawlerName']
-            crawlerSeeds=request.POST['crawlerSeeds'].split('\r\n')
-            crawlerTemplate=request.POST['crawlerTemplate']
+            crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
+            crawlerTemplate = request.POST['crawlerTemplate']
             try:
                 crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate)
                 Crawler(crawlerName=crawlerName, 
@@ -224,7 +224,7 @@ def fetch(request):
             r = urllib2.urlopen(req)
             cleaned = ''
             for line in r:
-                # fix for some forums
+                # fix for some forums templates
                 line = line.replace('popupctrl', '')
                 line = line.replace('popupmenu', '')
                 a = re.findall('url\((.*?)\)', line)
