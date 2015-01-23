@@ -133,15 +133,17 @@ $(document).ready(function() {
 			}).mouseout(function (event) {
 				$(event.target).removeClass('outline-element');
 			}).on('click dblclick', function (event) {
+				
 				/************** PAGER *****************/
 				if (pager_mode) {
 					if (typeof $(event.target).attr('href') != 'undefined') {
 						$(event.target).toggleClass('outline-element-clicked');
-						pager_links.push($(event.target).attr('href'));
+						pager_links.push($(event.target).attr('href').trim());
 						get_sequence(pager_links);
 					}
 				}
 				/************** END *****************/
+				
 				else {
 					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != '') {
 						$(event.target).toggleClass('outline-element-clicked');
@@ -332,15 +334,35 @@ $(document).ready(function() {
 			$('#pager_done_bn').fadeIn('fast');
 			$('#crawlerPager').val(pager_links[0]);
 		} else if (pager_links.length > 1) {
-			for (var i = 0; i < pager_links.length; i++) {
-				
+			for (var i = 0; i < pager_links.length-1; i++) {
+				compareDiff(pager_links[i].split('/'), pager_links[i+1].split('/'))
 			}
+		}
+	}
+	
+	function compareDiff(link1, link2) {
+		var diff = 0;
+		var diff_pos;
+		for (var i = 0; i < Math.max(link1.length, link2.length); i++) {
+			if (link1[i] != link2[i]) {
+				diff_pos = i;
+				diff++;
+			}
+		}
+		if (diff === 1) {
+			console.log(link1[diff_pos]);
+			console.log(link2[diff_pos]);
+		} else {
 			
 		}
+//		console.log(link1);
+//		console.log(link2);
+//		console.log(diff);
 	}
 	
 	$('#pager_done_bn').click(function(event) {
 		pager_links = [];
+		pager_mode = false;
 		$('#pager_done_bn').hide();
 		$('#step_three_bn').fadeIn('fast');
 		$('#ifb').fadeIn('fast');
