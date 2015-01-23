@@ -83,6 +83,8 @@ def createCrawler(request):
             crawlerName = request.POST['crawlerName']
             crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
             crawlerTemplate = request.POST['crawlerTemplate']
+            crawlerPager = request.POST['crawlerPager']
+            print crawlerPager
             try:
                 crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate)
                 Crawler(crawlerName=crawlerName, 
@@ -91,7 +93,7 @@ def createCrawler(request):
                         crawlerStatus='running', 
                         crawlerOwner=username, 
                         crawlerTemplate=crawlerTemplate,
-                        crawlerDateTime=datetime.now()).save()            
+                        crawlerDateTime=datetime.now()).save()
             except Exception as err:
                 print err
             request.session['crawlers'] = crawlers + [crawlerName]
@@ -198,33 +200,14 @@ def fetch(request):
         try: 
             from urlparse import urljoin
             url = request.GET['url']
-            
-            # Should be implemented with scrapy
-#             import os
-#             p = subprocess.Popen(["python", os.path.dirname(os.path.dirname(__file__)) +'/scripts/test.py', url], stdout=PIPE)  
-#             cleaned = ''
-#             while True:
-#                 res = p.stdout.readline()
-#                      
-#                 if res == '' and p.poll() != None:
-#                     break
-#                 a = re.findall('url\((.*?)\)', res)   
-#                 if a:
-#                     for link in a:           
-#                         if 'http' not in link:
-#                             link = link.replace("'","")
-#                             link = link.replace('"',"")
-#                             res = re.sub("url\((.*?)\)", 'url(' + str(urljoin(parsed_url.scheme + "://" + parsed_url.netloc + "/", ''.join(link))) + ')' , res)
-#                             print res
-#                 cleaned = cleaned + str(res)
-            
+                        
             # No JavaScript support, fast
             import urllib2
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            r = urllib2.urlopen(req)
-            cleaned = ''
-            for line in r:
-                # fix for some forums templates
+            resp = urllib2.urlopen(req)
+            cleaned_resp = ''
+            for line in resp:
+                # fix for some forums templates, prevent popups
                 line = line.replace('popupctrl', '')
                 line = line.replace('popupmenu', '')
                 a = re.findall('url\((.*?)\)', line)
@@ -237,39 +220,37 @@ def fetch(request):
                                           , 'url(' + str(url) + ''.join(link) + ')' 
                                           , line) 
                     
-                cleaned = cleaned + line
+                cleaned_resp = cleaned_resp + line
 
             from bs4 import BeautifulSoup
-            soup = BeautifulSoup(cleaned)
-
-            for tag in soup.find_all('a', href=True):
-                tag['href'] = "javascript:void(0)"
-                tag['rel'] = "javascript:void(0)"
-                tag['onclick'] = "javascript:void(0)"
-                tag['target'] = "javascript:void(0)"
-                
+            soup = BeautifulSoup(cleaned_resp)
+            
+            # patch the css url so it will load from the server
             for tag in soup.find_all('link', href=True):
                 if 'http' not in tag['href']:
                     tag['href'] = urljoin(url, tag['href'])
-                    
+            
+            # patch image url so it will load from the server
             for tag in soup.find_all('img', src=True):
                 if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
-                    
+            
+            # load external script for web page to load properly
+            # so users are more familiar with the interface
             for tag in soup.find_all('script', src=True):
                 if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
-            
+
             # fix for some forums, disable in-line scripts that prevents page from loading
             # e.g http://www.kiasuparents.com/kiasu/forum/index.php
             for tag in soup.find_all('script', src=False):
                 tag.decompose()
 
+            # disable and remove all iframe to prevent errors
             for tag in soup.find_all('iframe', src=True):
                 tag['src'] = ''
-                
-            #Can implement injection of javascript into the HTML response to 'clean' the response   
-            #Inject Focra CSS into the HTML response
+  
+            # inject focra.css into response
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
             soup.head.append(css_tag)
             

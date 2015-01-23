@@ -2,19 +2,19 @@
 {% load staticfiles %}
 {% block title %}{{ crawler.crawlerName }}{% endblock %}
 {% block body_block %}
-	<div class="alert alert-success">
-		
+	
+		<div id="info" class="well well-lg">
 		{% if crawler.crawlerStatus == 'running' %}
 				<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
-				<button id="startBn" type="button" disabled >Start Crawler</button>
-				<button id="stopBn" type="button">Stop Crawler</button>
+				<button id="startBn" type="button" class="btn btn-success"disabled>Start Crawler</button>
+				<button id="stopBn" type="button" class="btn btn-danger">Stop Crawler</button>			
 			{% else %}
 				<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
-				<button id="startBn" type="button" >Start Crawler</button>
-				<button id="stopBn" type="button" disabled>Stop Crawler</button>
+				<button id="startBn" type="button" class="btn btn-success" >Start Crawler</button>
+				<button id="stopBn" type="button" class="btn btn-danger" disabled>Stop Crawler</button>
 		{% endif %}
-		
-	</div>
+		</div>
+	
 	
 	<div role="tabpanel">
 

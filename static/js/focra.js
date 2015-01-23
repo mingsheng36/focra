@@ -56,27 +56,23 @@ $(document).ready(function() {
 	
 	// url input change
 	$('#url').on('input propertychange', function(event) {
-		if ($('#url').val() != "") {
-			$('#step_one_instruction').fadeOut('fast', function(event) {
-				$('#step_one_bn').fadeIn('fast');
-			});
+		if ($('#url').val() != '') {
+			$('#step_one_instruction').hide();
+			$('#step_one_bn').fadeIn('fast');
 		} else {
-			$('#step_one_bn').fadeOut('fast', function(event) {
-				$('#step_one_instruction').fadeIn('fast');	
-			});
+			$('#step_one_bn').hide();
+			$('#step_one_instruction').fadeIn('fast');
 		}
 	});
 
 	// step 1 (url)
 	$('#step_one_bn').click(function(event) {
 		if ($('#url').val() != '') {
-			$('#step_one_bn').fadeOut('fast', function(event) {
-				$('#url').attr('readonly', true);
-				$('#step_one_bn').hide();
-				$('#step_one_instruction').hide();
-				$('#loader').fadeIn('fast');
-				fetchURL()
-			});
+			$('#url').attr('readonly', true);
+			$('#step_one_bn').hide();
+			$('#step_one_instruction').hide();
+			$('#loader').fadeIn('slow');
+			fetchURL()
 		} else {
 			alert('Please enter your URL');
 		}
@@ -86,6 +82,8 @@ $(document).ready(function() {
 	var field_xpaths = [];
 	var selected_xpaths = [];
 	var general_xpath = "";
+	var pager_mode = false;
+	var pager_links = [];
 	
 	// step 2 on page load
 	if ($('.field').length > 1 || $('.field').attr('readonly') == true) {
@@ -108,7 +106,7 @@ $(document).ready(function() {
 		$('.field').attr('readonly', false);
 		$('.field').val('');
 	}
-	
+
 	// iframe on load
 	$('#iframe').load(function(){
 		if ($('#iframe').attr('srcdoc') != '') {
@@ -116,28 +114,46 @@ $(document).ready(function() {
 				showStepTwo();
 				$('#url').attr('readonly', false);
 			});
+			$('#iframe').contents().find('a').click(function(event) {
+	            event.preventDefault();
+	        });
 			var contain_texts;
 			$(this.contentWindow.document).mouseover(function (event) {
 				contain_texts = $(event.target).clone().children().remove().end().text().trim();
-				if ($(event.target).prop("tagName").toLowerCase() == "img") {
-					$(event.target).addClass( "outline-element" );
-				} 
-				else if (contain_texts) {
-					$(event.target).addClass( "outline-element" );
+				if (pager_mode) {
+					if (typeof $(event.target).attr('href') != 'undefined' && contain_texts != '') {
+						$(event.target).addClass( "outline-element" );
+					}
+				} else {
+					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != '') {
+						$(event.target).addClass( "outline-element" );
+					}
 				}
+				
 			}).mouseout(function (event) {
 				$(event.target).removeClass('outline-element');
 			}).on('click dblclick', function (event) {
-				if ($(event.target).prop("tagName").toLowerCase() == 'img' || contain_texts) {
-					$(event.target).toggleClass('outline-element-clicked');
-					selected_xpaths.push(getElementTreeXPath(event.target));
-					$('.badge').last().html(get_candidate_xpaths(selected_xpaths).length);
-					if ($('.field').last().val() != '' && $('.badge').last().text() != 0) {
-						$('#step_two_instruction_2').hide();
-						$('#done_bn').fadeIn('fast');
-					} else {
-						$('#done_bn').hide();
-						$('#step_two_instruction_2').fadeIn('fast');
+				/************** PAGER *****************/
+				if (pager_mode) {
+					if (typeof $(event.target).attr('href') != 'undefined') {
+						$(event.target).toggleClass('outline-element-clicked');
+						pager_links.push($(event.target).attr('href'));
+						get_sequence(pager_links);
+					}
+				}
+				/************** END *****************/
+				else {
+					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != '') {
+						$(event.target).toggleClass('outline-element-clicked');
+						selected_xpaths.push(getElementTreeXPath(event.target));
+						$('.badge').last().html(get_candidate_xpaths(selected_xpaths).length);
+						if ($('.field').last().val() != '' && $('.badge').last().text() != 0) {
+							$('#step_two_instruction_2').hide();
+							$('#done_bn').fadeIn('fast');
+						} else {
+							$('#done_bn').hide();
+							$('#step_two_instruction_2').fadeIn('fast');
+						}
 					}
 				}
 			});
@@ -147,19 +163,17 @@ $(document).ready(function() {
 	// fields input change detector
 	$('#fields').on('input propertychange','.field', function(event){
 		var curr_field_index = $(this).index('.field');		
-		//alert($('.field-badge:eq(' + curr_field_index + ')').html());
 		if ($(this).val() != '' && $('.field-badge:eq(' + curr_field_index + ')').text() == 0) {
 			$('#step_two_instruction_1').hide()
 			$('#step_two_instruction_2').fadeIn('fast');
 			$('#done_bn').hide();
 			$('#ifb').hide();
 		} else if ($(this).val() != '' && $('.field-badge:eq(' + curr_field_index + ')').text() != 0){
-			$('#step_two_instruction_2').fadeOut('fast', function(event){
-				$('#step_two_instruction_1').hide();
-				$('#step_two_instruction_2').hide();
-				$('#ifb').fadeOut('fast');
-				$('#done_bn').show();
-			});
+			$('#step_two_instruction_2').hide();
+			$('#step_two_instruction_1').hide();
+			$('#step_two_instruction_2').hide();
+			$('#ifb').fadeOut('fast');
+			$('#done_bn').fadeIn('fast');
 		} else if ($(this).val() == '' && $('.field-badge:eq(' + curr_field_index + ')').text() != 0){
 			$('#step_two_instruction_1').fadeIn('fast');
 			$('#step_two_instruction_2').hide();
@@ -174,25 +188,24 @@ $(document).ready(function() {
 	});
 
 	// add fields
-	$('#add_field_bn').click(function(event){
-		$('#step_two_bn').fadeOut('fast');
-		$('#add_field_bn').fadeOut('fast', function(event) {
-			$('#fields').append(
+	$('#add_field_bn').click(function(event) {
+		$('#step_two_bn').hide();
+		$('#add_field_bn').hide(); 
+		$('#fields').append(
 				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
 				'<div class="field-badge form-control">' +
-					'<span class="badge">0</span>' +
+				'<span class="badge">0</span>' +
 				'</div>' +
 				'<div class="field-delete form-control" style="cursor: pointer">' +
-					'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
-				'</div>');
-			$('.field').last().focus();
-			$('#step_two_instruction_1').show();
-			$('#ifb').show();
-		});
+				'<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
+		'</div>');
+		$('.field').last().focus();
+		$('#step_two_instruction_1').show();
+		$('#ifb').show();
 	});
-	
+
 	// delete fields
-	$('#fields').on('click', '.field-delete', function(event){
+	$('#fields').on('click', '.field-delete', function(event) {
 		var curr_i = $(this).index('.field-delete');
 		$('.field:eq(' + curr_i + ')').remove();
 		$('.field-badge:eq(' + curr_i + ')').empty();
@@ -215,9 +228,9 @@ $(document).ready(function() {
 			if ($('.field').last().attr('readonly') == 'readonly') {
 				$('#step_two_instruction_2').hide();
 				$('#step_two_instruction_1').hide();
-				$('#add_field_bn').fadeIn('fast');
-				$('#step_two_bn').show();
 				$('#done_bn').hide();
+				$('#add_field_bn').fadeIn('fast');
+				$('#step_two_bn').fadeIn('fast');
 				$('#ifb').fadeIn('fast');
 				$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 			} else {
@@ -250,17 +263,15 @@ $(document).ready(function() {
 	
 	// done selecting data
 	$('#done_bn').click(function(event) {
-		$('#done_bn').fadeOut('fast', function(event){
-			field_xpaths.push(general_xpath);
-			general_xpath = '';
-			selected_xpaths = [];
-			candidate_xpaths = [];
-			$('.field').attr('readonly', true);
-			$('#ifb').show();
-			$('#add_field_bn').fadeIn('fast');
-			$('#step_two_bn').fadeIn('fast');
-			$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
-		});
+		$('#done_bn').hide()
+		field_xpaths.push(general_xpath);
+		general_xpath = '';
+		selected_xpaths = [];
+		$('.field').attr('readonly', true);
+		$('#ifb').fadeIn('fast');
+		$('#add_field_bn').fadeIn('fast');
+		$('#step_two_bn').fadeIn('fast');
+		$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 	});
 
 	$('#step_two_bn').click(function(event) {
@@ -280,25 +291,69 @@ $(document).ready(function() {
 	// step 3 on page load
 	if ($('#crawlerName').val() != '') {
 		$('#crawlerName').attr('readonly', false);
-		$('#step_three_bn').show();
+		$('#pager_bn').fadeIn('fast');
+		$('#step_three_bn').fadeIn('fast');
 	} else {
+		$('#pager_bn').hide();
 		$('#step_three_bn').hide();
 	}
 	
 	$('#crawlerName').on('input propertychange', function(event){
 		if ($('#crawlerName').val() != '') {
+			$('#pager_bn').fadeIn('fast');
 			$('#step_three_bn').fadeIn('fast');
 		} else {
-			$('#step_three_bn').fadeOut('fast');
+			$('#pager_bn').hide();
+			$('#step_three_bn').hide();
 		}
+	});
+	
+	// show pagination option
+	$('#pager_bn').click(function(event) {
+		if (pager_mode) {
+			pager_mode = false;
+			$('#step_three_instruction').hide();
+			$('#crawlerName').attr('readonly', false);
+			$('#pager_bn').show();
+			$('#step_three_bn').fadeIn('fast');
+		} else {
+			pager_mode = true;
+			$('#crawlerName').attr('readonly', true);
+			$('#pager_bn').hide();
+			$('#step_three_bn').hide();
+			$('#step_three_instruction').fadeIn('fast');
+			$('#ifb').fadeOut('fast');
+		}
+	});
+	
+	function get_sequence(pager_links) {
+		if (pager_links.length == 1) {
+			$('#step_three_instruction').hide();
+			$('#pager_done_bn').fadeIn('fast');
+			$('#crawlerPager').val(pager_links[0]);
+		} else if (pager_links.length > 1) {
+			for (var i = 0; i < pager_links.length; i++) {
+				
+			}
+			
+		}
+	}
+	
+	$('#pager_done_bn').click(function(event) {
+		pager_links = [];
+		$('#pager_done_bn').hide();
+		$('#step_three_bn').fadeIn('fast');
+		$('#ifb').fadeIn('fast');
+		$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 	});
 
 	$('#step_three_bn').click(function(event) {
-		$('#step_three_bn').fadeOut('fast', function(event) {
-			$('#crawlerName').attr('readonly', true);
-			$('#loader').fadeIn('fast');
-			$('#create').submit();
-		});
+		$('#step_three_instruction').hide();
+		$('#pager_bn').hide();
+		$('#step_three_bn').hide();
+		$('#crawlerName').attr('readonly', true);
+		$('#loader').fadeIn('slow');
+		$('#create').submit();
 	});
 
 	/**************** Key Press Events **************/
@@ -377,7 +432,7 @@ $(document).ready(function() {
 			node1.splice(0, 1);
 			node2.splice(0, 1);
 			var diff = [];
-			for (i = 0; i < node1.length; i++) {
+			for (var i = 0; i < Math.max(node1.length, node2.length); i++) {
 				if (node1[i] != node2[i]) {
 					diff.push(i);
 				}
@@ -392,7 +447,7 @@ $(document).ready(function() {
 				candidate_xpaths = '';
 			} else if (diff.length == 1) {
 				// we can find similar xpaths if diff is just one node
-				for (j = 0; j <= diff[0]; j++) {
+				for (var j = 0; j <= diff[0]; j++) {
 					if (j == diff[0]) {
 						x = x + '/' + node1[j].replace(/[^a-z]/g,'');
 					} else {
@@ -400,7 +455,7 @@ $(document).ready(function() {
 					}
 				}
 				// add the rest of the xpath into the generalized xpath
-				for (k = diff[0] + 1; k < node1.length; k++) {
+				for (var k = diff[0] + 1; k < node1.length; k++) {
 					sub_x = sub_x + '/' + node1[k];
 				}
 				$('#iframe').contents().xpath(x).each(function(i) {
@@ -415,10 +470,10 @@ $(document).ready(function() {
 						$('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).addClass('outline-element-clicked');
 					}		
 				});
-				// remove tbody because its generated from mozilla
+				// remove tbody because its generated from browser
 				general_xpath = (x + sub_x).replace(/\/tbody/g, '');
 			} else {
-				//if diff > 1 for (node1, node2) we deselect and remove node1
+				//if diff(node1, node2) > 1 we deselect and remove node1
 				$('#iframe').contents().xpath(selected_xpaths[0]).removeClass('outline-element-clicked');
 				selected_xpaths.splice(0, 1);
 				// node2 will take over node1
@@ -451,7 +506,7 @@ $(document).ready(function() {
 			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
 			success: function( data ){
 				$('#display').html(data);
-				$('#stopBn').removeAttr('disabled');	    	
+				$('#stopBn').removeAttr('disabled');
 			}
 		});
 	});
@@ -502,8 +557,8 @@ $(document).ready(function() {
 						var data = $.parseJSON(res);
 						$.each(data, function(i, obj) {						
 							var rowData = "";
-							for (j = 0; j < fields.length; j++) { 
-								rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
+							for (var l = 0; l < fields.length; l++) { 
+								rowData = rowData + "<td>" + obj[fields[l]] + "</td>";
 							}
 							$('#crawlerData').append(
 									"<tr>" + rowData + "</tr>"	
