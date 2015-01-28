@@ -65,6 +65,7 @@ def crawler(request, username=None, crawlerName=None):
             request.session['crawlerAddr'] = crawler.crawlerAddr
             request.session['crawlerSeeds'] = crawler.crawlerSeeds
             request.session['crawlerTemplate']= crawler.crawlerTemplate
+            request.session['crawlerPager'] = crawler.crawlerPager
             # Retrieve and convert template into an ordered dict
             t = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
             return render(request, 'crawler.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
@@ -80,17 +81,17 @@ def createCrawler(request):
             return render(request, 'create.html', {'username': username, 'crawlers': crawlers})
     if request.method == 'POST':   
         if username:
-            crawlerName = request.POST['crawlerName']
-            crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
-            crawlerTemplate = request.POST['crawlerTemplate']
-            crawlerPager = request.POST['crawlerPager']
-            print crawlerPager
             try:
-                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate)
+                crawlerName = request.POST['crawlerName']
+                crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
+                crawlerTemplate = request.POST['crawlerTemplate']
+                crawlerPager = request.POST['crawlerPager']
+                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager)
                 Crawler(crawlerName=crawlerName, 
                         crawlerSeeds=crawlerSeeds, 
                         crawlerAddr=crawlerAddr, 
-                        crawlerStatus='running', 
+                        crawlerStatus='running',
+                        crawlerPager=crawlerPager,
                         crawlerOwner=username, 
                         crawlerTemplate=crawlerTemplate,
                         crawlerDateTime=datetime.now()).save()
@@ -135,8 +136,9 @@ def startCrawl(request):
         crawlerName = request.session.get('crawlerName')
         crawlerSeeds = request.session.get('crawlerSeeds')
         crawlerTemplate = request.session.get('crawlerTemplate')
+        crawlerPager = request.session.get('crawlerPager')
         try:
-            crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate)
+            crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager)
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
             request.session['crawlerAddr'] = crawlerAddr
         except Exception as err:
@@ -168,18 +170,27 @@ def stopCrawl(request):
 Starting the crawler through cmdline in local machine
 Needs to be changed to start through HTTP call for scalability
 '''  
-def runCrawler(name, seeds, template):
-    commands = ["scrapy", "crawl", "focras", "-a", "name=" + name, "-a", "seeds=" + ','.join(seeds), "-a", "template=" + template]
-    crawlerProcess = subprocess.Popen(commands, stderr=PIPE)    
-    while True:
-        line = crawlerProcess.stderr.readline()
-        crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
-        if crawlerAddr:
-            print ''.join(crawlerAddr)
-            break;
-        if line == '' and crawlerProcess.poll() != None:
-            break;
-    return ''.join(crawlerAddr)
+def runCrawler(name, seeds, template, pager):
+    try:
+        commands = ["scrapy", "crawl", "focras", 
+                    "-a", "name=" + name, 
+                    "-a", "seeds=" + ','.join(seeds), 
+                    "-a", "template=" + template, 
+                    "-a", "pager=" + pager.encode('ascii', 'xmlcharrefreplace')]
+        crawlerProcess = subprocess.Popen(commands, stderr=PIPE)
+        while True:
+            line = crawlerProcess.stderr.readline()
+            print line
+            crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
+            if crawlerAddr:
+                print ''.join(crawlerAddr)
+                crawlerProcess.stderr.close()
+                break;
+            if line == '' and crawlerProcess.poll() != None:
+                break;
+        return ''.join(crawlerAddr)
+    except Exception as err:
+        print err
 
 '''
 Stopping crawler through JSONRPC
@@ -194,13 +205,10 @@ def stopCrawler(addr):
 Fetch seed URl and do HTML pre-processing
 '''
 def fetch(request):
-    
     if request.method == 'GET':
-        
         try: 
             from urlparse import urljoin
-            url = request.GET['url']
-                        
+            url = request.GET['url']              
             # No JavaScript support, fast
             import urllib2
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -249,6 +257,7 @@ def fetch(request):
             # disable and remove all iframe to prevent errors
             for tag in soup.find_all('iframe', src=True):
                 tag['src'] = ''
+                tag['srcdoc'] = ''
   
             # inject focra.css into response
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')

@@ -1,3 +1,5 @@
 List of Bugs
 ===========================
-Fields having the same name will be omitted
+1. Fields having the same name will be omitted
+2. Fields will not be saved when going back from Step 3 to Step 2
+3. Javascript generated in the front-end but in scrapy we dont generate javasript (response not synced)

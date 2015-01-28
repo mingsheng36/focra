@@ -10,6 +10,7 @@ class Crawler(Document):
     crawlerSeeds = ListField(required=True,)
     crawlerStatus = StringField(required=True)
     crawlerAddr = StringField()
+    crawlerPager = StringField()
     crawlerOwner = StringField(required=True)
     crawlerDateTime = DateTimeField()
     '''

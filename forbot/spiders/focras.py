@@ -6,11 +6,11 @@ from scrapy.contrib.loader import ItemLoader
 from scrapy.item import Item, Field
 import json, collections
 from bs4 import BeautifulSoup
+from urlparse import urljoin
+from HTMLParser import HTMLParser
 
 class FocraSpider(Spider):
-
 	name = 'focras'
-	
 	'''
 	To access scrapy's core API. basically can modify anything in the 'crawler'
 	'''
@@ -28,7 +28,9 @@ class FocraSpider(Spider):
 		try:
 			self.template = json.loads(self.template, object_pairs_hook=collections.OrderedDict)
 			self.start_urls =  kwargs.get('seeds').split(',')
+			self.base_url = self.start_urls
 			self.item = Item()
+			self.pager = HTMLParser().unescape(self.pager)
 		except Exception as error:
 			print error
 
@@ -41,7 +43,7 @@ class FocraSpider(Spider):
 			body = BeautifulSoup(response.body)
 			for t in body.find_all('tbody'):
 				t.unwrap()
-			response = response.replace(body=str(body))
+			response = response.replace(body=str(body.prettify()))
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
@@ -52,12 +54,12 @@ class FocraSpider(Spider):
 				'''
 			yield dynamicItemLoader.load_item()
 			
-# 			pager = response.xpath('/html/body/div[4]/div[2]/div/div/table/tr/td[1]/div/div/table[2]/tr/td[2]/div/ul/li[6]/a/@href').extract()
-# 			from urlparse import urljoin
-# 			pager_sanitized = urljoin(self.start_urls[0], pager.pop())
-# 			print self.start_urls[0]
-# 			print pager_sanitized
-# 			yield Request(pager_sanitized, callback=self.parse)
-			
+			# check for pagination
+			nextlink = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()
+			if nextlink:
+				print 'next link is ' + nextlink[0]
+				pager_sanitized = urljoin(self.base_url[0], nextlink.pop())
+				print 'pager sanitized is ' + pager_sanitized
+				yield Request(pager_sanitized, callback=self.parse)
 		except Exception as err:
 			print err
