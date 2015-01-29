@@ -29,8 +29,7 @@ class MongoDBPipeline(object):
                 for k in item.keys():
                     row[k] = None
                     try:
-                        if item.get(k)[j]:
-                            row[k] = item.get(k)[j]
+                        row[k] = item.get(k)[j]
                     except Exception as e:
                         print e
                 collection.insert(row)

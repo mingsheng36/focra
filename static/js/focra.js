@@ -460,6 +460,12 @@ $(document).ready(function() {
 						$('#iframe').contents().xpath(x + '[' + (i+1) + ']' + sub_x).addClass('outline-element-clicked');
 					}		
 				});
+				
+				if (node1[node1.length-1].replace(/[^a-z]/g,'') == 'img') {
+					sub_x = sub_x + '/@src';
+				} else {
+					sub_x = sub_x + '/text()';
+				}
 				// remove tbody because its generated from browser
 				general_xpath = (x + sub_x).replace(/\/tbody/g, '');
 			} else {
@@ -523,6 +529,10 @@ $(document).ready(function() {
 		if (choice == false) {
 			event.preventDefault();
 		}
+	});
+	
+	$('#babyCrawler').click(function(event) {
+		
 	});
 	
 	/***************** DATA SECTION *****************/	

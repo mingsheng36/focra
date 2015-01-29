@@ -106,8 +106,17 @@ def createCrawler(request):
 Update current crawler in session
 '''
 def updateCrawler(request):
-    return
+    return None
 
+'''
+Create Baby Crawler
+'''
+def baby(request):
+    username = request.session.get('username')
+    crawlers = request.session.get('crawlers')
+    if request.method == 'GET':
+        return render(request, 'baby.html', {'username': username, 'crawlers': crawlers})
+        
 '''
 Delete current crawler in session
 '''

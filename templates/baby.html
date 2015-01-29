@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}Create Crawler{% endblock %}
+{% block body_block %}
+<div class="panel panel-default">
+	<div class="panel-heading">
+
+		<form id="create" method="post" action="/create" class="form-inline">
+			{% csrf_token %} 
+			<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
+			<input type="hidden" id="crawlerPager" name="crawlerPager" value="">
+			
+			<div class="form-group">
+
+				<!-- STEP 2 -->
+				<div id="step_two" class="input-group">
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-info">Step 2 of 3</button>
+					</div>
+					<div id="fields" class="form-group">
+						<input class="field form-control" type="text" size="15"
+							placeholder="fieldname">
+						<div class="field-badge form-control">
+							<span class="badge">0</span>
+						</div>
+						<div class="field-delete form-control" style="cursor: pointer">
+							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+						</div>
+					</div>
+					
+					<div class="form-group">&nbsp;</div>
+					
+					<button id="step_two_instruction_1" class="btn btn-info"
+						type="button">Enter Field Name</button>
+
+					<button id="step_two_instruction_2" style="display: none;"
+						class="btn btn-info" type="button">Select by Clicking On
+						The Data Below</button>
+
+					<button id="done_bn" style="display: none;" class="btn btn-primary"
+						type="button">Done !</button>
+
+					<button id="add_field_bn" style="display: none;"
+						class="btn btn-primary" type="button">Add Field +</button>
+						
+					<div class="form-group">&nbsp;</div>
+					
+					<button id="step_two_bn" style="display: none;"
+						class="btn btn-primary" type="button">Next Step &gt;</button>
+
+				</div>
+
+				<!-- STEP 3 -->
+				<div id="step_three" class="input-group" style="display: none;">
+					<div class="input-group-btn">
+						<button type="button" class="btn btn-info">Step 3 of 3</button>
+					</div>
+					<div class="form-group">
+						<input id="crawlerName" name="crawlerName" class="form-control"
+							autofocus type="text" size="30" placeholder="Your Crawler Name">
+					</div>
+					
+					<div class="form-group">&nbsp;</div>
+					<button id="step_three_instruction" style="display: none;" class="btn btn-info"
+						type="button">Click on the next two pages to let us know the sequence</button>
+
+					<button id="pager_done_bn" style="display: none;"
+						class="btn btn-primary" type="button">Done !</button>
+						
+					<button id="pager_bn" style="display: none;"
+						class="btn btn-primary" type="button">Add Pager +</button>
+
+					<div class="form-group">&nbsp;</div>
+					<button id="step_three_bn" style="display: none;"
+						class="btn btn-primary" type="button">Start Crawler</button>
+
+				</div>
+				
+				<img id="loader" style="display: none;"
+					src="{% static 'images/loader.gif' %}" alt="Loading..">
+
+			</div>
+
+		</form>
+
+	</div>
+
+	<div class="panel-body">
+		<div id="ifw" style="position: relative;">
+			<div id="ifb" style="position: absolute; top: 0; left: 0; width: 100%; height: 69vh;"></div>
+			<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
+		</div>
+	</div>
+
+</div>
+{% endblock %}
