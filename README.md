@@ -20,25 +20,26 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - ~~Algorithms to detect similar XPaths~~
 
 #####WEEK 18 (19-25/01/2015)
-- ~~Pagination (partial)~~
+- ~~Crawl paginated data (partial)~~
 
 #####WEEK 19 (26-01/02/2015)
-- ~~Pagination (full)~~
-- Display data properly
+- ~~Crawl paginated data (full)~~
+- ~~Display data in proper rows~~
 - Nested Parents Crawler
 
 #####WEEK 20 (02-08/02/2015)
 - Schedule crawl frequency
-- Pause/Resume crawlers
 - Improve on algorithms (aggregation + alignment)
 - Export data to Excel / CSV / JSON URL
+- Pause/Resume crawlers
+- Page pagination for data display
 
 - *Start crawler through schedule API*
 - *Crawl JavaScript generated contents*
 - *Monitor performance of crawler*
 - *All of Scrapy's settings*
-- *Edit fields names and field columns of the Crawler*
-- *Change database architecture (Not scalable as it uses one collection/crawler)*
+- *Edit fields names and column position of the Crawler*
+- *Change database architecture (Not scalable as it uses one collection per crawler)*
 
 #####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
 - Improve on design based on user evaluation

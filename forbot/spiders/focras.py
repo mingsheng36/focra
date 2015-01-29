@@ -1,4 +1,3 @@
-
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spider import Spider
 from scrapy import signals, Request
@@ -40,10 +39,11 @@ class FocraSpider(Spider):
 	def parse(self, response):		
 		try:
 			print "Focras - parsing item"
+			#print response.xpath('/html/body/div[4]/div[2]/div/div/table/tr/td[1]/div/div/form[1]/table[3]/tr[1]/td[3]/div[1]/a[2]').extract()
 			body = BeautifulSoup(response.body)
 			for t in body.find_all('tbody'):
 				t.unwrap()
-			response = response.replace(body=str(body.prettify()))
+			response = response.replace(body=body.prettify(encoding='ascii'))
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
@@ -53,13 +53,13 @@ class FocraSpider(Spider):
 				need to join them together
 				'''
 			yield dynamicItemLoader.load_item()
-			
 			# check for pagination
-			nextlink = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()
-			if nextlink:
-				print 'next link is ' + nextlink[0]
-				pager_sanitized = urljoin(self.base_url[0], nextlink.pop())
-				print 'pager sanitized is ' + pager_sanitized
-				yield Request(pager_sanitized, callback=self.parse)
+			if self.pager:
+				nextlink = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()
+				if nextlink:
+					print 'next link is ' + nextlink[0]
+					pager_sanitized = urljoin(self.base_url[0], nextlink.pop())
+					print 'pager sanitized is ' + pager_sanitized
+					yield Request(pager_sanitized, callback=self.parse)
 		except Exception as err:
 			print err

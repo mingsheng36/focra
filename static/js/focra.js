@@ -547,8 +547,8 @@ $(document).ready(function() {
 						var data = $.parseJSON(res);
 						$.each(data, function(i, obj) {						
 							var rowData = "";
-							for (var l = 0; l < fields.length; l++) { 
-								rowData = rowData + "<td>" + obj[fields[l]] + "</td>";
+							for (var j = 0; j < fields.length; j++) { 
+								rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
 							}
 							$('#crawlerData').append(
 									"<tr>" + rowData + "</tr>"	

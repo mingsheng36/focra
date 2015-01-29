@@ -18,12 +18,21 @@ class MongoDBPipeline(object):
 
     def process_item(self, item, spider):
         try:
-            # 'name' passed in from views.py
             collection = self.db[spider.name]
             print "pipline - processing item"
-            print item.keys()
-            for value in item:
-                print value
-            collection.insert(dict(item))
+            most_length = 0
+            for i in item:
+                if len(item.get(i)) > most_length:
+                    most_length = len(item.get(i))
+            for j in range(most_length):
+                row = {}
+                for k in item.keys():
+                    row[k] = None
+                    try:
+                        if item.get(k)[j]:
+                            row[k] = item.get(k)[j]
+                    except Exception as e:
+                        print e
+                collection.insert(row)
         except Exception as err:
             print err

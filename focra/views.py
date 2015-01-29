@@ -180,7 +180,8 @@ def runCrawler(name, seeds, template, pager):
         crawlerProcess = subprocess.Popen(commands, stderr=PIPE)
         while True:
             line = crawlerProcess.stderr.readline()
-            print line
+            # to view the process output 
+            #print line
             crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
             if crawlerAddr:
                 print ''.join(crawlerAddr)
