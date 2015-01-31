@@ -25,9 +25,13 @@ class FocraSpider(Spider):
 		print 'focras init() kwargs seeds ' + kwargs.get('seeds')
 		print 'focras init() kwargs template '+ self.template
 		try:
+			if kwargs.get('seeds').split(',')[0].startswith('http://'):
+				print kwargs.get('seeds').split(',')[0]
+				self.start_urls =  kwargs.get('seeds').split(',')
+				self.base_url = self.start_urls
+			else:
+				print 'this is a baby crawler'
 			self.template = json.loads(self.template, object_pairs_hook=collections.OrderedDict)
-			self.start_urls =  kwargs.get('seeds').split(',')
-			self.base_url = self.start_urls
 			self.item = Item()
 			self.pager = HTMLParser().unescape(self.pager)
 		except Exception as error:
@@ -39,8 +43,13 @@ class FocraSpider(Spider):
 	def parse(self, response):		
 		try:
 			print "Focras - parsing item"
-			#print response.xpath('/html/body/div[4]/div[2]/div/div/table/tr/td[1]/div/div/form[1]/table[3]/tr[1]/td[3]/div[1]/a[2]').extract()
 			body = BeautifulSoup(response.body)
+			for tag in body.find_all('a', href=True):
+				if 'http' not in tag['href']:
+					tag['href'] = urljoin(self.base_url[0], tag['href'])
+			for tag in body.find_all('img', src=True):
+				if 'http' not in tag['src']:
+					tag['src'] = urljoin(self.base_url[0], tag['src'])
 			for t in body.find_all('tbody'):
 				t.unwrap()
 			response = response.replace(body=body.prettify(encoding='ascii'))
@@ -54,7 +63,7 @@ class FocraSpider(Spider):
 				'''
 			yield dynamicItemLoader.load_item()
 			# check for pagination
-			if self.pager:
+			if self.pager != 'null':
 				nextlink = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()
 				if nextlink:
 					print 'next link is ' + nextlink[0]

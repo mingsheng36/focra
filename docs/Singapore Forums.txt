@@ -22,6 +22,10 @@ HEADER PROBLEM http://www.singaporebikes.com/ - allow
 
 REQUIRES LOGIN http://forum.shareinvestor.com/forum/ - allow
 
+Fields
+=======
+Link, Date, DateTime, HTML, Currency, Whole Number, Number, Language, Country, Boolean, Image
+
 List of Foreign forums
 ======================================
 1. http://forum.xda-developers.com/
@@ -86,3 +90,5 @@ http://www.pinoysg.com/forum/viewtopic.php?f=85&t=11187&start=30
 http://forum.brightsparks.com.sg/showthread.php?t=311
 http://forum.brightsparks.com.sg/showthread.php?t=311&page=2
 http://forum.brightsparks.com.sg/showthread.php?t=311&page=3
+
+http://www.flightradar24.com/data/airports/AOR

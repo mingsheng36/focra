@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^delete$', views.deleteCrawler, name='deleteCrawler'),
     url(r'^fetch$', views.fetch, name='fetch'),
     url(r'^data$', views.data, name='data'),
+    url(r'^baby/(?P<field>\w+)$', views.baby, name='baby'),
     url(r'^(?P<username>\w+)$', views.overview, name='overview'),
     url(r'^(?P<username>\w+)/(?P<crawlerName>\w+)$', views.crawler, name='crawler'),
 )

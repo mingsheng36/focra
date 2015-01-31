@@ -12,6 +12,8 @@ class Crawler(Document):
     crawlerAddr = StringField()
     crawlerPager = StringField()
     crawlerOwner = StringField(required=True)
+    crawlerParent = StringField()
+    crawlerBaby = StringField()
     crawlerDateTime = DateTimeField()
     '''
     Because mongoengine does not support ordered-dict-field yet. store as string to maintain order

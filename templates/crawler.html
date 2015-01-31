@@ -1,7 +1,46 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% block title %}{{ crawler.crawlerName }}{% endblock %}
+{% extends 'base.html' %} 
+{% load staticfiles %} 
+{% block title %}
+{{ crawler.crawlerName }}
+{% endblock %} 
 {% block body_block %}
+
+<br />
+<div id="info" class="well well-lg">
+	{% if crawler.crawlerStatus == 'running' %}
+	<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
+	<button id="startBn" type="button" class="btn btn-success" disabled>Start
+		Crawler</button>
+	<button id="stopBn" type="button" class="btn btn-danger">Stop
+		Crawler</button>
+	{% else %}
+	<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
+	<button id="startBn" type="button" class="btn btn-success">Start
+		Crawler</button>
+	<button id="stopBn" type="button" class="btn btn-danger" disabled>Stop
+		Crawler</button>
+	{% endif %}
+
+	<button id="babyCrawler" type="button" class="btn btn-primary">Create
+		Baby Crawler</button>
+	<div class="btn-group">
+		<button type="button" class="btn btn-default">Select Start
+			Links From</button>
+		<button type="button" class="btn btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-expanded="false">
+			<span class="caret"></span> <span class="sr-only">Toggle
+				Dropdown</span>
+		</button>
+
+		<ul class="dropdown-menu" role="menu">
+			{% for field in fields_w_link %}
+			<li><a href="/baby/{{ field }}">{{ field }}</a></li> 
+			{% endfor %}
+		</ul>
+	</div>
+
+</div>
+
 <div role="tabpanel">
 
 	<ul class="nav nav-tabs" role="tablist">
@@ -14,57 +53,26 @@
 	</ul>
 
 	<div class="tab-content">
-		<br/>
-		<div id="info" class="well well-lg">
-			{% if crawler.crawlerStatus == 'running' %}
-			<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
-			<button id="startBn" type="button" class="btn btn-success" disabled>Start
-				Crawler</button>
-			<button id="stopBn" type="button" class="btn btn-danger">Stop
-				Crawler</button>
-			{% else %}
-			<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
-			<button id="startBn" type="button" class="btn btn-success">Start
-				Crawler</button>
-			<button id="stopBn" type="button" class="btn btn-danger" disabled>Stop
-				Crawler</button>
-			{% endif %}
-			
-			<button id="babyCrawler" type="button" class="btn btn-primary">Create
-				Baby Crawler</button>
-			<div class="btn-group">
-				<button type="button" class="btn btn-default">Select Start
-					Links From</button>
-				<button type="button" class="btn btn-default dropdown-toggle"
-					data-toggle="dropdown" aria-expanded="false">
-					<span class="caret"></span> <span class="sr-only">Toggle
-						Dropdown</span>
-				</button>
-				<ul class="dropdown-menu" role="menu">
-					{% for key in t.keys %}
-					<li><a href="#">{{ key }}</a></li>
-					{% endfor %}
-				</ul>
-			</div>
-			
-		</div>
-		
 		<div role="tabpanel" class="tab-pane active" id="monitor">
-			
+
 			<table class="table table-striped table-bordered">
 				{% for seed in crawler.crawlerSeeds %}
 				<tr>
-					<td colspan="2">Link: {{ seed }}</td> 
+					<td colspan="2">Link: {{ seed }}</td>
 				</tr>
 				{% endfor %}
-				{% for key, value in t.items %}
+				<tr>
+					<td colspan="2">Pager: {{ crawler.crawlerPager }}</td>
+				</tr>
+				
+				{% for key, value in ordered_template_field.items %}
 				<tr>
 					<td>{{ key }} :</td>
 					<td><input type="text" value="{{ value }}" size="80"></td>
-				</tr> 
+				</tr>
 				{% endfor %}
 			</table>
-			
+
 		</div>
 
 		<div role="tabpanel" class="tab-pane fade table-responsive" id="data">
@@ -72,7 +80,7 @@
 			<table id="crawlerData" class="table table-bordered"
 				style="width: 100%">
 				<tr>
-					{% for key in t.keys %}
+					{% for key in ordered_template_field.keys %}
 					<th class="fields">{{ key }}</th> 
 					{% endfor %}
 				</tr>
@@ -97,8 +105,7 @@
 		<div role="tabpanel" class="tab-pane fade" id="settings">
 			<br />
 			<form id="delete" method="post" action="/delete">
-				{% csrf_token %} 
-				{% if crawler.crawlerStatus == 'running' %}
+				{% csrf_token %} {% if crawler.crawlerStatus == 'running' %}
 				<button id="deleteBn" class="btn btn-danger" type="submit"
 					data-toggle="tooltip" data-placement="top" title="Delete Crawler"
 					disabled>Delete Crawler</button>
@@ -108,7 +115,7 @@
 					Crawler</button>
 				{% endif %}
 			</form>
-			
+
 		</div>
 	</div>
 

@@ -5,7 +5,8 @@
 <div class="panel panel-default">
 	<div class="panel-heading">
 
-		<form id="create" method="post" action="/create" class="form-inline">
+		<input type="hidden" id="extractedLink" name="extractedLink" value="{{ extracted_link }}">
+		<form id="create" method="post" action="/baby/{{ field_link_name }}" class="form-inline">
 			{% csrf_token %} 
 			<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
 			<input type="hidden" id="crawlerPager" name="crawlerPager" value="">
@@ -91,6 +92,6 @@
 			<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
 		</div>
 	</div>
-
+	
 </div>
 {% endblock %}

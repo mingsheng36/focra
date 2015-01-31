@@ -72,7 +72,7 @@ $(document).ready(function() {
 			$('#step_one_bn').hide();
 			$('#step_one_instruction').hide();
 			$('#loader').fadeIn('slow');
-			fetchURL()
+			fetchURL($('#url').val())
 		} else {
 			alert('Please enter your URL');
 		}
@@ -380,11 +380,11 @@ $(document).ready(function() {
 	
 	/*********** Helper functions **************/	
 	// fetch URLs
-	function fetchURL() {
+	function fetchURL(url) {
 		$.ajax({
 			url: '/fetch',
 			data: { 
-				'url': $('#url').val(), 
+				'url': url, 
 			},
 			type: 'GET',
 			success: function(res) {
@@ -461,8 +461,12 @@ $(document).ready(function() {
 					}		
 				});
 				
+				// get the text or src only
 				if (node1[node1.length-1].replace(/[^a-z]/g,'') == 'img') {
-					sub_x = sub_x + '/@src';
+					//sub_x = sub_x + '/@src';
+					sub_x = sub_x;
+				} else if (node1[node1.length-1].replace(/[^a-z]/g,'') == 'a'){
+					sub_x = sub_x;
 				} else {
 					sub_x = sub_x + '/text()';
 				}
@@ -534,6 +538,12 @@ $(document).ready(function() {
 	$('#babyCrawler').click(function(event) {
 		
 	});
+	
+	/***************** BABY SECTION *****************/
+	if ($('#extractedLink').val()) {
+		//alert($('#extractedLink').val());
+		fetchURL($('#extractedLink').val())
+	}
 	
 	/***************** DATA SECTION *****************/	
 	// load data section

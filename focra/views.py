@@ -8,6 +8,7 @@ import json, collections
 from datetime import datetime
 from bson.json_util import dumps
 from pymongo import MongoClient
+from bs4 import BeautifulSoup
 client = MongoClient('localhost', 27017)
 db = client['CrawlerDB']
 
@@ -67,9 +68,19 @@ def crawler(request, username=None, crawlerName=None):
             request.session['crawlerTemplate']= crawler.crawlerTemplate
             request.session['crawlerPager'] = crawler.crawlerPager
             # Retrieve and convert template into an ordered dict
-            t = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
-            return render(request, 'crawler.html', {'username': username, 'crawlers': crawlers, 'crawler': crawler, 't': t})
-    
+            ordered_template_field = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
+            # Determine which  one are links
+            fields_w_link = []
+            for key, value in ordered_template_field.items():
+                if re.sub("[^a-z]", "", value.split('/')[-1]) == 'a':
+                    fields_w_link.append(key)
+
+            return render(request, 'crawler.html', {'username': username, 
+                                                    'crawlers': crawlers, 
+                                                    'crawler': crawler, 
+                                                    'ordered_template_field': ordered_template_field, 
+                                                    'fields_w_link': fields_w_link})
+
 '''
 Create a new crawler
 '''
@@ -107,15 +118,6 @@ Update current crawler in session
 '''
 def updateCrawler(request):
     return None
-
-'''
-Create Baby Crawler
-'''
-def baby(request):
-    username = request.session.get('username')
-    crawlers = request.session.get('crawlers')
-    if request.method == 'GET':
-        return render(request, 'baby.html', {'username': username, 'crawlers': crawlers})
         
 '''
 Delete current crawler in session
@@ -137,6 +139,46 @@ def deleteCrawler(request):
             print err
     return
 
+'''
+Create Baby Crawler
+'''
+def baby(request, field=None):
+    username = request.session.get('username')
+    crawlers = request.session.get('crawlers')
+    crawlerParent = request.session['crawlerName']
+    
+    if request.method == 'GET':
+        first_link_tag = db[crawlerParent].find_one().get(field)
+        if first_link_tag:
+            soup = BeautifulSoup(first_link_tag)
+            tag = soup.a
+            extracted_link = tag['href']
+
+        return render(request, 'baby.html', {'username': username, 'crawlers': crawlers, 'extracted_link': extracted_link, 'field_link_name': field})
+    elif request.method == 'POST':
+        try:
+            crawlerName = request.POST['crawlerName']
+            crawlerTemplate = request.POST['crawlerTemplate']
+            crawlerPager = request.POST['crawlerPager']
+            crawlerSeeds = [crawlerParent, field]
+            crawlerAddr = runCrawler(crawlerName, field, crawlerTemplate, crawlerPager)
+            Crawler(crawlerName=crawlerName, 
+                    crawlerSeeds=crawlerSeeds,
+                    crawlerAddr=crawlerAddr, 
+                    crawlerStatus='running',
+                    crawlerPager=crawlerPager,
+                    crawlerOwner=username,
+                    crawlerTemplate=crawlerTemplate,
+                    crawlerParent=crawlerParent,
+                    crawlerDateTime=datetime.now()).save()
+            # update parent crawler
+            crawler = Crawler.objects.get(crawlerName=crawlerParent)
+            crawler.crawlerBaby = crawlerName
+            crawler.save()
+        except Exception as err:
+            print err
+        request.session['crawlers'] = crawlers + [crawlerName]
+        return redirect('/' + username + '/' + crawlerName)
 '''
 Handle start crawler requests
 '''
@@ -163,10 +205,11 @@ Handle stop crawler requests
 '''      
 def stopCrawl(request):
     if request.method == 'POST':
-        print 'stopping ' + request.session.get('crawlerAddr')
         try:
             crawlerName = request.session.get('crawlerName')
-            stopCrawler(request.session.get('crawlerAddr'))
+            if request.session.get('crawlerAddr'):
+                print 'stopping ' + crawlerName + ' at ' + request.session.get('crawlerAddr')
+                stopCrawler(request.session.get('crawlerAddr'))
             Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped', set__crawlerAddr='')
         except Exception as err:
             print err
@@ -183,7 +226,7 @@ def runCrawler(name, seeds, template, pager):
     try:
         commands = ["scrapy", "crawl", "focras", 
                     "-a", "name=" + name, 
-                    "-a", "seeds=" + ','.join(seeds), 
+                    "-a", "seeds=" + ','.join(seeds),
                     "-a", "template=" + template, 
                     "-a", "pager=" + pager.encode('ascii', 'xmlcharrefreplace')]
         crawlerProcess = subprocess.Popen(commands, stderr=PIPE)
@@ -193,7 +236,7 @@ def runCrawler(name, seeds, template, pager):
             #print line
             crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
             if crawlerAddr:
-                print ''.join(crawlerAddr)
+                print name + ' running at '+ ''.join(crawlerAddr)
                 crawlerProcess.stderr.close()
                 break;
             if line == '' and crawlerProcess.poll() != None:
@@ -239,24 +282,23 @@ def fetch(request):
                                           , line) 
                     
                 cleaned_resp = cleaned_resp + line
-
-            from bs4 import BeautifulSoup
+                
             soup = BeautifulSoup(cleaned_resp)
             
             # patch the css url so it will load from the server
             for tag in soup.find_all('link', href=True):
-                if 'http' not in tag['href']:
+                if 'http://' not in tag['href']:
                     tag['href'] = urljoin(url, tag['href'])
             
             # patch image url so it will load from the server
             for tag in soup.find_all('img', src=True):
-                if 'http' not in tag['src']:
+                if 'http://' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
             
             # load external script for web page to load properly
             # so users are more familiar with the interface
             for tag in soup.find_all('script', src=True):
-                if 'http' not in tag['src']:
+                if 'http://' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
 
             # fix for some forums, disable in-line scripts that prevents page from loading
@@ -274,7 +316,7 @@ def fetch(request):
             soup.head.append(css_tag)
             
             from django.utils.safestring import mark_safe
-            return HttpResponse(mark_safe(soup.prettify()))
+            return HttpResponse(mark_safe(soup.prettify(encoding='ascii')))
     
         except Exception as err:
             print err
