@@ -25,15 +25,15 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 #####WEEK 19 (26-01/02/2015)
 - ~~Crawl paginated data (full)~~
 - ~~Display data in proper rows~~
-- Nested Parents Crawler
+- ~~Partial Nested Parents Crawler~~
 
 #####WEEK 20 (02-08/02/2015)
+- Test and fully implement Nested Parents Crawler
 - Schedule crawl frequency
 - Improve on algorithms (aggregation + alignment)
 - Export data to Excel / CSV / JSON URL
 - Pause/Resume crawlers
 - Page pagination for data display
-
 - *Start crawler through schedule API*
 - *Crawl JavaScript generated contents*
 - *Monitor performance of crawler*
