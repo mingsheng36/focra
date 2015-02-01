@@ -12,13 +12,13 @@ class MongoDBPipeline(object):
     def __init__(self, crawler):
         print "pipline - init()"
         self.settings = crawler.settings
-        self.crawler = crawler
+        #self.crawler = crawler
         client = MongoClient(self.settings['MONGODB_SERVER'], self.settings['MONGODB_PORT'])
         self.db = client[self.settings['MONGODB_DB']]
 
     def process_item(self, item, spider):
         try:
-            collection = self.db[spider.name]
+            collection = self.db[spider.cname]
             # remove null values
             most_length = 0
             for i in item:

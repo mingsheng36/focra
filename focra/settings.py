@@ -32,7 +32,6 @@ from mongoengine import connect
 FOCRA_DB = 'FocraDB'
 MONGO_HOST = '127.0.0.1'
 MONGO_PORT = 27017
-
 connect(FOCRA_DB, 'default' ,host=MONGO_HOST, port=MONGO_PORT)
 
 # Application definition

@@ -28,7 +28,7 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - ~~Partial Nested Parents Crawler~~
 
 #####WEEK 20 (02-08/02/2015)
-- Test and fully implement Nested Parents Crawler
+- ~~Test and fully implement Nested Parents Crawler~~
 - Schedule crawl frequency
 - Improve on algorithms (aggregation + alignment)
 - Export data to Excel / CSV / JSON URL
@@ -40,6 +40,7 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - *All of Scrapy's settings*
 - *Edit fields names and column position of the Crawler*
 - *Change database architecture (Not scalable as it uses one collection per crawler)*
+- *Django Push Events?*
 
 #####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
 - Improve on design based on user evaluation

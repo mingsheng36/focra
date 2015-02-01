@@ -34,6 +34,8 @@ $(document).ready(function() {
 		$('#step_one').hide();
 		$('#step_three').hide();
 		$('#step_two').fadeIn('fast', function (event) {
+			$('#step_two_instruction_1').show()
+			$('.field').attr('readonly', false);
 			$('.field').focus();
 		});
 	}
@@ -541,7 +543,9 @@ $(document).ready(function() {
 	
 	/***************** BABY SECTION *****************/
 	if ($('#extractedLink').val()) {
-		//alert($('#extractedLink').val());
+		$('#step_two_instruction_1').hide()
+		$('.field').attr('readonly', true);
+		$('#loader').fadeIn('slow');
 		fetchURL($('#extractedLink').val())
 	}
 	

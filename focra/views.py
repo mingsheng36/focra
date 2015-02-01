@@ -9,7 +9,9 @@ from datetime import datetime
 from bson.json_util import dumps
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
-client = MongoClient('localhost', 27017)
+
+# limit the total number of concurrent users
+client = MongoClient('localhost', 27017,  max_pool_size=1000)
 db = client['CrawlerDB']
 
 '''
@@ -160,8 +162,8 @@ def baby(request, field=None):
             crawlerName = request.POST['crawlerName']
             crawlerTemplate = request.POST['crawlerTemplate']
             crawlerPager = request.POST['crawlerPager']
-            crawlerSeeds = [crawlerParent, field]
-            crawlerAddr = runCrawler(crawlerName, field, crawlerTemplate, crawlerPager)
+            crawlerSeeds = [field, crawlerParent]
+            crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager)
             Crawler(crawlerName=crawlerName, 
                     crawlerSeeds=crawlerSeeds,
                     crawlerAddr=crawlerAddr, 
@@ -225,7 +227,7 @@ Needs to be changed to start through HTTP call for scalability
 def runCrawler(name, seeds, template, pager):
     try:
         commands = ["scrapy", "crawl", "focras", 
-                    "-a", "name=" + name, 
+                    "-a", "cname=" + name, 
                     "-a", "seeds=" + ','.join(seeds),
                     "-a", "template=" + template, 
                     "-a", "pager=" + pager.encode('ascii', 'xmlcharrefreplace')]
@@ -233,7 +235,7 @@ def runCrawler(name, seeds, template, pager):
         while True:
             line = crawlerProcess.stderr.readline()
             # to view the process output 
-            #print line
+            # print line
             crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
             if crawlerAddr:
                 print name + ' running at '+ ''.join(crawlerAddr)
