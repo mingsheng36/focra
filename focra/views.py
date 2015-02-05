@@ -212,7 +212,6 @@ def stopCrawl(request):
             if request.session.get('crawlerAddr'):
                 print 'stopping ' + crawlerName + ' at ' + request.session.get('crawlerAddr')
                 stopCrawler(request.session.get('crawlerAddr'))
-            Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped', set__crawlerAddr='')
         except Exception as err:
             print err
         return HttpResponse(crawlerName + ' has been stopped')

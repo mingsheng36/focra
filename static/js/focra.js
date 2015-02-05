@@ -33,6 +33,7 @@ $(document).ready(function() {
 	function showStepTwo() {
 		$('#step_one').hide();
 		$('#step_three').hide();
+		$('#step_two').show();
 		$('#step_two').fadeIn('fast', function (event) {
 			$('#step_two_instruction_1').show()
 			$('.field').attr('readonly', false);

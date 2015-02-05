@@ -7,12 +7,11 @@ class MongoDBPipeline(object):
     @classmethod
     def from_crawler(cls, crawler):
         print 'pipline - from crawler()'    
-        return cls(crawler)    
+        return cls(crawler)
             
     def __init__(self, crawler):
         print "pipline - init()"
         self.settings = crawler.settings
-        #self.crawler = crawler
         client = MongoClient(self.settings['MONGODB_SERVER'], self.settings['MONGODB_PORT'])
         self.db = client[self.settings['MONGODB_DB']]
 

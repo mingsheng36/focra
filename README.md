@@ -14,7 +14,7 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - ~~Load and display data in table format~~
 
 #####WEEK 16 (05-11/01/2014)
-- Break
+- ~~Break~~
 
 #####WEEK 17 (START OF SEMESTER 2, 12-18/01/2015)
 - ~~Algorithms to detect similar XPaths~~
@@ -29,18 +29,20 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 
 #####WEEK 20 (02-08/02/2015)
 - ~~Test and fully implement Nested Parents Crawler~~
+- Pause/Resume crawlers
 - Schedule crawl frequency
 - Improve on algorithms (aggregation + alignment)
+=====================================================
 - Export data to Excel / CSV / JSON URL
-- Pause/Resume crawlers
 - Page pagination for data display
+- *Django Push Events?*
 - *Start crawler through schedule API*
 - *Crawl JavaScript generated contents*
 - *Monitor performance of crawler*
 - *All of Scrapy's settings*
 - *Edit fields names and column position of the Crawler*
 - *Change database architecture (Not scalable as it uses one collection per crawler)*
-- *Django Push Events?*
+=====================================================
 
 #####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
 - Improve on design based on user evaluation
