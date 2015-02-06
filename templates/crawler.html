@@ -7,6 +7,7 @@
 
 <br />
 <div id="info" class="well well-lg">
+
 	{% if crawler.crawlerStatus == 'running' %}
 	<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
 	<button id="startBn" type="button" class="btn btn-success" disabled>Start
@@ -15,30 +16,37 @@
 		Crawler</button>
 	{% else %}
 	<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
-	<button id="startBn" type="button" class="btn btn-success">Start
-		Crawler</button>
-	<button id="stopBn" type="button" class="btn btn-danger" disabled>Stop
-		Crawler</button>
+	<button id="startBn" type="button" class="btn btn-success">Start</button>
+	<button id="stopBn" type="button" class="btn btn-danger" disabled>Stop</button>
 	{% endif %}
+	
+	<button id="pauseBn" type="button" class="btn btn-primary">Pause</button>
+	<button id="resumeBn" type="button" class="btn btn-primary">Resume</button>
 
-	<button id="babyCrawler" type="button" class="btn btn-primary">Create
-		Baby Crawler</button>
-	<div class="btn-group">
+	<button id="createBabyBn" type="button" class="btn btn-primary">Create
+		Baby</button>
+	<div id='selectField' class="btn-group" style="display:none">
 		<button type="button" class="btn btn-default">Select Start
 			Links From</button>
-		<button type="button" class="btn btn-default dropdown-toggle"
+		
+		<button type="button" class="btn btn-default"
 			data-toggle="dropdown" aria-expanded="false">
 			<span class="caret"></span> <span class="sr-only">Toggle
 				Dropdown</span>
 		</button>
-
+		
 		<ul class="dropdown-menu" role="menu">
 			{% for field in fields_w_link %}
 			<li><a href="/baby/{{ field }}">{{ field }}</a></li> 
 			{% endfor %}
 		</ul>
+		
+		<button id="cancelBabyBn" type="button" class="btn btn-default dropdown" style="cursor: pointer">
+			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+		</button>
+		
 	</div>
-
+	
 </div>
 
 <div role="tabpanel">
@@ -85,21 +93,6 @@
 					{% endfor %}
 				</tr>
 			</table>
-			<nav>
-				<ul class="pagination">
-					<li><a href="#" aria-label="Previous"> <span
-							aria-hidden="true">&laquo;</span>
-					</a></li>
-					<li><a href="#">1</a></li>
-					<li><a href="#">2</a></li>
-					<li><a href="#">3</a></li>
-					<li><a href="#">4</a></li>
-					<li><a href="#">5</a></li>
-					<li><a href="#" aria-label="Next"> <span
-							aria-hidden="true">&raquo;</span>
-					</a></li>
-				</ul>
-			</nav>
 		</div>
 
 		<div role="tabpanel" class="tab-pane fade" id="settings">

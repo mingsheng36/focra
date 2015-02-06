@@ -69,6 +69,7 @@ def crawler(request, username=None, crawlerName=None):
             request.session['crawlerSeeds'] = crawler.crawlerSeeds
             request.session['crawlerTemplate']= crawler.crawlerTemplate
             request.session['crawlerPager'] = crawler.crawlerPager
+            request.session['crawlerStatus'] = crawler.crawlerStatus
             # Retrieve and convert template into an ordered dict
             ordered_template_field = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
             # Determine which  one are links
@@ -148,15 +149,18 @@ def baby(request, field=None):
     username = request.session.get('username')
     crawlers = request.session.get('crawlers')
     crawlerParent = request.session['crawlerName']
-    
     if request.method == 'GET':
-        first_link_tag = db[crawlerParent].find_one().get(field)
-        if first_link_tag:
-            soup = BeautifulSoup(first_link_tag)
-            tag = soup.a
-            extracted_link = tag['href']
-
-        return render(request, 'baby.html', {'username': username, 'crawlers': crawlers, 'extracted_link': extracted_link, 'field_link_name': field})
+        try:
+            cursor = db[crawlerParent].find({field:{'$ne':'null'}}, {field: 1}).limit(5)
+            for link in cursor:
+                if link.get(field):
+                    soup = BeautifulSoup(link.get(field))
+                    tag = soup.a
+                    extracted_link = tag['href']
+                    break
+            return render(request, 'baby.html', {'username': username, 'crawlers': crawlers, 'extracted_link': extracted_link, 'field_link_name': field})        
+        except Exception as err:
+            print err
     elif request.method == 'POST':
         try:
             crawlerName = request.POST['crawlerName']
@@ -186,17 +190,25 @@ Handle start crawler requests
 '''
 def startCrawl(request):  
     if request.method == 'POST':  
-        crawlerName = request.session.get('crawlerName')
-        crawlerSeeds = request.session.get('crawlerSeeds')
-        crawlerTemplate = request.session.get('crawlerTemplate')
-        crawlerPager = request.session.get('crawlerPager')
         try:
-            crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager)
-            Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
-            request.session['crawlerAddr'] = crawlerAddr
+            crawlerName = request.session.get('crawlerName')
+            crawlerSeeds = request.session.get('crawlerSeeds')
+            crawlerTemplate = request.session.get('crawlerTemplate')
+            crawlerPager = request.session.get('crawlerPager')
+            crawlerAddr = request.session.get('crawlerAddr')
+            crawlerStatus = request.session.get('crawlerStatus')
+            if crawlerAddr == '' and crawlerStatus != 'running':
+                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager)
+                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
+                                                                    set__crawlerAddr=crawlerAddr)
+                request.session['crawlerAddr'] = crawlerAddr
+                request.session['crawlerStatus'] = 'running'
+                print crawlerName + ' - Running at ' + crawlerAddr
+                return HttpResponse(crawlerName + ' is running')
+            else:
+                return HttpResponse(crawlerName + ' is already running')
         except Exception as err:
             print err
-        return HttpResponse(crawlerName + ' is running')
     else:
         return HttpResponse("Crawl failed")
         
@@ -209,31 +221,92 @@ def stopCrawl(request):
     if request.method == 'POST':
         try:
             crawlerName = request.session.get('crawlerName')
-            if request.session.get('crawlerAddr'):
-                print 'stopping ' + crawlerName + ' at ' + request.session.get('crawlerAddr')
-                stopCrawler(request.session.get('crawlerAddr'))
+            crawlerAddr = request.session.get('crawlerAddr')
+            crawlerStatus = request.session.get('crawlerStatus')
+            if crawlerAddr != '' and crawlerStatus == 'running':
+                print crawlerName + ' - Stopping at ' + request.session.get('crawlerAddr')
+                stopCrawler(crawlerAddr)
+                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped',
+                                                                    set__crawlerAddr='',
+                                                                    set__queue_counter='',
+                                                                    set__next_page_link='')
+                request.session['crawlerAddr'] = ''
+                request.session['crawlerStatus'] = 'stopped'
+                return HttpResponse(crawlerName + ' has been stopped')
+            else:
+                return HttpResponse(crawlerName + ' is not running!')
         except Exception as err:
             print err
-        return HttpResponse(crawlerName + ' has been stopped')
     else:
         return HttpResponse("Stop failed")
     return redirect('/')
+ 
+'''
+Handle pause crawler requests
+'''      
+def pauseCrawl(request):
+    if request.method == 'POST':
+        try:
+            crawlerName = request.session.get('crawlerName')
+            crawlerAddr = request.session.get('crawlerAddr')
+            crawlerStatus = request.session.get('crawlerStatus')
+            if crawlerAddr != '' and crawlerStatus == 'running':
+                print crawlerName + ' - Pausing at ' + request.session.get('crawlerAddr')
+                stopCrawler(request.session.get('crawlerAddr'))
+                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='paused', set__crawlerAddr='')
+                request.session['crawlerAddr'] = ''
+                request.session['crawlerStatus'] = 'paused'
+                return HttpResponse(crawlerName + ' has been paused')
+            else:
+                return HttpResponse(crawlerName + ' is not running!')
+        except Exception as err:
+            print err
+    else:
+        return HttpResponse("Pause failed")
+    return redirect('/')
 
 '''
+Handle resume crawler requests
+'''      
+def resumeCrawl(request):
+    if request.method == 'POST':  
+        try:
+            crawlerName = request.session.get('crawlerName')
+            crawlerSeeds = request.session.get('crawlerSeeds')
+            crawlerTemplate = request.session.get('crawlerTemplate')
+            crawlerPager = request.session.get('crawlerPager')
+            crawlerAddr = request.session.get('crawlerAddr')
+            crawlerStatus = request.session.get('crawlerStatus')
+            if crawlerAddr == '' and crawlerStatus == 'paused':
+                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager)
+                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
+                request.session['crawlerAddr'] = crawlerAddr
+                request.session['crawlerStatus'] = 'running'
+                return HttpResponse(crawlerName + ' has been resumed')
+            else:
+                return HttpResponse(crawlerName + ' was not paused!')
+        except Exception as err:
+            print err
+    else:
+        return HttpResponse("Resume failed")
+    return redirect('/')
+
+'''
+Returns crawler running address
 Starting the crawler through cmdline in local machine
 Needs to be changed to start through HTTP call for scalability
 '''  
 def runCrawler(name, seeds, template, pager):
     try:
         commands = ["scrapy", "crawl", "focras", 
-                    "-a", "cname=" + name, 
-                    "-a", "seeds=" + ','.join(seeds),
-                    "-a", "template=" + template, 
+                    "-a", "cname=" + name.strip(), 
+                    "-a", "seeds=" + ','.join(seeds).strip(),
+                    "-a", "template=" + template.strip(), 
                     "-a", "pager=" + pager.encode('ascii', 'xmlcharrefreplace')]
         crawlerProcess = subprocess.Popen(commands, stderr=PIPE)
         while True:
             line = crawlerProcess.stderr.readline()
-            # to view the process output 
+            # to view the process output, uncomment below 
             # print line
             crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
             if crawlerAddr:
@@ -288,18 +361,18 @@ def fetch(request):
             
             # patch the css url so it will load from the server
             for tag in soup.find_all('link', href=True):
-                if 'http://' not in tag['href']:
+                if 'http' not in tag['href']:
                     tag['href'] = urljoin(url, tag['href'])
             
             # patch image url so it will load from the server
             for tag in soup.find_all('img', src=True):
-                if 'http://' not in tag['src']:
+                if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
             
             # load external script for web page to load properly
             # so users are more familiar with the interface
             for tag in soup.find_all('script', src=True):
-                if 'http://' not in tag['src']:
+                if 'http' not in tag['src']:
                     tag['src'] = urljoin(url, tag['src'])
 
             # fix for some forums, disable in-line scripts that prevents page from loading

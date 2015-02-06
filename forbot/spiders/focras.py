@@ -11,6 +11,7 @@ from pymongo import MongoClient
 import Queue
 
 client = MongoClient('localhost', 27017)
+no_of_links_to_load = 50
 
 class FocraSpider(Spider):
 	name = 'focras'
@@ -22,6 +23,7 @@ class FocraSpider(Spider):
 		print "focras - from crawler"
 		spider = cls(settings=crawler.settings, **kwargs)
 		crawler.signals.connect(spider.stopped, signals.engine_stopped)
+		crawler.signals.connect(spider.idle, signals.spider_idle)
 		return spider
 	
 	def __init__(self, settings=None, **kwargs):
@@ -30,12 +32,14 @@ class FocraSpider(Spider):
 		print 'focras init(' + self.cname + ') kwargs template '+ self.template
 		self.queue = Queue.Queue()
 		self.queue_counter = 0
+		self.queue_reload_counter = 0
 		self.next_page_link = 'null'
+		self.end_of_data = False
 		
 		try:
 			# non baby crawler
 			self.base_url = kwargs.get('seeds').split(',')
-			if self.base_url[0].startswith('http://'):
+			if self.base_url[0].startswith('http'):
 				# start the crawling
 				self.start_urls = self.base_url
 			else:
@@ -48,12 +52,18 @@ class FocraSpider(Spider):
 					self.mongodb_name = settings['MONGODB_DB']
 					db = client[self.mongodb_name]
 					collection = db[self.parentname]
-					links = collection.find({}, {self.fieldname: 1}).limit(100)
+					cursor = collection.find({}, {self.fieldname: 1}).limit(no_of_links_to_load)
+					# set the queue reload counter
+					self.queue_reload_counter += no_of_links_to_load
 					client.close()
+					if cursor.count() <= self.queue_reload_counter:
+						print self.cname + '- No more links to load'
+						self.end_of_data = True
 					# put it into queue
-					for link in links:
+					for link in cursor:
 						if link.get(self.fieldname):
 							soup = BeautifulSoup(link.get(self.fieldname))
+							print soup.a['href']
 							self.queue.put(soup.a['href'])
 					# dequeue and start the crawling
 					self.base_url = [self.queue.get()]
@@ -67,30 +77,35 @@ class FocraSpider(Spider):
 		except Exception as error:
 			print error
 	
+	# interrupted state, crawler status determined by views.py
 	def stopped(self):
-		# update crawler status when the job has finished
 		try:
+			print self.cname + " - Stopped"
 			db = client['FocraDB']
 			collection = db['crawler']
 			# baby crawler
 			if self.queue_counter != 0:
-				collection.update({"_id": self.cname}, {"$set":{'crawlerStatus':'stopped', 'queue_counter': self.queue_counter, 'crawlerAddr': ''}})
-				print "STOPPING " + self.cname + " - queue counter is: " + str(self.queue_counter)
+				collection.update({"_id": self.cname}, {"$set":{'queue_counter': self.queue_counter}})
+				print self.cname + " - Queue counter is: " + str(self.queue_counter)
 			# pager
 			if self.pager != 'null':
-				collection.update({"_id": self.cname}, {"$set":{'crawlerStatus':'stopped', 'next_page_link': self.next_page_link, 'crawlerAddr': ''}})
-				print "STOPPING " + self.cname + " next page link is: " + str(self.next_page_link)
-			# normal scraping
-			if self.queue_counter == 0 and self.pager == 'null':
-				collection.update({"_id": self.cname}, {"$set":{'crawlerStatus':'stopped', 'crawlerAddr': ''}})
-				print "STOPPING " + self.cname
+				collection.update({"_id": self.cname}, {"$set":{'next_page_link': self.next_page_link}})
+				print self.cname + " - Saved pager link is: " + str(self.next_page_link)
 			client.close()
 		except Exception as err:
 			print err
 	
+	# closed gracefully, crawler status complete
+	def idle(self):
+		db = client['FocraDB']
+		collection = db['crawler']
+		collection.update({"_id": self.cname}, {"$set":{'crawlerAddr': '', 'crawlerStatus': 'completed'}})
+		print self.cname + " - Crawl completed, closing gracefully"
+		client.close()
+			
 	def parse(self, response):		
 		try:
-			print self.cname + " - parsing item"
+			print self.cname + " - Parsing items"
 			body = BeautifulSoup(response.body)
 			for tag in body.find_all('a', href=True):
 				if 'http' not in tag['href']:
@@ -115,34 +130,45 @@ class FocraSpider(Spider):
 			if self.pager != 'null':
 				nextlink = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()
 				if nextlink:
-					if not nextlink[0].startswith('http://'):
+					if not nextlink[0].startswith('http'):
 						nextlink[0] = urljoin(self.base_url[0], nextlink.pop())
-					print 'Next page for ' + self.cname + ': ' + nextlink[0]
+					print self.cname + ' - Next page is: ' + nextlink[0]
 					# to save the state of the pagination
 					self.next_page_link = nextlink[0]
-					yield Request(nextlink[0], callback=self.parse)
+					yield Request(nextlink[0], callback=self.parse, dont_filter=True)
 				else:
 					if not self.queue.empty():
-						print 'Next link from queue for ' + self.cname + ':'
-						yield Request(self.queue.get(), callback=self.parse)
+						yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
 						self.queue_counter += 1
-						self.check_queue()
+						if self.queue.qsize() <= no_of_links_to_load and self.end_of_data == False:
+							self.check_queue()
 			else:
 				if not self.queue.empty():
-					print 'Next link from queue for ' + self.cname + ':'
-					yield Request(self.queue.get(), callback=self.parse)
+					yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
 					self.queue_counter += 1
-					self.check_queue()
-				
+					if self.queue.qsize() <= no_of_links_to_load and self.end_of_data == False:
+						self.check_queue()
 		except Exception as err:
 			print err
 
 	def check_queue(self):
-		if self.queue.qsize() <= 20:
-			print 'queue less than 3, adding..'
-	
-# 	def get_links(self):
-# 		self.db = client[self.mongodb_name]
-# 		collection = self.db[self.parentname]
-# 		links = collection.find({}, {self.fieldname: 1}).limit(100)
-# 		client.close()
+		try:
+			print self.cname + '- Reload counter ' + str(self.queue_reload_counter)
+			print self.cname + '- Queue less than ' + str(no_of_links_to_load) + ', querying for more links'
+			db = client[self.mongodb_name]
+			collection = db[self.parentname]
+			cursor = collection.find({}, {self.fieldname: 1}).skip(self.queue_reload_counter).limit(no_of_links_to_load)
+			client.close()
+			self.queue_reload_counter += no_of_links_to_load
+			# cursor count returns the total row
+			if cursor.count() <= self.queue_reload_counter:
+				print self.cname + '- No more links to load'
+				self.end_of_data = True
+			# put it into queue
+			for link in cursor:
+				if link.get(self.fieldname):
+					soup = BeautifulSoup(link.get(self.fieldname))
+					print soup.a['href']
+					self.queue.put(soup.a['href'])
+		except Exception as err:
+			print err			

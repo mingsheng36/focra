@@ -40,6 +40,6 @@ class MongoDBPipeline(object):
                     except Exception:
                         pass
                 collection.insert(row)
-            print 'pipline - inserted ' + str(most_length) + ' rows'
+            print 'pipline - Inserted ' + str(most_length) + ' rows'
         except Exception as err:
             print err

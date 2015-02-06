@@ -33,7 +33,7 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - Schedule crawl frequency
 - Improve on algorithms (aggregation + alignment)
 - Export data to Excel / CSV / JSON URL
-- Page pagination for data display
+- Scroll-load-append data display
 - *Django Push Events?*
 - *Start crawler through schedule API*
 - *Crawl JavaScript generated contents*

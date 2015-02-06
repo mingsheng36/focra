@@ -34,11 +34,6 @@ $(document).ready(function() {
 		$('#step_one').hide();
 		$('#step_three').hide();
 		$('#step_two').show();
-		$('#step_two').fadeIn('fast', function (event) {
-			$('#step_two_instruction_1').show()
-			$('.field').attr('readonly', false);
-			$('.field').focus();
-		});
 	}
 	
 	function showStepThree() {
@@ -114,6 +109,12 @@ $(document).ready(function() {
 		if ($('#iframe').attr('srcdoc') != '') {
 			$('#loader').fadeOut('fast', function(event) {	
 				showStepTwo();
+				// for baby crawler
+				$('#step_two').fadeIn('fast', function (event) {
+					$('#step_two_instruction_1').show()
+					$('.field').attr('readonly', false);
+					$('.field').focus();
+				});
 				$('#url').attr('readonly', false);
 			});
 			$('#iframe').contents().find('a').click(function(event) {
@@ -529,6 +530,32 @@ $(document).ready(function() {
 			}
 		});
 	});
+			
+	// pause crawler
+	$('#pauseBn').click(function(event) {
+		$('#display').html('Pausing..');
+		$.ajax({
+			url : '/pause',
+			type: 'POST',
+			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+			success: function( data ){
+				$('#display').html(data);
+			}
+		});
+	});
+	
+	// resume crawler
+	$('#resumeBn').click(function(event) {
+		$('#display').html('Resuming..');
+		$.ajax({
+			url : '/resume',
+			type: 'POST',
+			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+			success: function( data ){
+				$('#display').html(data);
+			}
+		});
+	});
 	
 	// delete crawler
 	$('#delete').submit(function(event) {
@@ -538,8 +565,16 @@ $(document).ready(function() {
 		}
 	});
 	
-	$('#babyCrawler').click(function(event) {
-		
+	// create baby crawler button
+	$('#createBabyBn').click(function(event) {
+		$('#createBabyBn').hide();
+		$('#selectField').fadeIn('fast');
+	});
+	
+	// create baby crawler button
+	$('#cancelBabyBn').click(function(event) {
+		$('#selectField').hide();
+		$('#createBabyBn').fadeIn('fast');
 	});
 	
 	/***************** BABY SECTION *****************/
