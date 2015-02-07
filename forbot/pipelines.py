@@ -15,6 +15,10 @@ class MongoDBPipeline(object):
         client = MongoClient(self.settings['MONGODB_SERVER'], self.settings['MONGODB_PORT'])
         self.db = client[self.settings['MONGODB_DB']]
 
+    '''
+    data extracted per xpath are in a list format, separated by '\r\n' or maybe '\n'
+    need to join them together
+    '''
     def process_item(self, item, spider):
         try:
             collection = self.db[spider.cname]
