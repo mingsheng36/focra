@@ -138,8 +138,15 @@ $(document).ready(function() {
 			}).on('click dblclick', function (event) {
 				
 				/************** PAGER *****************/
-				if (pager_mode) {
-					if (typeof $(event.target).attr('href') != 'undefined') {
+				if (pager_mode) {					
+					if ($(event.target).prop("tagName").toLowerCase() == 'a' || $(event.target).parent().prop("tagName").toLowerCase() == 'a') {
+						if ($(event.target).prop("tagName").toLowerCase() == 'a') {
+							alert($(event.target).prop("tagName").toLowerCase());
+						} else if ($(event.target).parent().prop("tagName").toLowerCase() == 'a') {
+							alert($(event.target).parent().prop("tagName").toLowerCase());
+						}
+						
+						$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
 						$(event.target).toggleClass('outline-element-clicked');
 						$('#step_three_instruction').hide();
 						$('#pager_done_bn').fadeIn('fast');
@@ -316,29 +323,35 @@ $(document).ready(function() {
 	
 	// show pagination option
 	$('#pager_bn').click(function(event) {
-		if (pager_mode) {
-			pager_mode = false;
-			$('#step_three_instruction').hide();
-			$('#crawlerName').attr('readonly', false);
-			$('#pager_bn').show();
-			$('#step_three_bn').fadeIn('fast');
-		} else {
-			pager_mode = true;
-			$('#crawlerName').attr('readonly', true);
-			$('#pager_bn').hide();
-			$('#step_three_bn').hide();
-			$('#step_three_instruction').fadeIn('fast');
-			$('#ifb').fadeOut('fast');
-		}
+		pager_mode = true;
+		$('#crawlerName').attr('readonly', true);
+		$('#pager_bn').hide();
+		$('#pager_done_bn').hide();
+		$('#step_three_bn').hide();
+		$('#step_three_instruction').fadeIn('fast');
+		$('#pager_cancel_bn').fadeIn('fast');
+		$('#ifb').fadeOut('fast');
 	});
 
 	$('#pager_done_bn').click(function(event) {
-		pager_links = [];
 		pager_mode = false;
 		$('#pager_done_bn').hide();
 		$('#step_three_bn').fadeIn('fast');
 		$('#ifb').fadeIn('fast');
 		$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
+	});
+	
+	$('#pager_cancel_bn').click(function(event) {
+		pager_mode = false;
+		$('#pager_cancel_bn').hide()
+		$('#pager_done_bn').hide();
+		$('#step_three_instruction').hide();
+		$('#crawlerName').attr('readonly', false);
+		$('#pager_bn').fadeIn('fast');
+		$('#step_three_bn').fadeIn('fast');
+		$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
+		$('#ifb').fadeIn('fast');
+		$('#crawlerPager').val('null');
 	});
 
 	$('#step_three_bn').click(function(event) {

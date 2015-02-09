@@ -1,5 +1,4 @@
 Django==1.7
-Twisted==14.0.2
 Scrapy==0.24.4
 pymongo==2.7.2
 mongoengine==0.8.7

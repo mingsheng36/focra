@@ -9,6 +9,9 @@ from datetime import datetime
 from bson.json_util import dumps
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
+from django.utils.safestring import mark_safe
+from urlparse import urljoin
+import urllib2
 
 # limit the total number of concurrent users
 client = MongoClient('localhost', 27017,  max_pool_size=1000)
@@ -331,11 +334,8 @@ Fetch seed URl and do HTML pre-processing
 '''
 def fetch(request):
     if request.method == 'GET':
-        try: 
-            from urlparse import urljoin
+        try:  
             url = request.GET['url']              
-            # No JavaScript support, fast
-            import urllib2
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             resp = urllib2.urlopen(req)
             cleaned_resp = ''
@@ -377,17 +377,21 @@ def fetch(request):
             # e.g http://www.kiasuparents.com/kiasu/forum/index.php
             for tag in soup.find_all('script', src=False):
                 tag.decompose()
-
+            
             # disable and remove all iframe to prevent errors
             for tag in soup.find_all('iframe', src=True):
                 tag['src'] = ''
                 tag['srcdoc'] = ''
-  
+            
+            # remove all the tbody before generating the html source
+            # iframe at create.html will still generate a general tbody tag
+            for tag in soup.find_all('tbody'):
+                tag.unwrap()
+            
             # inject focra.css into response
             css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
             soup.head.append(css_tag)
-            
-            from django.utils.safestring import mark_safe
+
             return HttpResponse(mark_safe(soup.prettify(encoding='ascii')))
         except Exception as err:
             print err

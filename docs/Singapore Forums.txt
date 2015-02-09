@@ -3,7 +3,7 @@ List of Singapore forums - robots.txt
 0. http://www.onetonline.org/
 1. http://forums.hardwarezone.com.sg/ - allow
 2. http://sgforums.com/forums - did not specify
-3. http://www.mycarforum.com/ - did not specify 
+3. http://www.mycarforum.com/index.php?app=forums - did not specify 
 4. http://forums.vr-zone.com/ - allow 
 5. http://thenewageparents.com/forum/ - allow
 6. http://forum.singaporeexpats.com/ - allow
