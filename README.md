@@ -34,10 +34,13 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 #####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
 - ~~Toggle CSS and JavaScript on and off~~
 - ~~Fix pager not able to select 'Next' for some websites~~
+- Show hierarchy of crawlers 
+- Allow selection of download delay
 - Allow selection of next link when going to baby crawler template page (some page not enough info to generate template)
 - Redesign Crawler Page
 - Append start links to Baby Crawler data
 - Scroll-load-append data display
+- User Login/Logout/Registration
 - Improve on algorithms (aggregation + alignment)
 - Export data to Excel / CSV / JSON URL
 - *Schedule crawl frequency*
