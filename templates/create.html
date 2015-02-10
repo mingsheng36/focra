@@ -4,7 +4,6 @@
 {% block body_block %}
 <div class="panel panel-default">
 	<div class="panel-heading">
-
 		<form id="create" method="post" action="/create" class="form-inline">
 			{% csrf_token %} 
 			<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
@@ -25,11 +24,10 @@
 					</div>
 
 					<button id="step_one_instruction" class="btn btn-info"
-						type="button">Enter Your Seed URL.</button>
-
+						type="button">Enter Your Seed URL.</button> 
 					<button id="step_one_bn" style="display: none;"
 						class="btn btn-primary" type="button">Next Step &gt;</button>
-
+					
 				</div>
 
 				<!-- STEP 2 -->
@@ -87,6 +85,7 @@
 					<button id="pager_done_bn" style="display: none;"
 						class="btn btn-primary" type="button">Done !</button>
 					
+					<div class="form-group">&nbsp;</div>
 					<button id="pager_cancel_bn" style="display: none;"
 						class="btn btn-default" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 					</button>
@@ -104,9 +103,14 @@
 					src="{% static 'images/loader.gif' %}" alt="Loading..">
 
 			</div>
-
+			
+		<div id="toggleDiv" class="btn-group pull-right">
+			<button id="toggleJS" type="button" class="btn btn-default">JS (ONed)</button>
+			<button id="toggleCSS" type="button" class="btn btn-default ">CSS (ONed)</button>
+		</div>
+		
 		</form>
-
+			
 	</div>
 
 	<div class="panel-body">

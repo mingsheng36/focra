@@ -1,10 +1,7 @@
 List of Bugs
 ===========================
 1. Fields having the same name will be omitted
-3. Javascript generated in the front-end but in scrapy we dont generate javasript (response not synced)
-4. Pager link cannot accept images or images inside <a> tag and 'babyfieldlinks' also + regex
-5. Validation for unique crawler name
-6. Validation for field names and crawler name with special char or spaces
-7. Allow selection of next link when going to baby crawler template page (some page not enough info to generate template)
-8. When click on selecting pager mode, cant exit pager mode
-9. Code 'not in http' needs to be strip() whitespaces and check by startswith('http')
+2. Validation for unique crawler name
+3. Validation for field names and crawler name with special char or spaces
+4. Baby Crawler not able to toggle JS/CSS
+5. Javascript generated in the front-end but in scrapy we dont generate javasript (response not synced)

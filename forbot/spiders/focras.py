@@ -151,12 +151,21 @@ class FocraSpider(Spider):
 			yield dynamicItemLoader.load_item()
 			# check for pagination
 			if self.pager != 'null':
-				nextlinks = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()
-				if nextlinks:
-					if not nextlinks[0].startswith('http'):
-						self.next_page_link = urljoin(self.base_url[0], nextlinks.pop())
-					else:
-						self.next_page_link = nextlinks.pop()
+				next_link = None
+				if bool(BeautifulSoup(self.pager, "html.parser").find()):
+					# remove the \r for 'end of line' diff
+					self.pager = self.pager.replace('\r', '')
+					a_tags = response.xpath('//a').extract()
+					for tag in a_tags:
+						if self.pager in tag:
+							print tag
+							tag = BeautifulSoup(tag)
+							next_link = tag.a.get('href')
+							break
+				else:
+					next_link = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()[0]
+				if next_link:
+					self.next_page_link = next_link
 					print self.cname + ' - Next page is: ' + self.next_page_link
 					yield Request(self.next_page_link, callback=self.parse, dont_filter=True)
 				else:

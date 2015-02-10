@@ -25,7 +25,6 @@ MONGODB_PORT = 27017
 MONGODB_DB = "CrawlerDB"
 
 DOWNLOAD_DELAY = 2
-
-DNSCACHE_ENABLED = False
+COOKIES_ENABLED = False
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'fobot (+http://www.yourdomain.com)'

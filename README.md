@@ -30,10 +30,17 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 #####WEEK 20 (02-08/02/2015)
 - ~~Test and fully implement Nested Parents Crawler~~
 - ~~Pause/Resume crawlers~~
-- Improve on algorithms (aggregation + alignment)
+
+#####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
+- ~~Toggle CSS and JavaScript on and off~~
+- ~~Fix pager not able to select 'Next' for some websites~~
+- Allow selection of next link when going to baby crawler template page (some page not enough info to generate template)
+- Redesign Crawler Page
+- Append start links to Baby Crawler data
 - Scroll-load-append data display
+- Improve on algorithms (aggregation + alignment)
 - Export data to Excel / CSV / JSON URL
-- Schedule crawl frequency
+- *Schedule crawl frequency*
 - *Django Push Events?*
 - *Start crawler through schedule API*
 - *Crawl JavaScript generated contents*
@@ -41,8 +48,6 @@ built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
 - *All of Scrapy's settings*
 - *Edit fields names and column position of the Crawler*
 - *Change database architecture (Not scalable as it uses one collection per crawler)*
-
-#####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
 - Improve on design based on user evaluation
 
 #####WEEK 22 (ASSIGNMENTS, 16-22/02/2015)

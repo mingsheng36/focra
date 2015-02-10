@@ -28,9 +28,11 @@ $(document).ready(function() {
 		$('#done_bn').hide()
 		$('#add_field_bn').hide();
 		$('#step_two_bn').hide();
+		$('#toggleDiv').show();
 	}
 
 	function showStepTwo() {
+		$('#toggleDiv').hide();
 		$('#step_one').hide();
 		$('#step_three').hide();
 		$('#step_two').show();
@@ -42,9 +44,13 @@ $(document).ready(function() {
 		$("#step_three").fadeIn('fast', function(event) {
 			$('#crawlerName').focus();
 		});
+		$('#toggleDiv').hide();
 	}
 	
 	/*********** STEP 1 ************/
+	var js = true;
+	var css = true;
+	
 	// step 1 on page load
 	if ($('#url').val() != '') {
 		$('#url').attr('readonly', false);
@@ -62,7 +68,26 @@ $(document).ready(function() {
 			$('#step_one_instruction').fadeIn('fast');
 		}
 	});
-
+	
+	$('#toggleJS').click(function(event) {
+		if(js) {
+			js = false;
+			$('#toggleJS').html('JS (OFFed)');
+		} else {
+			js = true;
+			$('#toggleJS').html('JS (ONed)')
+		}
+	});
+	
+	$('#toggleCSS').click(function(event) {
+		if(css) {
+			css = false;
+			$('#toggleCSS').html('CSS (OFFed)');
+		} else {
+			css = true;
+			$('#toggleCSS').html('CSS (ONed)');
+		}
+	});
 	// step 1 (url)
 	$('#step_one_bn').click(function(event) {
 		if ($('#url').val() != '') {
@@ -70,7 +95,7 @@ $(document).ready(function() {
 			$('#step_one_bn').hide();
 			$('#step_one_instruction').hide();
 			$('#loader').fadeIn('slow');
-			fetchURL($('#url').val())
+			fetchURL($('#url').val(), js, css)
 		} else {
 			alert('Please enter your URL');
 		}
@@ -141,24 +166,27 @@ $(document).ready(function() {
 				if (pager_mode) {					
 					if ($(event.target).prop("tagName").toLowerCase() == 'a' || $(event.target).parent().prop("tagName").toLowerCase() == 'a') {
 						if ($(event.target).prop("tagName").toLowerCase() == 'a') {
-							alert($(event.target).prop("tagName").toLowerCase());
+							$('#crawlerPager').val($(event.target).text().trim());
 						} else if ($(event.target).parent().prop("tagName").toLowerCase() == 'a') {
-							alert($(event.target).parent().prop("tagName").toLowerCase());
+							$('#crawlerPager').val($(event.target).get(0).outerHTML.trim());
 						}
-						
 						$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
-						$(event.target).toggleClass('outline-element-clicked');
 						$('#step_three_instruction').hide();
 						$('#pager_done_bn').fadeIn('fast');
-						$('#crawlerPager').val($(event.target).text().trim());
 					}
 				}
 				/************** END *****************/
 				
 				else {
 					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != '') {
-						$(event.target).toggleClass('outline-element-clicked');
-						selected_xpaths.push(getElementTreeXPath(event.target));
+						if ($(event.target).parent().prop('tagName').toLowerCase() == 'a') {
+							$(event.target).parent().toggleClass('outline-element-clicked');
+							selected_xpaths.push(getElementTreeXPath($(event.target).parent()));
+						} else {
+							$(event.target).toggleClass('outline-element-clicked');
+							selected_xpaths.push(getElementTreeXPath(event.target));
+						}
+						
 						$('.badge').last().html(get_candidate_xpaths(selected_xpaths).length);
 						if ($('.field').last().val() != '' && $('.badge').last().text() != 0) {
 							$('#step_two_instruction_2').hide();
@@ -336,6 +364,7 @@ $(document).ready(function() {
 	$('#pager_done_bn').click(function(event) {
 		pager_mode = false;
 		$('#pager_done_bn').hide();
+		$('#pager_cancel_bn').hide();
 		$('#step_three_bn').fadeIn('fast');
 		$('#ifb').fadeIn('fast');
 		$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
@@ -397,11 +426,13 @@ $(document).ready(function() {
 	
 	/*********** Helper functions **************/	
 	// fetch URLs
-	function fetchURL(url) {
+	function fetchURL(url, js, css) {
 		$.ajax({
 			url: '/fetch',
 			data: { 
-				'url': url, 
+				'url': url,
+				'js': js,
+				'css': css
 			},
 			type: 'GET',
 			success: function(res) {
@@ -595,7 +626,7 @@ $(document).ready(function() {
 		$('#step_two_instruction_1').hide()
 		$('.field').attr('readonly', true);
 		$('#loader').fadeIn('slow');
-		fetchURL($('#extractedLink').val())
+		fetchURL($('#extractedLink').val(), true, true)
 	}
 	
 	/***************** DATA SECTION *****************/	

@@ -335,7 +335,9 @@ Fetch seed URl and do HTML pre-processing
 def fetch(request):
     if request.method == 'GET':
         try:  
-            url = request.GET['url']              
+            url = request.GET['url']
+            js = request.GET['js']
+            css = request.GET['css']
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             resp = urllib2.urlopen(req)
             cleaned_resp = ''
@@ -359,8 +361,11 @@ def fetch(request):
             
             # patch the css url so it will load from the server
             for tag in soup.find_all('link', href=True):
-                if 'http' not in tag['href']:
-                    tag['href'] = urljoin(url, tag['href'])
+                if css == 'true':
+                    if 'http' not in tag['href']:
+                        tag['href'] = urljoin(url, tag['href'])
+                else:
+                    tag.decompose()
             
             # patch image url so it will load from the server
             for tag in soup.find_all('img', src=True):
@@ -370,8 +375,11 @@ def fetch(request):
             # load external script for web page to load properly
             # so users are more familiar with the interface
             for tag in soup.find_all('script', src=True):
-                if 'http' not in tag['src']:
-                    tag['src'] = urljoin(url, tag['src'])
+                if js == 'true':
+                    tag.decompose()
+                else:
+                    if 'http' not in tag['src']:
+                        tag['src'] = urljoin(url, tag['src'])
 
             # fix for some forums, disable in-line scripts that prevents page from loading
             # e.g http://www.kiasuparents.com/kiasu/forum/index.php
