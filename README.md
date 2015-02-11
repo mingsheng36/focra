@@ -15,9 +15,10 @@ built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4,
 2. Command prompt >> cd to the cloned/downloaded directory 
 3. Command prompt >> pip install -r requirements.txt
 4. Create two database, 'FocraDB' and 'CrawlerDB' in your MongoDB using default host:port (127.0.0.1:27017)
-5. Make sure you add [this directory to your PYTHONPATH](http://stackoverflow.com/a/4855685)
-6. Command prompt >> python manage.py runserver
-7. Go to [http://localhost:8000](http://localhost:8000) and start crawling!
+5. Start MongoDB, command prompt >> mongod
+6. Make sure you add [this directory to your PYTHONPATH](http://stackoverflow.com/a/4855685)
+7. Command prompt >> python manage.py runserver
+8. Go to [http://localhost:8000](http://localhost:8000) and start crawling!
 
 - [x] Visually create your own XPath template
 - [x] Toggle CSS and JavaScript on and off
