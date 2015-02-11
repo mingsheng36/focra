@@ -3,7 +3,7 @@ FOCRA
 **A Visual, Distributed and Cloud based Web Crawler** 
 built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4,
 
-![alt text](https://github.com/mingsheng36/Focra/blob/master/docs/2.png "Demo")
+![alt text](https://github.com/mingsheng36/Focra/blob/master/docs/3.png "Demo")
 
 ##Pre-requisites
 - [Python 2.7](https://www.python.org/downloads/)
@@ -18,8 +18,9 @@ built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4,
 5. Start MongoDB, command prompt >> mongod
 6. Make sure you add this directory to your [PYTHONPATH](http://stackoverflow.com/a/4855685)
 7. Command prompt >> python manage.py runserver
-8. Go to [http://localhost:8000](http://localhost:8000) and start crawling!
+8. Go to [localhost:8000](http://localhost:8000) and start crawling!
 
+##Features
 - [x] Visually create your own XPath template
 - [x] Toggle CSS and JavaScript on and off
 - [x] Crawl Pagination
