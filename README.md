@@ -1,79 +1,44 @@
 FOCRA
 =====
 **A Visual, Distributed and Cloud based Web Crawler** 
-built with Django 1.7, Scrapy 0.24.4, Mongodb 2.6.5
+built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4,
 
-#####WEEK 14 (22-28/12/2014)
-- ~~Create the template object for crawler~~
-- ~~Store template XPath in crawler~~
-- ~~Load data with XPath according to fields~~
-- ~~Store into external database~~
+Instructions to deploy
+-----------------------
+###Pre-requisites
+- [Python 2.7](https://www.python.org/downloads/)
+- [Pip](https://pip.pypa.io/en/latest/installing.html#install-pip)
+- [MongoDB](http://docs.mongodb.org/manual/installation/) 
 
-#####WEEK 15 (29-04/01/2015)
-- ~~Allow user to visually choose XPath~~
-- ~~Load and display data in table format~~
+1. Clone this repository or downlaod as zip
+2. Command prompt >> cd to the cloned/downloaded directory 
+3. Command prompt >> pip install -r requirements.txt
+4. Create two database, 'FocraDB' and 'CrawlerDB' in your MongoDB using default host:port (127.0.0.1:27017)
+5. Make sure you add [this directory to your PYTHONPATH](http://stackoverflow.com/a/4855685)
+5. Command prompt >> python manage.py runserver
+6. Go to [http://localhost:8000] and start crawling!
 
-#####WEEK 16 (05-11/01/2014)
-- ~~Break~~
+- [x] Visually create your own XPath template
+- [x] Toggle CSS and JavaScript on and off
+- [x] Crawl Pagination
+- [x] Baby Crawler (created from sublinks of Crawler)
+- [x] Pause/Resume Crawl
+- [x] Show Hierarchy of Crawlers (how they are related) 
+- [x] Pause/Resume crawlers
+- [ ] Scroll-load-append data display
+- [ ] User Login/Logout/Registration
+- [ ] Improve on algorithms (aggregation + alignment)
+- [ ] Export data to Excel / CSV / JSON URL
+- [ ] Schedule Crawl Frequency
+- [ ] Crawl JavaScript Pages
+- [ ] Monitor Performance of Crawler
+- [ ] Django Push Events
+- [ ] Edit fields names and column position of the Crawler
+- [ ] Change Database architecture (Not scalable as it uses one collection per crawler)
 
-#####WEEK 17 (START OF SEMESTER 2, 12-18/01/2015)
-- ~~Algorithms to detect similar XPaths~~
+###Things to Note
+- This is not tested nor prettified, just a prototype for now.
+- There is a download delay of 2 seconds (you can change it in forbot/settings.py > DOWNLOAD_DELAY)
 
-#####WEEK 18 (19-25/01/2015)
-- ~~Crawl paginated data (partial)~~
 
-#####WEEK 19 (26-01/02/2015)
-- ~~Crawl paginated data (full)~~
-- ~~Display data in proper rows~~
-- ~~Partial Nested Parents Crawler~~
 
-#####WEEK 20 (02-08/02/2015)
-- ~~Test and fully implement Nested Parents Crawler~~
-- ~~Pause/Resume crawlers~~
-
-#####WEEK 21 (ASSIGNMENTS, 09-15/02/2015)
-- ~~Toggle CSS and JavaScript on and off~~
-- ~~Fix pager not able to select 'Next' for some websites~~
-- Show hierarchy of crawlers 
-- Allow selection of download delay
-- Allow selection of next link when going to baby crawler template page (some page not enough info to generate template)
-- Redesign Crawler Page
-- Append start links to Baby Crawler data
-- Scroll-load-append data display
-- User Login/Logout/Registration
-- Improve on algorithms (aggregation + alignment)
-- Export data to Excel / CSV / JSON URL
-- *Schedule crawl frequency*
-- *Django Push Events?*
-- *Start crawler through schedule API*
-- *Crawl JavaScript generated contents*
-- *Monitor performance of crawler*
-- *All of Scrapy's settings*
-- *Edit fields names and column position of the Crawler*
-- *Change database architecture (Not scalable as it uses one collection per crawler)*
-- Improve on design based on user evaluation
-
-#####WEEK 22 (ASSIGNMENTS, 16-22/02/2015)
-- Improve on design based on user evaluation
-
-#####WEEK 23 (ASSIGNMENTS, 23-01/03/2015)
-- Improve on design based on user evaluation
-- Report writing
-
-#####WEEK 24 (ASSIGNMENTS, 02-08/03/2015)
-- Improve on design based on user evaluation
-- Report Writing
-
-#####WEEK 25 (END OF SEMESTER 2, 09-15/03/2015)
-- Improve on design based on user evaluation
-- Report Writing
-
-#####WEEK 26 (DEMONSTRATION TO SUPERVISOR 16-20/03/15)
-- Finalise Product
-- Demonstration to Supervisor
-- Report Writing
-
-#####WEEK 27 (PRESENTATION 22-27/03/15, REPORT SUBMISSION 27/03/15)
-- Film Video
-- Finalise Report
-- Project Submission (Product + Report + Video)

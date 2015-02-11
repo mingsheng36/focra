@@ -228,7 +228,7 @@ def stopCrawl(request):
             crawlerName = request.session.get('crawlerName')
             crawlerAddr = request.session.get('crawlerAddr')
             crawlerStatus = request.session.get('crawlerStatus')
-            if crawlerAddr != '' and crawlerStatus == 'running':
+            if crawlerStatus == 'running':
                 print crawlerName + ' - Stopping at ' + request.session.get('crawlerAddr')
                 stopCrawler(crawlerAddr)
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped',
@@ -298,6 +298,8 @@ Needs to be changed to start through HTTP call for scalability
 '''  
 def runCrawler(name, seeds, template, pager, runtype, pager_link=None):
     try:
+        import sys
+        print sys.path
         commands = ["scrapy", "crawl", "focras", 
                     "-a", "cname=" + name.strip(), 
                     "-a", "seeds=" + ','.join(seeds).strip(),
