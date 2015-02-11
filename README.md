@@ -3,20 +3,21 @@ FOCRA
 **A Visual, Distributed and Cloud based Web Crawler** 
 built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4,
 
-Instructions to deploy
------------------------
-###Pre-requisites
-- [Python 2.7](https://www.python.org/downloads/)
-- [Pip](https://pip.pypa.io/en/latest/installing.html#install-pip)
-- [MongoDB](http://docs.mongodb.org/manual/installation/) 
+![alt text](https://github.com/mingsheng36/Focra/blob/master/docs/2.png "Demo")
 
+##Pre-requisites
+-[Python 2.7](https://www.python.org/downloads/)
+-[Pip](https://pip.pypa.io/en/latest/installing.html)
+-[MongoDB](http://docs.mongodb.org/manual/installation/) 
+
+##Instructions to deploy
 1. Clone this repository or downlaod as zip
 2. Command prompt >> cd to the cloned/downloaded directory 
 3. Command prompt >> pip install -r requirements.txt
 4. Create two database, 'FocraDB' and 'CrawlerDB' in your MongoDB using default host:port (127.0.0.1:27017)
 5. Make sure you add [this directory to your PYTHONPATH](http://stackoverflow.com/a/4855685)
-5. Command prompt >> python manage.py runserver
-6. Go to [http://localhost:8000] and start crawling!
+6. Command prompt >> python manage.py runserver
+7. Go to [http://localhost:8000](http://localhost:8000) and start crawling!
 
 - [x] Visually create your own XPath template
 - [x] Toggle CSS and JavaScript on and off
@@ -39,6 +40,3 @@ Instructions to deploy
 ###Things to Note
 - This is not tested nor prettified, just a prototype for now.
 - There is a download delay of 2 seconds (you can change it in forbot/settings.py > DOWNLOAD_DELAY)
-
-
-
