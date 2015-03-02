@@ -2,7 +2,9 @@
 {% load staticfiles %}
 {% block title %}Create Crawler{% endblock %}
 {% block body_block %}
+
 <div class="panel panel-default">
+
 	<div class="panel-heading">
 		<form id="create" method="post" action="/create" class="form-inline">
 			{% csrf_token %} 
@@ -17,7 +19,7 @@
 						<button type="button" class="btn btn-info">Step 1 of 3</button>
 					</div>
 					<div class="form-group">
-						<input id="url" size="100" autofocus name="crawlerSeeds"
+						<input id="url" size="90vh" autofocus name="crawlerSeeds"
 							type="url" class="form-control "
 							placeholder="Copy and Paste Your URL here." pattern="https?://.+"
 							required> &nbsp;
@@ -26,13 +28,14 @@
 					<button id="step_one_instruction" class="btn btn-info"
 						type="button">Enter Your Seed URL.</button> 
 					<button id="step_one_bn" style="display: none;"
-						class="btn btn-primary" type="button">Next Step &gt;</button>
+						class="btn btn-success" type="button">Next Step</button>
 					
 				</div>
 
 				<!-- STEP 2 -->
 				<div id="step_two" class="input-group" style="display: none;">
 					<div class="input-group-btn">
+						<button id="back2" type="button" class="btn btn-info"> &lt; </button>
 						<button type="button" class="btn btn-info">Step 2 of 3</button>
 					</div>
 					<div id="fields" class="form-group">
@@ -55,8 +58,8 @@
 						class="btn btn-info" type="button">Select by Clicking On
 						The Data Below</button>
 
-					<button id="done_bn" style="display: none;" class="btn btn-primary"
-						type="button">Done !</button>
+					<button id="done_bn" style="display: none;" class="btn btn-success"
+						type="button">Done</button>
 
 					<button id="add_field_bn" style="display: none;"
 						class="btn btn-primary" type="button">Add Field +</button>
@@ -64,18 +67,21 @@
 					<div class="form-group">&nbsp;</div>
 					
 					<button id="step_two_bn" style="display: none;"
-						class="btn btn-primary" type="button">Next Step &gt;</button>
+						class="btn btn-success" type="button">Next Step</button>
 
 				</div>
 
 				<!-- STEP 3 -->
 				<div id="step_three" class="input-group" style="display: none;">
 					<div class="input-group-btn">
+						<button id="back3" type="button" class="btn btn-info"> &lt; </button>
 						<button type="button" class="btn btn-info">Step 3 of 3</button>
 					</div>
-					<div class="form-group">
+		 
+					<div class="form-group has-feedback">
 						<input id="crawlerName" name="crawlerName" class="form-control"
 							autofocus type="text" size="30" placeholder="Your Crawler Name">
+							<span id="feedback" class="glyphicon form-control-feedback" aria-hidden="true"></span>
 					</div>
 					
 					<div class="form-group">&nbsp;</div>
@@ -95,8 +101,12 @@
 
 					<div class="form-group">&nbsp;</div>
 					<button id="step_three_bn" style="display: none;"
-						class="btn btn-primary" type="button">Start Crawler</button>
-
+						class="btn btn-success" type="button">Start Crawler</button>
+					
+					<button id="step_three_check" style="display: none;"
+						class="btn btn-danger" type="button">Crawler Name Already Taken!</button>
+					<button id="step_three_check2" style="display: none;"
+						class="btn btn-danger" type="button">Crawler should not consist of special characters or spaces!</button>
 				</div>
 				
 				<img id="loader" style="display: none;"
@@ -114,7 +124,7 @@
 	</div>
 
 	<div class="panel-body">
-		<div id="ifw" style="position: relative;">
+		<div id="ifw" style="position: relative; height: 69vh;">
 			<div id="ifb" style="position: absolute; top: 0; left: 0; width: 100%; height: 69vh;"></div>
 			<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
 		</div>

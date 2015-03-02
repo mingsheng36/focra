@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from django.utils.safestring import mark_safe
 from urlparse import urljoin
 import urllib2
+from collections import OrderedDict
 
 # limit the total number of concurrent users
 client = MongoClient('localhost', 27017,  max_pool_size=1000)
@@ -90,6 +91,20 @@ def crawler(request, username=None, crawlerName=None):
                 print err
     return redirect('/')
 
+def remove_duplicates_keys(ordered_pairs):
+    d = OrderedDict()
+    c = 1
+    for k, v in ordered_pairs:
+        # removes special chars and spaces
+        k = re.sub('[^A-Za-z0-9]+', '', k)
+        if k in d:
+            k = k+str(c)
+            c += 1
+            d[k] = v
+        else:
+            d[k] = v
+    return d
+
 '''
 Create a new crawler
 '''
@@ -102,18 +117,18 @@ def createCrawler(request):
     if request.method == 'POST':   
         if username:
             try:
-                crawlerName = request.POST['crawlerName']
+                crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()
                 crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
-                crawlerTemplate = request.POST['crawlerTemplate']
+                crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
                 crawlerPager = request.POST['crawlerPager']
                 crawlerStatus='running'
                 crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
-                Crawler(crawlerName=crawlerName, 
-                        crawlerSeeds=crawlerSeeds, 
-                        crawlerAddr=crawlerAddr, 
+                Crawler(crawlerName=crawlerName,
+                        crawlerSeeds=crawlerSeeds,
+                        crawlerAddr=crawlerAddr,
                         crawlerStatus=crawlerStatus,
                         crawlerPager=crawlerPager,
-                        crawlerOwner=username, 
+                        crawlerOwner=username,
                         crawlerTemplate=crawlerTemplate,
                         crawlerDateTime=datetime.now()).save()
                 request.session['crawlers'] = crawlers + [crawlerName]
@@ -169,8 +184,8 @@ def baby(request, field=None):
             print err
     elif request.method == 'POST':
         try:
-            crawlerName = request.POST['crawlerName']
-            crawlerTemplate = request.POST['crawlerTemplate']
+            crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()
+            crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
             crawlerPager = request.POST['crawlerPager']
             crawlerSeeds = [field, crawlerParent]
             crawlerStatus = 'running'
@@ -298,8 +313,6 @@ Needs to be changed to start through HTTP call for scalability
 '''  
 def runCrawler(name, seeds, template, pager, runtype, pager_link=None):
     try:
-        import sys
-        print sys.path
         commands = ["scrapy", "crawl", "focras", 
                     "-a", "cname=" + name.strip(), 
                     "-a", "seeds=" + ','.join(seeds).strip(),
@@ -338,6 +351,8 @@ def fetch(request):
     if request.method == 'GET':
         try:  
             url = request.GET['url']
+            if not url.startswith("http://") or url.startswith("https://"):
+                return HttpResponse("format")
             js = request.GET['js']
             css = request.GET['css']
             req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -403,8 +418,13 @@ def fetch(request):
             soup.head.append(css_tag)
 
             return HttpResponse(mark_safe(soup.prettify(encoding='ascii')))
+        except urllib2.HTTPError as err:
+            return HttpResponse(str(err.code))
+        except ValueError:
+            return HttpResponse("format")
         except Exception as err:
-            print err
+            return HttpResponse("format")
+            
 
 '''
 Display Crawler data from CrawlerDB
@@ -416,3 +436,20 @@ def data(request):
         return HttpResponse(dumps(collection.find()))
     except Exception as err:
         print err
+
+'''
+Validate Crawler unique names
+'''
+def check_name(request):
+    if request.method == 'GET':
+        try:
+            crawlerName = re.sub('[^A-Za-z0-9]+', '', request.GET['crawlerName']).lower()
+            if crawlerName:
+                c = Crawler.objects(crawlerName=crawlerName)
+                if c:
+                    return HttpResponse("invalid")
+                else:
+                    return HttpResponse("valid")
+            
+        except Exception as err:
+            print err

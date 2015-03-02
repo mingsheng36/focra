@@ -10,10 +10,8 @@
 
 	{% if crawler.crawlerStatus == 'running' %}
 	<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
-	<button id="startBn" type="button" class="btn btn-success" disabled>Start
-		Crawler</button>
-	<button id="stopBn" type="button" class="btn btn-danger">Stop
-		Crawler</button>
+	<button id="startBn" type="button" class="btn btn-success" disabled>Start</button>
+	<button id="stopBn" type="button" class="btn btn-danger">Stop</button>
 	{% else %}
 	<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
 	<button id="startBn" type="button" class="btn btn-success">Start</button>

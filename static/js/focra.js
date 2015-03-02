@@ -32,10 +32,11 @@ $(document).ready(function() {
 	}
 
 	function showStepTwo() {
+		$('#ifb').show();
 		$('#toggleDiv').hide();
 		$('#step_one').hide();
 		$('#step_three').hide();
-		$('#step_two').show();
+		$('#step_two').fadeIn('fast');
 	}
 	
 	function showStepThree() {
@@ -339,13 +340,14 @@ $(document).ready(function() {
 		$('#step_three_bn').hide();
 	}
 	
+	// asd
 	$('#crawlerName').on('input propertychange', function(event){
 		if ($('#crawlerName').val() != '') {
-			$('#pager_bn').fadeIn('fast');
-			$('#step_three_bn').fadeIn('fast');
+			checkCrawlerName($('#crawlerName').val());
 		} else {
 			$('#pager_bn').hide();
 			$('#step_three_bn').hide();
+			$('#feedback').removeClass('glyphicon-ok glyphicon-remove');
 		}
 	});
 	
@@ -434,9 +436,26 @@ $(document).ready(function() {
 				'js': js,
 				'css': css
 			},
+			statusCode: {
+				500: function() {
+					alert( "Focra Server Error" );
+				}
+			},
 			type: 'GET',
 			success: function(res) {
-				$('#iframe').attr('srcdoc', res);
+				// if response is longer than 20, it is most propably a well formed html response
+				if (res.length > 50) {
+					$('#iframe').show();
+					$('#iframe').attr('srcdoc', res);
+				} else if (res == 'format') {
+					$('#loader').hide();
+					$('#url').attr('readonly', false).val("");
+					$('#step_one_instruction').removeClass('btn-info').addClass('btn-danger').html("Please enter the correct URL format").show();
+				} else {
+					$('#loader').hide();
+					$('#url').attr('readonly', false).val("");
+					$('#step_one_instruction').removeClass('btn-info').addClass('btn-danger').html(res + ": Please re-enter your URL").show();
+				}
 			}
 		});
 	}
@@ -665,4 +684,46 @@ $(document).ready(function() {
 		}
 	});
 
+	/***************** Crawler Name checker *****************/
+	function checkCrawlerName(name) {
+		if(/^[a-zA-Z0-9]+$/.test(name) == true) {
+			$('#step_three_check2').hide();
+			$.ajax({
+				url : '/check',
+				type: 'GET',
+				data : {
+					'crawlerName': name,
+				},
+				success: function( data ){
+					if (data == 'valid' && $('#crawlerName').val() != '') {
+						$('#step_three_check').hide();
+						$('#pager_bn').fadeIn('fast');
+						$('#step_three_bn').fadeIn('fast');
+						$('#feedback').removeClass('glyphicon-remove').addClass('glyphicon-ok');
+						$('#crawlerName').removeClass('bg-danger').addClass('bg-success');
+					} else if (data == 'invalid' && $('#crawlerName').val() != '') {
+						$('#step_three_check').fadeIn('fast');
+						$('#pager_bn').hide();
+						$('#step_three_bn').hide();
+						$('#feedback').removeClass('glyphicon-ok').addClass('glyphicon-remove');
+					}
+				}
+			});
+
+		} else {
+			$('#step_three_check2').fadeIn('fast');
+			$('#pager_bn').hide();
+			$('#step_three_bn').hide();
+			$('#feedback').removeClass('glyphicon-ok').addClass('glyphicon-remove');
+		}
+	}
+	
+	$('#back2').click(function(event){
+		showStepOne();
+	});
+	
+	$('#back3').click(function(event){
+		showStepTwo();
+	});
+	
 });

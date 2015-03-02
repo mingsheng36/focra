@@ -1,8 +1,10 @@
 List of Bugs
 ===========================
-1. Fields having the same name will be omitted
-2. Validation for unique crawler name
-3. Validation for field names and crawler name with special char or spaces
 4. Crawler control buttons (control whether it can be clickable or not)
 4. Baby Crawler not able to toggle JS/CSS
+5. Dashboard
+6. popovers for first crawler
+
+
+6. demo set with iso datetime for larry ( threadname, message, postDate )
 5. Javascript generated in the front-end but in scrapy we dont generate javasript (response not synced)
