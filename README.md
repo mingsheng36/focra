@@ -1,7 +1,12 @@
 FOCRA
 =====
+<<<<<<< HEAD
 **A Visual, Distributed and Cloud based Web Crawler** 
 built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4
+=======
+**A Visual Web Forum Crawler** 
+built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4,
+>>>>>>> origin/master
 
 ![alt text](https://github.com/mingsheng36/Focra/blob/master/docs/3.png "Demo")
 
@@ -41,5 +46,10 @@ built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4
 
 ###Things to Note
 - This is not tested nor prettified, just a prototype for now.
+<<<<<<< HEAD
 - Internet Explorer not supported!
 - There is a download delay of 2 seconds (you can change it in forbot/settings.py > DOWNLOAD_DELAY)
+=======
+- There is a download delay of 2 seconds (you can change it in forbot/settings.py > DOWNLOAD_DELAY)
+- Internet Explorer not supported!
+>>>>>>> origin/master
