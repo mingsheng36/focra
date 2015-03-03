@@ -1,10 +1,11 @@
 List of Bugs
 ===========================
-4. Crawler control buttons (control whether it can be clickable or not)
-4. Baby Crawler not able to toggle JS/CSS
-5. Dashboard
-6. popovers for first crawler
+3. baby Crawler not able to toggle JS/CSS
+4. pagination
+5. Dashboard - summary of crawlers/running animation/pauseAndResumeButtons/
+6. Index page/login/register
+7. user login
+8. modify algorithm
 
-
-6. demo set with iso datetime for larry ( threadname, message, postDate )
-5. Javascript generated in the front-end but in scrapy we dont generate javasript (response not synced)
+9. demo set with iso datetime for larry ( threadname, message, postDate )
+10. Javascript generated in the front-end but in scrapy we dont generate javasript (response not synced)

@@ -1,7 +1,22 @@
 $(document).ready(function() {
 	
 	/************* Create Crawler Steps **************/
+	var first = false;
+	if ($('#first').length) {
+		first = true;
+	}
+	
 	function showStepOne() {
+		
+		$('#crawlerName').popover('hide');
+		$('#url').popover('hide');
+		$('#step_one_bn').popover('hide');
+		$('#iframe').popover('hide');
+		$('#firstField').popover('hide');
+		$('#done_bn').popover('hide');
+		$('#firstBadge').popover('hide');
+		$('#step_two_bn').popover('hide');
+		
 		$('#step_two').hide();
 		$('#step_three').hide();
 		$('#step_one').fadeIn();
@@ -29,6 +44,7 @@ $(document).ready(function() {
 		$('#add_field_bn').hide();
 		$('#step_two_bn').hide();
 		$('#toggleDiv').show();
+		
 	}
 
 	function showStepTwo() {
@@ -37,6 +53,19 @@ $(document).ready(function() {
 		$('#step_one').hide();
 		$('#step_three').hide();
 		$('#step_two').fadeIn('fast');
+		
+		if (first) {
+			$('#crawlerName').popover('hide');
+			$('#url').popover('hide');
+			$('#step_one_bn').popover('hide');
+			$('#iframe').popover('hide');
+			$('#firstField').popover('hide');
+			$('#done_bn').popover('hide');
+			$('#firstBadge').popover('hide');
+			$('#step_two_bn').popover('hide');
+			
+			$('#firstField').popover('show');
+		}
 	}
 	
 	function showStepThree() {
@@ -46,11 +75,27 @@ $(document).ready(function() {
 			$('#crawlerName').focus();
 		});
 		$('#toggleDiv').hide();
+		if (first) {
+			//$('#crawlerName').popover('hide');
+			$('#url').popover('hide');
+			$('#step_one_bn').popover('hide');
+			$('#iframe').popover('hide');
+			$('#firstField').popover('hide');
+			$('#done_bn').popover('hide');
+			$('#firstBadge').popover('hide');
+			$('#step_two_bn').popover('hide');
+			
+			$('#crawlerName').popover('show');
+		}
 	}
 	
 	/*********** STEP 1 ************/
 	var js = true;
 	var css = true;
+	
+	if (first) {
+		$('#url').popover('show');
+	}
 	
 	// step 1 on page load
 	if ($('#url').val() != '') {
@@ -60,10 +105,16 @@ $(document).ready(function() {
 	}
 	
 	// url input change
+	var shown1 = false;
 	$('#url').on('input propertychange', function(event) {
 		if ($('#url').val() != '') {
 			$('#step_one_instruction').hide();
 			$('#step_one_bn').fadeIn('fast');
+			if (first == true && shown1 == false) {
+				$('#url').popover('destroy');
+				$('#step_one_bn').popover('show');
+				shown1 = true;
+			}
 		} else {
 			$('#step_one_bn').hide();
 			$('#step_one_instruction').fadeIn('fast');
@@ -97,6 +148,9 @@ $(document).ready(function() {
 			$('#step_one_instruction').hide();
 			$('#loader').fadeIn('slow');
 			fetchURL($('#url').val(), js, css)
+			if (first) {
+				$('#step_one_bn').popover('destroy');
+			}
 		} else {
 			alert('Please enter your URL');
 		}
@@ -162,6 +216,10 @@ $(document).ready(function() {
 			}).mouseout(function (event) {
 				$(event.target).removeClass('outline-element');
 			}).on('click dblclick', function (event) {
+				if (first) {
+					$('#iframe').popover('destroy');
+					$('#firstBadge').popover('show');
+				}
 				
 				/************** PAGER *****************/
 				if (pager_mode) {					
@@ -203,7 +261,13 @@ $(document).ready(function() {
 	});
 	
 	// fields input change detector
+	var shown2 = false;
 	$('#fields').on('input propertychange','.field', function(event){
+		if (first == true && shown2 == false) {
+			$('#firstField').popover('destroy');
+			$('#iframe').popover('show');
+			shown2 = true;
+		}
 		var curr_field_index = $(this).index('.field');		
 		if ($(this).val() != '' && $('.field-badge:eq(' + curr_field_index + ')').text() == 0) {
 			$('#step_two_instruction_1').hide()
@@ -244,6 +308,11 @@ $(document).ready(function() {
 		$('.field').last().focus();
 		$('#step_two_instruction_1').show();
 		$('#ifb').show();
+		if (first) {
+			$('#done_bn').popover('destroy');
+			$('#firstBadge').popover('destroy');
+			$('#step_two_bn').popover('destroy');
+		}
 	});
 
 	// delete fields
@@ -314,9 +383,19 @@ $(document).ready(function() {
 		$('#add_field_bn').fadeIn('fast');
 		$('#step_two_bn').fadeIn('fast');
 		$('#iframe').contents().find('.outline-element-clicked').removeClass('outline-element-clicked');
+		if (first) {
+			$('#done_bn').popover('destroy');
+			$('#firstBadge').popover('destroy');
+			$('#step_two_bn').popover('show');
+		}
 	});
 
 	$('#step_two_bn').click(function(event) {
+		if (first) {
+			$('#done_bn').popover('destroy');
+			$('#firstBadge').popover('destroy');
+			$('#step_two_bn').popover('destroy');
+		}
 		var crawlerTemplate = []
 		$(".field").each(function(i){
 			if ($(this).val() != '' && field_xpaths[i] != '') {
@@ -340,14 +419,26 @@ $(document).ready(function() {
 		$('#step_three_bn').hide();
 	}
 	
-	// asd
+	// check crawler name
+	var cStatus = false;
+	var shown3 = false;
 	$('#crawlerName').on('input propertychange', function(event){
-		if ($('#crawlerName').val() != '') {
-			checkCrawlerName($('#crawlerName').val());
+		if (first == true && shown3 == false) {
+			$('#crawlerName').popover('show');
+			shown3 = true;
 		} else {
-			$('#pager_bn').hide();
-			$('#step_three_bn').hide();
-			$('#feedback').removeClass('glyphicon-ok glyphicon-remove');
+			$('#crawlerName').popover('destroy');
+		}
+		if (cStatus == false) {
+			cStatus = true;
+			if ($('#crawlerName').val() != '') {
+				setTimeout(function() { checkCrawlerName(); }, 500);
+			} else {
+				$('#pager_bn').hide();
+				$('#step_three_bn').hide();
+				$('#feedback').removeClass('glyphicon-ok glyphicon-remove');
+				cStatus = false;
+			}
 		}
 	});
 	
@@ -443,7 +534,7 @@ $(document).ready(function() {
 			},
 			type: 'GET',
 			success: function(res) {
-				// if response is longer than 20, it is most propably a well formed html response
+				// if response is longer than 50, it is most propably a well formed html response
 				if (res.length > 50) {
 					$('#iframe').show();
 					$('#iframe').attr('srcdoc', res);
@@ -504,6 +595,11 @@ $(document).ready(function() {
 				candidate_xpaths = '';
 			} else if (diff.length == 1) {
 				// we can find similar xpaths if diff is just one node
+				if (first) {
+					$('#firstBadge').popover('destroy');
+					$('#done_bn').popover('show');
+				}
+				
 				for (var j = 0; j <= diff[0]; j++) {
 					if (j == diff[0]) {
 						x = x + '/' + node1[j].replace(/[^a-z]/g,'');
@@ -685,9 +781,13 @@ $(document).ready(function() {
 	});
 
 	/***************** Crawler Name checker *****************/
-	function checkCrawlerName(name) {
+	function checkCrawlerName() {
+		var name = $('#crawlerName').val()
 		if(/^[a-zA-Z0-9]+$/.test(name) == true) {
 			$('#step_three_check2').hide();
+			$('#pager_bn').hide();
+			$('#step_three_bn').hide();
+			$('#loader').fadeIn('fast');
 			$.ajax({
 				url : '/check',
 				type: 'GET',
@@ -695,26 +795,33 @@ $(document).ready(function() {
 					'crawlerName': name,
 				},
 				success: function( data ){
+					$('#loader').hide();
 					if (data == 'valid' && $('#crawlerName').val() != '') {
 						$('#step_three_check').hide();
 						$('#pager_bn').fadeIn('fast');
 						$('#step_three_bn').fadeIn('fast');
 						$('#feedback').removeClass('glyphicon-remove').addClass('glyphicon-ok');
-						$('#crawlerName').removeClass('bg-danger').addClass('bg-success');
+						cStatus = false;
 					} else if (data == 'invalid' && $('#crawlerName').val() != '') {
 						$('#step_three_check').fadeIn('fast');
 						$('#pager_bn').hide();
 						$('#step_three_bn').hide();
 						$('#feedback').removeClass('glyphicon-ok').addClass('glyphicon-remove');
+						cStatus = false;
+					} else {
+						cStatus = false;
 					}
 				}
 			});
 
 		} else {
+			$('#loader').hide();
+			$('#step_three_check').hide();
 			$('#step_three_check2').fadeIn('fast');
 			$('#pager_bn').hide();
 			$('#step_three_bn').hide();
 			$('#feedback').removeClass('glyphicon-ok').addClass('glyphicon-remove');
+			cStatus = false;
 		}
 	}
 	

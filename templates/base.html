@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" href="{% static 'images/favicon.png' %}">
 	<link href="{% static 'css/base.css' %}" rel="stylesheet" type="text/css">
-	<link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+	<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
 <title>{% block title %}Focra{% endblock %}</title>
 </head>
 
@@ -45,6 +45,8 @@
 							{% endfor %}			
 						</ul>
 					</li>
+					{% else %}
+					 <input type="hidden" id="first" name="first" value="first">
 					{% endif %}
 					<li><a href="/create">Create Crawler +</a></li>
 					<!-- <li class="active"><a href="#">Home</a></li> -->

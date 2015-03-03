@@ -22,26 +22,33 @@
 						<input id="url" size="90vh" autofocus name="crawlerSeeds"
 							type="url" class="form-control "
 							placeholder="Copy and Paste Your URL here." pattern="https?://.+"
-							required> &nbsp;
+							required data-container="body" data-toggle="popover" data-placement="top" 
+							data-content="1. Grab an URL and Copy here." data-trigger="manual"> &nbsp;
 					</div>
 
 					<button id="step_one_instruction" class="btn btn-info"
 						type="button">Enter Your Seed URL.</button> 
 					<button id="step_one_bn" style="display: none;"
-						class="btn btn-success" type="button">Next Step</button>
+						class="btn btn-success" type="button" data-container="body" data-toggle="popover" data-placement="top" 
+							data-content="2. Click here to proceed." data-trigger="manual">Next Step</button>
 					
 				</div>
 
 				<!-- STEP 2 -->
 				<div id="step_two" class="input-group" style="display: none;">
 					<div class="input-group-btn">
-						<button id="back2" type="button" class="btn btn-info"> &lt; </button>
+						<button id="back2" type="button" class="btn btn-info" 
+						data-container="body" data-toggle="popover" data-placement="bottom" 
+							data-content="To go back Step 1, Click here." data-trigger="manual"> &lt; </button>
 						<button type="button" class="btn btn-info">Step 2 of 3</button>
 					</div>
 					<div id="fields" class="form-group">
-						<input class="field form-control" type="text" size="15"
-							placeholder="fieldname">
-						<div class="field-badge form-control">
+						<input id="firstField" class="field form-control" type="text" size="15"
+							placeholder="fieldname" data-container="body" data-toggle="popover" data-placement="top" 
+							data-content="3. Enter Field Name." data-trigger="manual">
+						<div id="firstBadge" class="field-badge form-control" data-container="body" data-toggle="popover" 
+						data-placement="bottom" data-content="This shows the number of data for this column that
+						 has been selected. Now try clicking on another similar data." data-trigger="manual">
 							<span class="badge">0</span>
 						</div>
 						<div class="field-delete form-control" style="cursor: pointer">
@@ -59,7 +66,9 @@
 						The Data Below</button>
 
 					<button id="done_bn" style="display: none;" class="btn btn-success"
-						type="button">Done</button>
+						type="button" data-container="body" data-toggle="popover" 
+						data-placement="right" data-content="The rest of the similar data will be selected automatically.
+						Now, click on 'Done' to proceed." data-trigger="manual">Done</button>
 
 					<button id="add_field_bn" style="display: none;"
 						class="btn btn-primary" type="button">Add Field +</button>
@@ -67,7 +76,9 @@
 					<div class="form-group">&nbsp;</div>
 					
 					<button id="step_two_bn" style="display: none;"
-						class="btn btn-success" type="button">Next Step</button>
+						class="btn btn-success" type="button" data-container="body" data-toggle="popover" 
+						data-placement="top" data-content="Click here to proceed or 'Add Fields' to add a new column" 
+						data-trigger="manual">Next Step</button>
 
 				</div>
 
@@ -80,7 +91,9 @@
 		 
 					<div class="form-group has-feedback">
 						<input id="crawlerName" name="crawlerName" class="form-control"
-							autofocus type="text" size="30" placeholder="Your Crawler Name">
+							autofocus type="text" size="30" placeholder="Your Crawler Name" data-container="body" data-toggle="popover" 
+						data-placement="top" data-content="Enter a unique name for your Crawler." 
+						data-trigger="manual">
 							<span id="feedback" class="glyphicon form-control-feedback" aria-hidden="true"></span>
 					</div>
 					
@@ -105,6 +118,7 @@
 					
 					<button id="step_three_check" style="display: none;"
 						class="btn btn-danger" type="button">Crawler Name Already Taken!</button>
+						
 					<button id="step_three_check2" style="display: none;"
 						class="btn btn-danger" type="button">Crawler should not consist of special characters or spaces!</button>
 				</div>
@@ -126,7 +140,8 @@
 	<div class="panel-body">
 		<div id="ifw" style="position: relative; height: 69vh;">
 			<div id="ifb" style="position: absolute; top: 0; left: 0; width: 100%; height: 69vh;"></div>
-			<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin"></iframe>
+			<iframe id="iframe" srcdoc="" sandbox="allow-scripts allow-same-origin" data-container="body" data-toggle="popover" 
+			data-placement="top" data-content="4. Select by clicking on any data you want." data-trigger="manual"></iframe>
 		</div>
 	</div>
 
