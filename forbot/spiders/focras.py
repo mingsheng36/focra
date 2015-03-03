@@ -8,6 +8,7 @@ from urlparse import urljoin
 from HTMLParser import HTMLParser
 from pymongo import MongoClient
 import Queue
+import time
 
 client = MongoClient('localhost', 27017)
 LINK_NUMBER = 50
@@ -20,14 +21,15 @@ class FocraSpider(Spider):
 	@classmethod
 	def from_crawler(cls, crawler, **kwargs):
 		print "focras - from crawler"
-		spider = cls(settings=crawler.settings, **kwargs)
+		spider = cls(stats=crawler.stats, settings=crawler.settings, **kwargs)
 		crawler.signals.connect(spider.stopped, signals.engine_stopped)
 		crawler.signals.connect(spider.idle, signals.spider_idle)
 		return spider
 	
-	def __init__(self, settings=None, **kwargs):
+	def __init__(self, stats=None, settings=None, **kwargs):
 		super(FocraSpider, self).__init__(**kwargs)
 		try:
+			self.start_time = time.time()
 			print 'focras init(' + self.cname + ') kwargs seeds ' + kwargs.get('seeds')
 			print 'focras init(' + self.cname + ') kwargs template '+ self.template
 			self.queue = Queue.Queue()
@@ -40,13 +42,17 @@ class FocraSpider(Spider):
 			self.item = Item()
 			self.pager = HTMLParser().unescape(self.pager)
 			self.base_url = kwargs.get('seeds').split(',')
-	
+			self.crawled_pages = 0
+			
 			# non baby crawler dont have a queue, check for pager only
 			if self.base_url[0].startswith('http'):
 				if self.runtype == 'resume' and self.pager != 'null':
 					db = client['FocraDB']
 					collection = db['crawler']
-					self.base_url = [collection.find_one({'_id':self.cname}).get('next_page_link')]
+					cursor_focra = collection.find_one({'_id':self.cname})
+					self.base_url = [cursor_focra.get('next_page_link')]
+					self.crawled_pages = cursor_focra.get('crawled_pages')
+					self.start_time = self.start_time - cursor_focra.get('time_executed')
 					client.close()
 					print self.cname + " - Resume page is: " + self.base_url[0]
 					self.start_urls = self.base_url
@@ -59,14 +65,16 @@ class FocraSpider(Spider):
 				self.parentname = self.base_url.pop()
 				self.fieldname = self.base_url.pop()
 				# connect using parent name and get first 100 of the field name
-				self.mongodb_name = settings['MONGODB_DB']
-				db = client[self.mongodb_name]
+				self.crawler_db = settings['CRAWLER_DB']
+				db = client[self.crawler_db]
 				collection = db[self.parentname]
 				if self.runtype == 'resume':
 					db_focra = client['FocraDB']
 					cursor_focra = db_focra['crawler'].find_one({'_id': self.cname})
 					self.queue_counter = cursor_focra.get('queue_counter')
 					self.next_page_link = cursor_focra.get('next_page_link')
+					self.crawled_pages = cursor_focra.get('crawled_pages')
+					self.start_time = self.start_time - cursor_focra.get('time_executed')
 					print self.cname + " - Loading Queue from " + str(self.queue_counter)
 					cursor = collection.find({}, {self.fieldname: 1}).skip(self.queue_counter).limit(LINK_NUMBER)
 					self.queue_reload_counter = self.queue_reload_counter + LINK_NUMBER + self.queue_counter
@@ -75,6 +83,7 @@ class FocraSpider(Spider):
 					# set the queue reload counter
 					self.queue_reload_counter += LINK_NUMBER
 				client.close()
+				
 				if cursor.count() <= self.queue_reload_counter:
 					print self.cname + '- No more links to load'
 					self.end_of_data = True
@@ -96,24 +105,28 @@ class FocraSpider(Spider):
 					else:
 						print self.cname + " - Resume page is: " + self.base_url[0]
 					self.start_urls = self.base_url
-					
 		except Exception as error:
 			print error
 	
 	# interrupted state, crawler status determined by views.py
+	# it is stopped or paused
 	def stopped(self):
 		try:
 			if self.runtype != 'complete':
 				print self.cname + " - Stopped"
 				db = client['FocraDB']
 				collection = db['crawler']
-				# baby crawler
+				# baby crawler queue from parent crawler
 				if self.queue_counter != 0:
-					collection.update({"_id": self.cname}, {"$set":{'queue_counter': self.queue_counter}})
+					collection.update({"_id": self.cname}, {"$set":{'queue_counter': self.queue_counter, 
+																 	'crawled_pages': self.crawled_pages,
+																 	'time_executed': time.time() - self.start_time}})
 					print self.cname + " - Saved queue counter is: " + str(self.queue_counter)
-				# pager
+				# main or chained crawler pager state
 				if self.pager != 'null' and self.next_page_link:
-					collection.update({"_id": self.cname}, {"$set":{'next_page_link': self.next_page_link}})
+					collection.update({"_id": self.cname}, {"$set":{'next_page_link': self.next_page_link,
+																 	'crawled_pages': self.crawled_pages,
+																 	'time_executed': time.time() - self.start_time}})
 					print self.cname + " - Saved Page link is: " + str(self.next_page_link)
 				client.close()
 		except Exception as err:
@@ -124,7 +137,10 @@ class FocraSpider(Spider):
 		try:
 			db = client['FocraDB']
 			collection = db['crawler']
-			collection.update({"_id": self.cname}, {"$set":{'crawlerAddr': '', 'crawlerStatus': 'completed'}})
+			collection.update({"_id": self.cname}, {"$set":{'crawlerAddr': '',
+															'crawlerStatus': 'completed',
+															'crawled_pages': self.crawled_pages,
+															'time_executed': time.time() - self.start_time}})
 			print self.cname + " - Crawl completed, closing gracefully"
 			self.runtype = 'complete'
 			client.close()
@@ -133,8 +149,14 @@ class FocraSpider(Spider):
 			
 	def parse(self, response):		
 		try:
+			self.crawled_pages += 1
+			db = client['FocraDB']
+			db['crawler'].update({"_id": self.cname}, {"$set":{'crawled_pages': self.crawled_pages,
+															'time_executed': time.time()-self.start_time}})
+			
 			print self.cname + " - Parsing items"
 			body = BeautifulSoup(response.body)
+			
 			for tag in body.find_all('a', href=True):
 				if 'http' not in tag['href']:
 					tag['href'] = urljoin(self.base_url[0], tag['href'])
@@ -143,15 +165,19 @@ class FocraSpider(Spider):
 					tag['src'] = urljoin(self.base_url[0], tag['src'])
 			for t in body.find_all('tbody'):
 				t.unwrap()
+			
 			response = response.replace(body=body.prettify(encoding='ascii'))
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
+			
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
 			yield dynamicItemLoader.load_item()
+			
 			# check for pagination
 			if self.pager != 'null':
 				next_link = None
+				# if the pager is in html format
 				if bool(BeautifulSoup(self.pager, "html.parser").find()):
 					# remove the \r for 'end of line' diff
 					self.pager = self.pager.replace('\r', '')
@@ -162,24 +188,32 @@ class FocraSpider(Spider):
 							tag = BeautifulSoup(tag)
 							next_link = tag.a.get('href')
 							break
+				# if the pager is in text format
 				else:
 					next_link = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()[0]
+				
 				if next_link:
 					self.next_page_link = next_link
 					print self.cname + ' - Next page is: ' + self.next_page_link
 					yield Request(self.next_page_link, callback=self.parse, dont_filter=True)
+					
 				else:
+					# chained crawler with pagination
+					# check for more links from parent column
 					if not self.queue.empty():
 						yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
 						self.queue_counter += 1
 						if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 							self.check_queue()
 			else:
+				# chained crawler without pagination
+				# check for more links from parent column
 				if not self.queue.empty():
 					yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
 					self.queue_counter += 1
 					if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 						self.check_queue()
+					
 		except Exception as err:
 			print err
 
@@ -187,7 +221,7 @@ class FocraSpider(Spider):
 		try:
 			print self.cname + '- Reload counter ' + str(self.queue_reload_counter)
 			print self.cname + '- Queue less than ' + str(LINK_NUMBER) + ', querying for more links'
-			db = client[self.mongodb_name]
+			db = client[self.crawler_db]
 			collection = db[self.parentname]
 			cursor = collection.find({}, {self.fieldname: 1}).skip(self.queue_reload_counter).limit(LINK_NUMBER)
 			client.close()

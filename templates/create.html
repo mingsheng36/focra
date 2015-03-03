@@ -20,7 +20,7 @@
 					</div>
 					<div class="form-group">
 						<input id="url" size="90vh" autofocus name="crawlerSeeds"
-							type="url" class="form-control "
+							type="url" class="form-control " maxlength="200"
 							placeholder="Copy and Paste Your URL here." pattern="https?://.+"
 							required data-container="body" data-toggle="popover" data-placement="top" 
 							data-content="1. Grab an URL and Copy here." data-trigger="manual"> &nbsp;
@@ -43,7 +43,7 @@
 						<button type="button" class="btn btn-info">Step 2 of 3</button>
 					</div>
 					<div id="fields" class="form-group">
-						<input id="firstField" class="field form-control" type="text" size="15"
+						<input id="firstField" class="field form-control" type="text" size="15" maxlength="20"
 							placeholder="fieldname" data-container="body" data-toggle="popover" data-placement="top" 
 							data-content="3. Enter Field Name." data-trigger="manual">
 						<div id="firstBadge" class="field-badge form-control" data-container="body" data-toggle="popover" 
@@ -90,7 +90,7 @@
 					</div>
 		 
 					<div class="form-group has-feedback">
-						<input id="crawlerName" name="crawlerName" class="form-control"
+						<input id="crawlerName" name="crawlerName" class="form-control" maxlength="30"
 							autofocus type="text" size="30" placeholder="Your Crawler Name" data-container="body" data-toggle="popover" 
 						data-placement="top" data-content="Enter a unique name for your Crawler." 
 						data-trigger="manual">

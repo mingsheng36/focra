@@ -4,25 +4,76 @@
 {{ crawler.crawlerName }}
 {% endblock %} 
 {% block body_block %}
+<div id="info" class="well well-lg" style="padding: 15px;">
+	<div class="page-header form-inline" style="margin:0px">
+		<h2>
+			{{ crawler.crawlerName | title }} 
+			<small>
+			{% for seed in crawler.crawlerSeeds %} 
+				(<a href="{{seed}}" target="_blank">{{seed}}</a>)
+			{% endfor %}
+			</small>
+		</h2>
 
-<br />
-<div id="info" class="well well-lg">
-
-	{% if crawler.crawlerStatus == 'running' %}
-	<h2 id="display">{{ crawler.crawlerName }} is {{ crawler.crawlerStatus }}</h2>
-	<button id="startBn" type="button" class="btn btn-success" disabled>Start</button>
-	<button id="stopBn" type="button" class="btn btn-danger">Stop</button>
-	{% else %}
-	<h2 id="display">{{ crawler.crawlerName }} has been {{ crawler.crawlerStatus }}</h2>
-	<button id="startBn" type="button" class="btn btn-success">Start</button>
-	<button id="stopBn" type="button" class="btn btn-danger" disabled>Stop</button>
-	{% endif %}
+		<button id="switchBn" type="button" class="btn btn-success">Start</button>
+			
+		<button id="pauseBn" type="button" class="btn btn-primary">Pause</button>
+		<button id="resumeBn" type="button" class="btn btn-primary">Resume</button>
+		<button id="createBabyBn" type="button" class="btn btn-primary">Create
+			Baby</button>
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#templateModal">Template</button>
+		<button type="button" class="btn btn-primary" id="data_tab">Data</button>
+		
+		{% if crawler.crawlerStatus == 'running' %}
+			<button id="deleteBn" class="btn btn-danger" type="submit"
+				data-toggle="tooltip" data-placement="top" title="Delete Crawler"
+				disabled>Delete Crawler</button>
+		{% else %}
+			<button id="deleteBn" class="btn btn-danger" type="submit"
+				data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete
+						Crawler</button>
+		{% endif %}
 	
-	<button id="pauseBn" type="button" class="btn btn-primary">Pause</button>
-	<button id="resumeBn" type="button" class="btn btn-primary">Resume</button>
-
-	<button id="createBabyBn" type="button" class="btn btn-primary">Create
-		Baby</button>
+	</div>
+<br/>
+<ul class="list-inline">
+  <li>
+  <strong style="font-size:12px">Status:</strong>
+  	{% if crawler.crawlerStatus == "running" %}
+	<span class="label label-success">{{ crawler.crawlerStatus | title}}</span>
+	{% elif crawler.crawlerStatus == "stopped" %}
+	<span class="label label-danger">{{ crawler.crawlerStatus | title}}</span>
+	{% elif crawler.crawlerStatus == "paused" %}
+	<span class="label label-warning">{{ crawler.crawlerStatus | title}}</span>
+	{% elif crawler.crawlerStatus == "completed" %}
+	<span class="label label-primary">{{ crawler.crawlerStatus | title}}</span>
+	{% else %}
+	<span class="label label-danger">unknown</span>
+	{% endif %}
+  </li>
+  <li>
+  	<strong style="font-size:12px">Pages Crawled:</strong>
+   	<span class="badge">{{ crawler.crawled_pages }} pages</span>
+  </li>
+  <li>
+  	<strong style="font-size:12px">Rows Inserted:</strong> 
+  	<span class="badge">{{ crawler.rows_inserted }} rows</span>
+  </li>
+  <li>
+  	<strong style="font-size:12px">Time Executed:</strong> 
+  	<span class="badge">{{ crawler.time_executed | floatformat:"0" }} seconds</span>
+  </li>
+  <li>
+  	<strong style="font-size:12px">Paginated:</strong>
+  	<span class="badge">
+	{% if crawler.crawlerPager != "null" %}
+		Yes
+	{% else %}
+		No
+	{% endif %}
+	</span>
+	</li>
+</ul>
 	
 	<div id='selectField' class="btn-group" style="display:none">
 		<button type="button" class="btn btn-default">Select Start
@@ -48,43 +99,9 @@
 	
 </div>
 
-<div role="tabpanel">
+<div class=" table-responsive">
 
-	<ul class="nav nav-tabs" role="tablist">
-		<li id="monitor_tab" role="presentation" class="active"><a
-			href="#monitor" aria-controls="monitor" role="tab" data-toggle="tab">Monitor</a></li>
-		<li id="data_tab" role="presentation"><a href="#data"
-			aria-controls="data" role="tab" data-toggle="tab">Data</a></li>
-		<li id="settings_tab" role="presentation"><a href="#settings"
-			aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
-	</ul>
-
-	<div class="tab-content">
-		<div role="tabpanel" class="tab-pane active" id="monitor">
-
-			<table class="table table-striped table-bordered">
-				{% for seed in crawler.crawlerSeeds %}
-				<tr>
-					<td colspan="2">Link: {{ seed }}</td>
-				</tr>
-				{% endfor %}
-				<tr>
-					<td colspan="2">Pager: {{ crawler.crawlerPager }}</td>
-				</tr>
-				
-				{% for key, value in ordered_template_field.items %}
-				<tr>
-					<td>{{ key }} :</td>
-					<td><input type="text" value="{{ value }}" size="80"></td>
-				</tr>
-				{% endfor %}
-			</table>
-
-		</div>
-
-		<div role="tabpanel" class="tab-pane fade table-responsive" id="data">
-			<br />
-			<table id="crawlerData" class="table table-bordered"
+<table id="crawlerData" class="table table-bordered"
 				style="width: 100%">
 				<tr>
 					{% for key in ordered_template_field.keys %}
@@ -92,24 +109,30 @@
 					{% endfor %}
 				</tr>
 			</table>
-		</div>
-
-		<div role="tabpanel" class="tab-pane fade" id="settings">
-			<br />
-			<form id="delete" method="post" action="/delete">
-				{% csrf_token %} {% if crawler.crawlerStatus == 'running' %}
-				<button id="deleteBn" class="btn btn-danger" type="submit"
-					data-toggle="tooltip" data-placement="top" title="Delete Crawler"
-					disabled>Delete Crawler</button>
-				{% else %}
-				<button id="deleteBn" class="btn btn-danger" type="submit"
-					data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete
-					Crawler</button>
-				{% endif %}
-			</form>
-
-		</div>
-	</div>
-
 </div>
+
+<div id="templateModal" class="modal fade ">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ crawler.crawlerName | title}} Template</h4>
+      </div>
+      <div class="modal-body table-responsive">
+        <table class="table table-striped table-bordered">
+			{% for key, value in ordered_template_field.items %}
+			<tr>
+				<td>{{ key }}</td>
+				<td>{{ value }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 {% endblock %}

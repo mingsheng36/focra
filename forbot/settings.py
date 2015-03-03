@@ -22,7 +22,8 @@ ITEM_PIPELINES = {'forbot.pipelines.MongoDBPipeline':10}
 
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
-MONGODB_DB = "CrawlerDB"
+CRAWLER_DB = "CrawlerDB"
+FOCRA_DB = "FocraDB"
 
 DOWNLOAD_DELAY = 2
 COOKIES_ENABLED = False

@@ -298,7 +298,7 @@ $(document).ready(function() {
 		$('#step_two_bn').hide();
 		$('#add_field_bn').hide(); 
 		$('#fields').append(
-				'<input autofocus class="field form-control" type="text" size="15" size="10" placeholder="fieldname">' +
+				'<input autofocus class="field form-control" type="text" size="15" size="10" maxlength="20" placeholder="fieldname">' +
 				'<div class="field-badge form-control">' +
 				'<span class="badge">0</span>' +
 				'</div>' +
@@ -432,11 +432,19 @@ $(document).ready(function() {
 		if (cStatus == false) {
 			cStatus = true;
 			if ($('#crawlerName').val() != '') {
-				setTimeout(function() { checkCrawlerName(); }, 500);
-			} else {
+				$('#step_three_check2').hide();
+				$('#step_three_check').hide();
 				$('#pager_bn').hide();
 				$('#step_three_bn').hide();
-				$('#feedback').removeClass('glyphicon-ok glyphicon-remove');
+				$('#loader').fadeIn('fast');
+				setTimeout(function() { checkCrawlerName(); }, 700);
+			} else {
+				$('#step_three_check2').hide();
+				$('#step_three_check').hide();
+				$('#pager_bn').hide();
+				$('#step_three_bn').hide();
+				$('#feedback').removeClass('glyphicon-remove');
+				$('#feedback').removeClass('glyphicon-ok');
 				cStatus = false;
 			}
 		}
@@ -659,17 +667,17 @@ $(document).ready(function() {
 	
 	/************* CRAWLER SECTION ***************/
 	// call to start crawler
-	$('#startBn').click(function(event) {
-		$('#display').html('Initializing..');
-		$('#startBn').attr('disabled', true);
-		$('#deleteBn').attr('disabled', true);
+	$('#switchBn').click(function(event) {
+		$('#switchBn').html('Initializing..');
+		$('#switchBn').attr('disabled', true);
 		$.ajax({
 			url : '/start',
 			type: 'POST',
 			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
 			success: function( data ){
-				$('#display').html(data);
-				$('#stopBn').removeAttr('disabled');
+				$('#switchBn').html('Stop Crawler');
+				$('#switchBn').removeAttr('disabled');
+				$('#switchBn').removeClass('btn-success').addClass('btn-danger');
 			}
 		});
 	});
@@ -684,7 +692,7 @@ $(document).ready(function() {
 			success: function( data ){
 				$('#display').html(data);
 				$('#stopBn').attr('disabled',true);
-				$('#startBn').removeAttr('disabled');
+				$('#switchBn').removeAttr('disabled');
 				$('#deleteBn').removeAttr('disabled');
 			}
 		});
@@ -717,10 +725,17 @@ $(document).ready(function() {
 	});
 	
 	// delete crawler
-	$('#delete').submit(function(event) {
+	$('#deleteBn').click(function(event) {
 		var choice = confirm("Are you sure you want to delete?");
-		if (choice == false) {
-			event.preventDefault();
+		if (choice == true) {
+			$.ajax({
+				url : '/delete',
+				type: 'POST',
+				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+				success: function( data ){
+					window.location.href = "/"
+				}
+			});
 		}
 	});
 	
@@ -783,11 +798,10 @@ $(document).ready(function() {
 	/***************** Crawler Name checker *****************/
 	function checkCrawlerName() {
 		var name = $('#crawlerName').val()
-		if(/^[a-zA-Z0-9]+$/.test(name) == true) {
+		if(/^[a-zA-Z0-9]*$/.test(name) == true) {
 			$('#step_three_check2').hide();
 			$('#pager_bn').hide();
 			$('#step_three_bn').hide();
-			$('#loader').fadeIn('fast');
 			$.ajax({
 				url : '/check',
 				type: 'GET',
@@ -809,6 +823,12 @@ $(document).ready(function() {
 						$('#feedback').removeClass('glyphicon-ok').addClass('glyphicon-remove');
 						cStatus = false;
 					} else {
+						$('#step_three_check2').hide();
+						$('#step_three_check').hide();
+						$('#pager_bn').hide();
+						$('#step_three_bn').hide();
+						$('#feedback').removeClass('glyphicon-remove');
+						$('#feedback').removeClass('glyphicon-ok');
 						cStatus = false;
 					}
 				}

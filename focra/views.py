@@ -74,6 +74,11 @@ def crawler(request, username=None, crawlerName=None):
                 request.session['crawlerTemplate']= crawler.crawlerTemplate
                 request.session['crawlerPager'] = crawler.crawlerPager
                 request.session['crawlerStatus'] = crawler.crawlerStatus
+                crawler.rows_inserted = db[crawlerName].count()
+                if crawler.time_executed is None:
+                    crawler.time_executed = "0"
+                if crawler.crawled_pages is None:
+                    crawler.crawled_pages = "0"
                 # Retrieve and convert template into an ordered dict
                 ordered_template_field = json.loads(crawler.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
                 # Determine which  one are links
@@ -96,7 +101,9 @@ def remove_duplicates_keys(ordered_pairs):
     c = 1
     for k, v in ordered_pairs:
         # removes special chars and spaces
-        k = re.sub('[^A-Za-z0-9]+', '', k)
+        k = re.sub('[^A-Za-z0-9]+', '', k)[:20]
+        if not k:
+            k = 'blank'
         if k in d:
             k = k+str(c)
             c += 1
@@ -117,7 +124,9 @@ def createCrawler(request):
     if request.method == 'POST':   
         if username:
             try:
-                crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()
+                crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()[:30]
+                if not crawlerName:
+                    crawlerName = 'blank'
                 crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
                 crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
                 crawlerPager = request.POST['crawlerPager']
@@ -156,8 +165,7 @@ def deleteCrawler(request):
             crawlers = request.session.get('crawlers')
             crawlers.remove(crawlerName)
             request.session['crawlers'] = crawlers
-            collection = db[crawlerName]
-            collection.drop()     
+            db[crawlerName].drop()    
             return redirect('/' + username)
         except Exception as err:
             print err
@@ -184,7 +192,9 @@ def baby(request, field=None):
             print err
     elif request.method == 'POST':
         try:
-            crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()
+            crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()[:30]
+            if not crawlerName:
+                    crawlerName = 'blank'
             crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
             crawlerPager = request.POST['crawlerPager']
             crawlerSeeds = [field, crawlerParent]
@@ -219,6 +229,8 @@ def startCrawl(request):
             crawlerPager = request.session.get('crawlerPager')
             crawlerAddr = request.session.get('crawlerAddr')
             crawlerStatus = request.session.get('crawlerStatus')
+            if db[crawlerName]:
+                db[crawlerName].drop()
             if crawlerAddr == '' and crawlerStatus != 'running':
                 crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
@@ -351,7 +363,7 @@ def fetch(request):
     if request.method == 'GET':
         try:  
             url = request.GET['url']
-            if not url.startswith("http://") or url.startswith("https://"):
+            if not url.startswith("http"):
                 return HttpResponse("format")
             js = request.GET['js']
             css = request.GET['css']
@@ -376,6 +388,10 @@ def fetch(request):
                 
             soup = BeautifulSoup(cleaned_resp)
             
+            # fix page being redirected
+            for tag in soup.find_all('span', onclick=True):
+                tag['onclick'] = ""
+                
             # patch the css url so it will load from the server
             for tag in soup.find_all('link', href=True):
                 if css == 'true':
@@ -443,13 +459,14 @@ Validate Crawler unique names
 def check_name(request):
     if request.method == 'GET':
         try:
-            crawlerName = re.sub('[^A-Za-z0-9]+', '', request.GET['crawlerName']).lower()
-            if crawlerName:
+            if request.GET['crawlerName']:
+                crawlerName = re.sub('[^A-Za-z0-9]+', '', request.GET['crawlerName']).lower()[:30]
                 c = Crawler.objects(crawlerName=crawlerName)
                 if c:
                     return HttpResponse("invalid")
                 else:
                     return HttpResponse("valid")
-            
+            else:
+                return HttpResponse("invalid")
         except Exception as err:
             print err

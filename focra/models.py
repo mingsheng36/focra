@@ -13,9 +13,12 @@ class Crawler(Document):
     crawlerOwner = StringField(required=True)
     crawlerParent = StringField()
     crawlerBaby = StringField()
+    crawlerCreated = DateTimeField()
     queue_counter = StringField()
     next_page_link = StringField()
-    crawlerDateTime = DateTimeField()
+    crawled_pages = StringField()
+    rows_inserted = StringField()
+    time_executed = StringField()
     '''
     Because mongoengine does not support ordered-dict-field yet. store as string to maintain order
     '''

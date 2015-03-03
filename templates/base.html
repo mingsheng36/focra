@@ -41,7 +41,7 @@
 					</a>
 						<ul class="dropdown-menu" role="menu">
 							{% for crawler in crawlers %}
-							<li><a href="/{{ username }}/{{ crawler }}">{{ crawler }}</a></li>
+							<li><a href="/{{ username }}/{{ crawler }}">{{ crawler | title}}</a></li>
 							{% endfor %}			
 						</ul>
 					</li>

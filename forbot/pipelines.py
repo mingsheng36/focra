@@ -13,15 +13,15 @@ class MongoDBPipeline(object):
         print "pipline - init()"
         self.settings = crawler.settings
         client = MongoClient(self.settings['MONGODB_SERVER'], self.settings['MONGODB_PORT'])
-        self.db = client[self.settings['MONGODB_DB']]
-
+        self.crawler_db = client[self.settings['CRAWLER_DB']]
+        
     '''
     data extracted per xpath are in a list format, separated by '\r\n' or maybe '\n'
     need to join them together
     '''
     def process_item(self, item, spider):
         try:
-            collection = self.db[spider.cname]
+            crawler_collection = self.crawler_db[spider.cname]
             # remove null values
             most_length = 0
             for i in item:
@@ -43,7 +43,7 @@ class MongoDBPipeline(object):
                             row[k] = item.get(k)[j]
                     except Exception:
                         pass
-                collection.insert(row)
+                crawler_collection.insert(row)
             print 'pipline - Inserted ' + str(most_length) + ' rows'
         except Exception as err:
             print err
