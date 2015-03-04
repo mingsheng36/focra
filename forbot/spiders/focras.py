@@ -172,6 +172,7 @@ class FocraSpider(Spider):
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
+			
 			yield dynamicItemLoader.load_item()
 			
 			# check for pagination

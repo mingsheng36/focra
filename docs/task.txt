@@ -1,10 +1,8 @@
 List of Tasks to do before Friday
 ===========================
-1. Dashboard - start, stop, pause and resume Buttons
-2. pagination - for data
-3. Everything about Chained (Baby) Crawler not able to toggle JS/CSS and select next page link
-4. Index page/login/register
-5. not able to grab images on some sites (xpath problem)
+1. Everything about Chained (Baby) Crawler not able to toggle JS/CSS and select next page link
+2. Index page/login/register
+3. not able to grab images on some sites (xpath problem)
 
 No time to implement before Friday
 ===========================

@@ -666,49 +666,60 @@ $(document).ready(function() {
 	}
 	
 	/************* CRAWLER SECTION ***************/
-	// call to start crawler
+	var poll_stats;
+	var INTERVAL = 1000;
+	
+	// poll on load, if it is not running it will stop automatically
+	poll_stats = setInterval(function () {getStats()}, INTERVAL);
+	
+	// to toggle start stop crawler
 	$('#switchBn').click(function(event) {
-		$('#switchBn').html('Initializing..');
-		$('#switchBn').attr('disabled', true);
-		$.ajax({
-			url : '/start',
-			type: 'POST',
-			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
-			success: function( data ){
-				$('#switchBn').html('Stop Crawler');
-				$('#switchBn').removeAttr('disabled');
-				$('#switchBn').removeClass('btn-success').addClass('btn-danger');
-			}
-		});
+		if ($('#switchBn').html().indexOf('Start') >= 0 || $('#switchBn').html().indexOf('Restart') >= 0) {
+			$('#switchBn').html('Starting..');
+			$('#stateBn').hide();
+			$('#switchBn').attr('disabled', true);
+			$.ajax({
+				url : '/start',
+				type: 'POST',
+				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+				success: function( data ){
+					poll_stats = setInterval(function () {getStats()}, INTERVAL);
+				}
+			});
+		} else if ($('#switchBn').html().indexOf('Stop') >= 0) {
+			$('#switchBn').html('Stopping..');
+			$('#switchBn').attr('disabled', true);
+			$.ajax({
+				url : '/stop',
+				type: 'POST',
+				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value}
+			});	
+		}
+		
 	});
-
-	// call to stop crawler
-	$('#stopBn').click( function(event) {
-		$('#display').html('Terminating..');
-		$.ajax({
-			url : '/stop',
-			type: 'POST',
-			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
-			success: function( data ){
-				$('#display').html(data);
-				$('#stopBn').attr('disabled',true);
-				$('#switchBn').removeAttr('disabled');
-				$('#deleteBn').removeAttr('disabled');
-			}
-		});
-	});
-			
+	
 	// pause crawler
-	$('#pauseBn').click(function(event) {
-		$('#display').html('Pausing..');
-		$.ajax({
-			url : '/pause',
-			type: 'POST',
-			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
-			success: function( data ){
-				$('#display').html(data);
-			}
-		});
+	$('#stateBn').click(function(event) {
+		if ($('#stateBn').html().indexOf('pause') >= 0) {
+			$('#stateBn').html('Pausing..');
+			$('#stateBn').attr('disabled', true);
+			$.ajax({
+				url : '/pause',
+				type: 'POST',
+				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value}
+			});
+		} else if ($('#stateBn').html().indexOf('play') >= 0) {
+			$('#stateBn').html('Resuming..');
+			$('#stateBn').attr('disabled', true);
+			$.ajax({
+				url : '/resume',
+				type: 'POST',
+				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+				success: function( data ){
+					poll_stats = setInterval(function () {getStats()}, INTERVAL);
+				}
+			});
+		}
 	});
 	
 	// resume crawler
@@ -739,18 +750,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	// create baby crawler button
-	$('#createBabyBn').click(function(event) {
-		$('#createBabyBn').hide();
-		$('#selectField').fadeIn('fast');
-	});
-	
-	// create baby crawler button
-	$('#cancelBabyBn').click(function(event) {
-		$('#selectField').hide();
-		$('#createBabyBn').fadeIn('fast');
-	});
-	
 	/***************** BABY SECTION *****************/
 	if ($('#extractedLink').val()) {
 		$('#step_two_instruction_1').hide()
@@ -759,42 +758,6 @@ $(document).ready(function() {
 		fetchURL($('#extractedLink').val(), true, true)
 	}
 	
-	/***************** DATA SECTION *****************/	
-	// load data section
-	var loaded = false;
-	var fields = [];
-	$(".fields").each(function(){
-		fields.push($(this).html());
-	});
-	
-	$('#data_tab').click(function(){
-		if (!loaded) {
-			$.ajax({
-				url: "/data",
-				type: "GET",
-				success: function(res) {
-					//empty not loaded
-					if (res.length == 2) {
-						loaded = false;
-					}
-					else {
-						var data = $.parseJSON(res);
-						$.each(data, function(i, obj) {						
-							var rowData = "";
-							for (var j = 0; j < fields.length; j++) { 
-								rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
-							}
-							$('#crawlerData').append(
-									"<tr>" + rowData + "</tr>"	
-							);
-						});
-						loaded = true;
-					}
-				}
-			});	
-		}
-	});
-
 	/***************** Crawler Name checker *****************/
 	function checkCrawlerName() {
 		var name = $('#crawlerName').val()
@@ -851,6 +814,118 @@ $(document).ready(function() {
 	
 	$('#back3').click(function(event){
 		showStepTwo();
+	});
+	
+	function getStats() {
+		$.ajax({
+			url: "/stats",
+			type: "GET",
+			success: function(res) {
+				var stats = res.split(',');
+				if (stats[0] == "running") {
+					// update stats
+					$("#status").removeClass().addClass('label label-success').html("Running");
+					$("#crawledPages").html(stats[1] + " pages");
+					$("#rowsInserted").html(stats[2] + " rows");
+					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$('#deleteBn').attr('disabled', true);
+					// show state button
+					$('#stateBn').html('Pause <span  class="glyphicon glyphicon-pause" aria-hidden="true"></span>');
+					$('#stateBn').removeAttr('disabled');
+					$('#switchBn').html('Stop Crawl <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>');
+					$('#switchBn').removeClass('btn-success').addClass('btn-danger');
+					
+					// change switch button
+					$('#switchBn').html('Stop Crawl <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>');
+					$('#switchBn').removeAttr('disabled');
+					$('#switchBn').removeClass('btn-success').addClass('btn-danger');
+					$('#stateBn').fadeIn('fast');
+					
+				} else if (stats[0] == "stopped") {
+					// update stats
+					$("#status").removeClass().addClass('label label-danger').html("Stopped");
+					$("#crawledPages").html(stats[1] + " pages");
+					$("#rowsInserted").html(stats[2] + " rows");
+					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$('#deleteBn').removeAttr('disabled');
+					
+					// switch state to stop
+					$('#switchBn').html('Restart Crawl');
+					$('#switchBn').removeAttr('disabled');
+					$('#switchBn').removeClass('btn-danger').addClass('btn-success');
+					$('#stateBn').hide();
+					
+					clearInterval(poll_stats);
+				} else if (stats[0] == "paused") {
+					// update stats
+					$("#status").removeClass().addClass('label label-warning').html("Paused");
+					$("#crawledPages").html(stats[1] + " pages");
+					$("#rowsInserted").html(stats[2] + " rows");
+					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$('#deleteBn').removeAttr('disabled');
+					
+					// show resume button
+					$('#stateBn').html('Resume <span class="glyphicon glyphicon-play" aria-hidden="true"></span>');
+					$('#stateBn').removeAttr('disabled');
+					$('#switchBn').html('Restart Crawl');
+					$('#switchBn').removeClass('btn-danger').addClass('btn-success');
+					
+					clearInterval(poll_stats);
+				} else if (stats[0] == "completed") {
+					// update stats
+					$("#status").removeClass().addClass('label label-primary').html("Completed");
+					$("#crawledPages").html(stats[1] + " pages");
+					$("#rowsInserted").html(stats[2] + " rows");
+					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$('#deleteBn').removeAttr('disabled');
+					
+					if ($('#switchBn').prop('disabled') == false) {
+						$('#switchBn').html('Restart Crawl');
+						$('#switchBn').removeClass('btn-danger').addClass('btn-success');
+						$('#stateBn').hide();
+					}
+					clearInterval(poll_stats);
+				} else {
+					clearInterval(poll_stats);
+				}
+			}
+		});
+	}
+	
+	$(".fieldLinks").click(function(event) {
+		var field = $(this).html()
+		$('#chainText').html(field);
+		$.ajax({
+			url : '/chain',
+			type: 'GET',
+			data : {
+				'field': field
+			},
+			success: function(res){
+				var data = $.parseJSON(res);
+				$('#chainLinks').html("");
+				$.each(data, function(i, obj) {
+					if ($(obj[field]).text().replace(/\s/g, "") != "") {
+						$('#chainLinks').append(
+							"<tr class='chainURL' data-link='" + $(obj[field]).attr('href') + "'><td>" + $(obj[field]).text() + "</td></tr>"	
+						);
+					} else {
+						$('#chainLinks').append(
+							"<tr class='chainURL' data-link='" + $(obj[field]).attr('href') + "'><td>" + $(obj[field]).attr('href') + "</td></tr>"	
+						);
+					}
+				});
+				if ($('#chainLinks').html() == "") {
+					$('#chainLinks').append(
+						"<tr><td>No links Available</td></tr>"	
+					);
+				}
+			}
+		});
+	});
+	
+	$('#chainLinks').on('click', '.chainURL', function(event) {
+		alert($(this).attr('data-link'));
 	});
 	
 });

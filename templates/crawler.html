@@ -1,10 +1,12 @@
 {% extends 'base.html' %} 
 {% load staticfiles %} 
+{% block css_block %}<link href="{% static 'css/simplePagination.css' %}" rel="stylesheet">{% endblock %}
 {% block title %}
-{{ crawler.crawlerName }}
+{{ crawler.crawlerName | title }} - Focra
 {% endblock %} 
 {% block body_block %}
 <div id="info" class="well well-lg" style="padding: 15px;">
+
 	<div class="page-header form-inline" style="margin:0px">
 		<h2>
 			{{ crawler.crawlerName | title }} 
@@ -15,111 +17,114 @@
 			</small>
 		</h2>
 
-		<button id="switchBn" type="button" class="btn btn-success">Start</button>
-			
-		<button id="pauseBn" type="button" class="btn btn-primary">Pause</button>
-		<button id="resumeBn" type="button" class="btn btn-primary">Resume</button>
-		<button id="createBabyBn" type="button" class="btn btn-primary">Create
-			Baby</button>
-		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#templateModal">Template</button>
-		<button type="button" class="btn btn-primary" id="data_tab">Data</button>
+		{% if crawler.crawlerStatus == "running" %}
+		<button id="switchBn" type="button" class="btn btn-danger">
+			Stop Crawl 
+			<span class="glyphicon glyphicon-stop" aria-hidden="true"></span>		
+		</button>
+		<button id="stateBn" type="button" class="btn btn-warning">
+			Pause
+			<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+		</button>
+
+		{% elif crawler.crawlerStatus == "stopped" or crawler.crawlerStatus == "completed" %}
+		<button id="switchBn" type="button" class="btn btn-success">
+			Restart Crawl
+		</button>
+		<button id="stateBn" type="button" class="btn btn-warning" style="display: none;">
+			Pause
+			<span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+		</button>
 		
-		{% if crawler.crawlerStatus == 'running' %}
-			<button id="deleteBn" class="btn btn-danger" type="submit"
-				data-toggle="tooltip" data-placement="top" title="Delete Crawler"
-				disabled>Delete Crawler</button>
+		{% elif crawler.crawlerStatus == "paused" %}
+		<button id="switchBn" type="button" class="btn btn-success">
+			Restart Crawl
+		</button>
+		<button id="stateBn" type="button" class="btn btn-warning">
+			Resume 
+			<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+		</button>
 		{% else %}
-			<button id="deleteBn" class="btn btn-danger" type="submit"
-				data-toggle="tooltip" data-placement="top" title="Delete Crawler">Delete
-						Crawler</button>
+		<button id="switchBn" type="button" class="btn btn-success">Start Crawl</button>
 		{% endif %}
-	
+
 	</div>
-<br/>
-<ul class="list-inline">
-  <li>
-  <strong style="font-size:12px">Status:</strong>
-  	{% if crawler.crawlerStatus == "running" %}
-	<span class="label label-success">{{ crawler.crawlerStatus | title}}</span>
-	{% elif crawler.crawlerStatus == "stopped" %}
-	<span class="label label-danger">{{ crawler.crawlerStatus | title}}</span>
-	{% elif crawler.crawlerStatus == "paused" %}
-	<span class="label label-warning">{{ crawler.crawlerStatus | title}}</span>
-	{% elif crawler.crawlerStatus == "completed" %}
-	<span class="label label-primary">{{ crawler.crawlerStatus | title}}</span>
-	{% else %}
-	<span class="label label-danger">unknown</span>
-	{% endif %}
-  </li>
-  <li>
-  	<strong style="font-size:12px">Pages Crawled:</strong>
-   	<span class="badge">{{ crawler.crawled_pages }} pages</span>
-  </li>
-  <li>
-  	<strong style="font-size:12px">Rows Inserted:</strong> 
-  	<span class="badge">{{ crawler.rows_inserted }} rows</span>
-  </li>
-  <li>
-  	<strong style="font-size:12px">Time Executed:</strong> 
-  	<span class="badge">{{ crawler.time_executed | floatformat:"0" }} seconds</span>
-  </li>
-  <li>
-  	<strong style="font-size:12px">Paginated:</strong>
-  	<span class="badge">
-	{% if crawler.crawlerPager != "null" %}
-		Yes
-	{% else %}
-		No
-	{% endif %}
-	</span>
-	</li>
-</ul>
-	
-	<div id='selectField' class="btn-group" style="display:none">
-		<button type="button" class="btn btn-default">Select Start
-			Links From</button>
-		
-		<button type="button" class="btn btn-default"
-			data-toggle="dropdown" aria-expanded="false">
-			<span class="caret"></span> <span class="sr-only">Toggle
-				Dropdown</span>
-		</button>
-		
-		<ul class="dropdown-menu" role="menu">
-			{% for field in fields_w_link %}
-			<li><a href="/baby/{{ field }}">{{ field }}</a></li> 
+	<br/>
+	<ul class="list-inline">
+		<li><strong style="font-size: 12px">Status:</strong> 
+			{% if crawler.crawlerStatus == "running" %} <span id="status"
+			class="label label-success">{{ crawler.crawlerStatus | title}}</span>
+			{% elif crawler.crawlerStatus == "stopped" %} <span id="status"
+			class="label label-danger">{{ crawler.crawlerStatus | title}}</span>
+			{% elif crawler.crawlerStatus == "paused" %} <span id="status"
+			class="label label-warning">{{ crawler.crawlerStatus | title}}</span>
+			{% elif crawler.crawlerStatus == "completed" %} <span id="status"
+			class="label label-primary">{{ crawler.crawlerStatus | title}}</span>
+			{% else %} <span id="status" class="label label-danger">unknown</span>
+			{% endif %}</li>
+		<li><strong style="font-size: 12px">Pages Crawled:</strong> <span
+			id="crawledPages" class="badge">{{ crawler.crawled_pages }}
+				pages</span></li>
+		<li><strong style="font-size: 12px">Rows Inserted:</strong> <span
+			id="rowsInserted" class="badge">{{ crawler.rows_inserted }}
+				rows</span></li>
+		<li><strong style="font-size: 12px">Time Executed:</strong> <span
+			id="timeExecuted" class="badge">{{ crawler.time_executed | floatformat:"0" }} seconds</span></li>
+		<li><strong style="font-size: 12px">Paginated:</strong> <span
+			class="badge"> 
+			{% if crawler.crawlerPager != "null" %} Yes 
+			{% else %} No 
+			{% endif %} </span></li>
+		<li>
+			<strong style="font-size: 12px"><a data-toggle="modal" data-target="#settingsModal">Settings</a>
+			<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+			</strong>
+		</li>
+		{% if fields_w_link %}
+		<li>
+			<strong style="font-size: 12px"><a data-toggle="modal" data-target="#chainModal">Create Chain Crawler</a> 
+			<span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+			</strong>
+		</li>
+		<form></form>
+		{% endif %}
+		<li>
+			<strong style="font-size: 12px"><a id="data_tab">Refresh Data </a> 
+			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+			</strong>
+		</li>
+	</ul>
+</div>
+
+<div class="table-responsive">
+	<table id="crawlerData" class="table table-bordered"
+		style="width: 100%;">
+		<tr>
+			{% for key in ordered_template_field.keys %}
+			<th class="fields">{{ key }}</th> 
 			{% endfor %}
-		</ul>
-		
-		<button id="cancelBabyBn" type="button" class="btn btn-default dropdown" style="cursor: pointer">
-			<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-		</button>
-
-	</div>
-	
+		</tr>
+	</table>
 </div>
 
-<div class=" table-responsive">
+<nav id="p" class="pull-right">
+	<ul class="pagination">
 
-<table id="crawlerData" class="table table-bordered"
-				style="width: 100%">
-				<tr>
-					{% for key in ordered_template_field.keys %}
-					<th class="fields">{{ key }}</th>
-					{% endfor %}
-				</tr>
-			</table>
-</div>
+	</ul>
+</nav>
 
-<div id="templateModal" class="modal fade ">
+<div id="settingsModal" class="modal fade ">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">{{ crawler.crawlerName | title}} Template</h4>
+        <h4 class="modal-title">Settings</h4>
       </div>
       <div class="modal-body table-responsive">
         <table class="table table-striped table-bordered">
+        	<tr>
+        		<th colspan=2>{{ crawler.crawlerName | title}} Template</th>
+        	</tr>
 			{% for key, value in ordered_template_field.items %}
 			<tr>
 				<td>{{ key }}</td>
@@ -129,10 +134,57 @@
 		</table>
       </div>
       <div class="modal-footer">
+			<button id="deleteBn" class="btn btn-danger" type="submit"
+				data-toggle="tooltip" data-placement="top" title="Delete Crawler">
+				Delete Crawler
+				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+			</button>
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div id="chainModal" class="modal fade ">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header form-inline">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong class="modal-title">
+       		Chain Crawler: 
+        </strong>
+		<div class="dropdown form-group">
+	        <button id="chainField" type="button" class="btn btn-default"
+				data-toggle="dropdown" aria-expanded="false">
+				<mark id="chainText">Select Fields Here !</mark>
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				{% for field in fields_w_link %}
+				<li><a class="fieldLinks">{{ field }}</a></li> 
+				{% endfor %}
+			</ul>
+			
+		</div>
+		<div id="toggleDiv" class="btn-group pull-right" style="margin-right:10px;">
+				<button id="toggleJS" type="button" class="btn btn-default">JS (ONed)</button>
+				<button id="toggleCSS" type="button" class="btn btn-default ">CSS (ONed)</button>
+		</div>
+      </div>
+      <div class="modal-body table-responsive ">
+      	<table id="chainLinks" class="table table-hover" style="margin-bottom:0px;">
+      		
+      	</table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock %}
+{% block script_block %}
+<script type="text/javascript" src="{% static 'js/data.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/jquery.simplePagination.js' %}"></script>
 {% endblock %}

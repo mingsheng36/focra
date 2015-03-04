@@ -69,11 +69,12 @@ def crawler(request, username=None, crawlerName=None):
                 crawlers = request.session.get('crawlers')
                 crawler = Crawler.objects.get(crawlerName=crawlerName)
                 request.session['crawlerName'] = crawler.crawlerName
-                request.session['crawlerAddr'] = crawler.crawlerAddr
                 request.session['crawlerSeeds'] = crawler.crawlerSeeds
                 request.session['crawlerTemplate']= crawler.crawlerTemplate
                 request.session['crawlerPager'] = crawler.crawlerPager
-                request.session['crawlerStatus'] = crawler.crawlerStatus
+                c = Crawler.objects.get(crawlerName=crawlerName)
+                request.session['crawlerStatus'] = c.crawlerStatus
+                request.session['crawlerAddr'] = c.crawlerAddr
                 crawler.rows_inserted = db[crawlerName].count()
                 if crawler.time_executed is None:
                     crawler.time_executed = "0"
@@ -172,22 +173,17 @@ def deleteCrawler(request):
     return redirect('/')
 
 '''
-Create Baby Crawler
+Create Chain Crawler
 '''
-def baby(request, field=None):
+def chain_crawler(request):
     username = request.session.get('username')
     crawlers = request.session.get('crawlers')
     crawlerParent = request.session['crawlerName']
     if request.method == 'GET':
         try:
-            cursor = db[crawlerParent].find({field:{'$ne':'null'}}, {field: 1}).limit(5)
-            for link in cursor:
-                if link.get(field):
-                    soup = BeautifulSoup(link.get(field))
-                    tag = soup.a
-                    extracted_link = tag['href']
-                    break
-            return render(request, 'baby.html', {'username': username, 'crawlers': crawlers, 'extracted_link': extracted_link, 'field_link_name': field})        
+            field = request.GET['field']
+            cursor = db[crawlerParent].find({field:{'$ne':'null'}}, {field: 1}, limit=5)
+            return HttpResponse(dumps(cursor))
         except Exception as err:
             print err
     elif request.method == 'POST':
@@ -227,11 +223,10 @@ def startCrawl(request):
             crawlerSeeds = request.session.get('crawlerSeeds')
             crawlerTemplate = request.session.get('crawlerTemplate')
             crawlerPager = request.session.get('crawlerPager')
-            crawlerAddr = request.session.get('crawlerAddr')
-            crawlerStatus = request.session.get('crawlerStatus')
+            c = Crawler.objects.get(crawlerName=crawlerName)
             if db[crawlerName]:
                 db[crawlerName].drop()
-            if crawlerAddr == '' and crawlerStatus != 'running':
+            if c.crawlerAddr == '' and c.crawlerStatus != 'running':
                 crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
                                                                     set__crawlerAddr=crawlerAddr)
@@ -448,8 +443,10 @@ Display Crawler data from CrawlerDB
 def data(request):
     try: 
         crawlerName = request.session.get('crawlerName')
-        collection = db[crawlerName]
-        return HttpResponse(dumps(collection.find()))
+        start = request.GET['start']
+        row_limit = request.GET['rowLimit']
+        return HttpResponse(str(db[crawlerName].count()) + "," + dumps(db[crawlerName].find(skip=int(start),
+                                                                                            limit=int(row_limit))))
     except Exception as err:
         print err
 
@@ -470,3 +467,17 @@ def check_name(request):
                 return HttpResponse("invalid")
         except Exception as err:
             print err
+            
+def stats(request):
+    if request.method == 'GET':
+        crawlerName = request.session.get('crawlerName')
+        if crawlerName:
+            try:
+                c = Crawler.objects.get(crawlerName=crawlerName) 
+                return HttpResponse(str(c.crawlerStatus) + "," +
+                                    str(c.crawled_pages) + "," +
+                                    str(db[crawlerName].count()) + "," +
+                                    str(c.time_executed))
+            except Exception as err:
+                print err
+        return HttpResponse("");
