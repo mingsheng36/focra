@@ -44,8 +44,11 @@ class FocraSpider(Spider):
 			self.base_url = kwargs.get('seeds').split(',')
 			self.crawled_pages = 0
 			
-			# non baby crawler dont have a queue, check for pager only
+			# non chain crawler dont have a queue, check for pager only
+			# chain crawler url does not start with http
 			if self.base_url[0].startswith('http'):
+				# for request_url of chain crawler
+				self.parentname = None
 				if self.runtype == 'resume' and self.pager != 'null':
 					db = client['FocraDB']
 					collection = db['crawler']
@@ -87,12 +90,15 @@ class FocraSpider(Spider):
 				if cursor.count() <= self.queue_reload_counter:
 					print self.cname + '- No more links to load'
 					self.end_of_data = True
+						
 				# put it into queue
 				for link in cursor:
 					if link.get(self.fieldname):
 						soup = BeautifulSoup(link.get(self.fieldname))
 						print soup.a['href']
 						self.queue.put(soup.a['href'])
+				
+				# if resume
 				if self.next_page_link:
 					self.base_url = [self.next_page_link]
 					print self.cname + " - Resume page is: " + self.base_url[0]
@@ -153,7 +159,6 @@ class FocraSpider(Spider):
 			db = client['FocraDB']
 			db['crawler'].update({"_id": self.cname}, {"$set":{'crawled_pages': self.crawled_pages,
 															'time_executed': time.time()-self.start_time}})
-			
 			print self.cname + " - Parsing items"
 			body = BeautifulSoup(response.body)
 			
@@ -169,6 +174,10 @@ class FocraSpider(Spider):
 			response = response.replace(body=body.prettify(encoding='ascii'))
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 			
+			if self.parentname is not None:
+				self.item.fields['request_url'] = Field()
+				dynamicItemLoader.add_value("request_url", response.url)
+				
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
@@ -185,13 +194,13 @@ class FocraSpider(Spider):
 					a_tags = response.xpath('//a').extract()
 					for tag in a_tags:
 						if self.pager in tag:
-							print tag
 							tag = BeautifulSoup(tag)
 							next_link = tag.a.get('href')
 							break
 				# if the pager is in text format
 				else:
-					next_link = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()[0]
+					if response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract():
+						next_link = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()[0]
 				
 				if next_link:
 					self.next_page_link = next_link

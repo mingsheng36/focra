@@ -5,8 +5,11 @@
 <div class="panel panel-default">
 	<div class="panel-heading">
 
-		<input type="hidden" id="extractedLink" name="extractedLink" value="{{ extracted_link }}">
-		<form id="create" method="post" action="/baby/{{ field_link_name }}" class="form-inline">
+		<input type="hidden" id="chainURL" name="chainURL" value="{{ chainURL }}">
+		<input type="hidden" id="chainJS" name="chainJS" value="{{ chainJS }}">
+		<input type="hidden" id="chainCSS" name="chainCSS" value="{{ chainCSS }}">
+		
+		<form id="create" method="post" action="/createChain" class="form-inline">
 			{% csrf_token %} 
 			<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
 			<input type="hidden" id="crawlerPager" name="crawlerPager" value="null">
@@ -38,8 +41,8 @@
 						class="btn btn-info" type="button">Select by Clicking On
 						The Data Below</button>
 
-					<button id="done_bn" style="display: none;" class="btn btn-primary"
-						type="button">Done !</button>
+					<button id="done_bn" style="display: none;" class="btn btn-success"
+						type="button">Done</button>
 
 					<button id="add_field_bn" style="display: none;"
 						class="btn btn-primary" type="button">Add Field +</button>
@@ -47,30 +50,32 @@
 					<div class="form-group">&nbsp;</div>
 					
 					<button id="step_two_bn" style="display: none;"
-						class="btn btn-primary" type="button">Next Step &gt;</button>
+						class="btn btn-success" type="button">Next Step &gt;</button>
 
 				</div>
 
 				<!-- STEP 3 -->
 				<div id="step_three" class="input-group" style="display: none;">
 					<div class="input-group-btn">
+						<button id="back3" type="button" class="btn btn-info"> &lt; </button>
 						<button type="button" class="btn btn-info">Step 3 of 3</button>
 					</div>
-					<div class="form-group">
-						<input id="crawlerName" name="crawlerName" class="form-control"
-							autofocus type="text" size="30" placeholder="Your Crawler Name">
+		 
+					<div class="form-group has-feedback">
+						<input id="crawlerName" name="crawlerName" class="form-control" maxlength="30"
+							autofocus type="text" size="30" placeholder="Your Crawler Name" data-container="body" data-toggle="popover" 
+						data-placement="top" data-content="Enter a unique name for your Crawler." 
+						data-trigger="manual">
+							<span id="feedback" class="glyphicon form-control-feedback" aria-hidden="true"></span>
 					</div>
 					
 					<div class="form-group">&nbsp;</div>
 					<button id="step_three_instruction" style="display: none;" class="btn btn-info"
 						type="button">Select the 'Next' link</button>
-					
-					<button id="pager_done_bn" style="display: none;"
-						class="btn btn-primary" type="button">Done !</button>
-					
+
 					<div class="form-group">&nbsp;</div>
 					<button id="pager_cancel_bn" style="display: none;"
-						class="btn btn-default" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+						class="btn btn-danger" type="button">Cancel <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 					</button>
 						
 					<button id="pager_bn" style="display: none;"
@@ -78,8 +83,13 @@
 
 					<div class="form-group">&nbsp;</div>
 					<button id="step_three_bn" style="display: none;"
-						class="btn btn-primary" type="button">Start Crawler</button>
-
+						class="btn btn-success" type="button">Start Crawler</button>
+					
+					<button id="step_three_check" style="display: none;"
+						class="btn btn-danger" type="button">Crawler Name Already Taken!</button>
+						
+					<button id="step_three_check2" style="display: none;"
+						class="btn btn-danger" type="button">Crawler should not consist of special characters or spaces!</button>
 				</div>
 				
 				<img id="loader" style="display: none;"

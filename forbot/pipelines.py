@@ -38,6 +38,8 @@ class MongoDBPipeline(object):
                 row = {}
                 for k in item.keys():
                     row[k] = None
+                    if k == 'request_url':
+                        row[k] = item.get(k)[0]
                     try:
                         if item.get(k)[j].strip():
                             row[k] = item.get(k)[j]

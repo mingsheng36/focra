@@ -28,14 +28,14 @@ built with Django 1.7, Mongodb 2.6.5, Scrapy 0.24.4
 - [x] Pause/Resume Crawl
 - [x] Show Hierarchy of Crawlers (how they are related) 
 - [x] Pause/Resume crawlers
-- [ ] Scroll-load-append data display
+- [x] View Data Pagination
+- [x] Monitor Performance of Crawler
 - [ ] User Login/Logout/Registration
 - [ ] Improve on algorithms (aggregation + alignment)
-- [ ] Export data to Excel / CSV / JSON URL
+- [ ] Django Push Events (currently using poll)
+- [ ] Export crawled data to Excel / CSV / JSON URL
 - [ ] Schedule Crawl Frequency
 - [ ] Crawl JavaScript Pages
-- [ ] Monitor Performance of Crawler
-- [ ] Django Push Events
 - [ ] Edit fields names and column position of the Crawler
 - [ ] Change Database architecture (Not scalable as it uses one collection per crawler)
 

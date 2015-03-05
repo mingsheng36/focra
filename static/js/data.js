@@ -29,8 +29,12 @@ $(document).ready(function() {
 				var data = $.parseJSON(res);
 				$.each(data, function(i, obj) {
 					var rowData = "";
-					for (var j = 0; j < fields.length; j++) { 
-						rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
+					for (var j = 0; j < fields.length; j++) {
+						if (fields[j] == "request_url") {
+							rowData = rowData + "<td><a href='" + obj[fields[j]] + "' target='_blank'>" + obj[fields[j]] + "</a></td>";
+						} else {
+							rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
+						}
 					}
 					$('#crawlerData').append(
 						"<tr>" + rowData + "</tr>"	

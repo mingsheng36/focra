@@ -5,15 +5,35 @@
 {{ crawler.crawlerName | title }} - Focra
 {% endblock %} 
 {% block body_block %}
+
+<div id="alert" class="alert alert-danger alert-dismissible"
+	style="display: none;" role="alert">
+	<button type="button" class="close" data-dismiss="alert"
+		aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+	<strong>Sorry!</strong> Parent dont exist anymore!
+</div>
+
 <div id="info" class="well well-lg" style="padding: 15px;">
 
 	<div class="page-header form-inline" style="margin:0px">
 		<h2>
-			{{ crawler.crawlerName | title }} 
+			{{ crawler.crawlerName | title }}
 			<small>
-			{% for seed in crawler.crawlerSeeds %} 
-				(<a href="{{seed}}" target="_blank">{{seed}}</a>)
-			{% endfor %}
+			{% if chains %}
+				{% for c in chains %}
+				<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					(<a href="{{c}}" target="_blank">{{c}}</a>)
+				{% endfor %}
+			{% else %}
+				{% for seed in crawler.crawlerSeeds %}
+				
+					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+					(<a href="{{seed}}" target="_blank">{{seed}}</a>)
+				
+				{% endfor %}
+			{% endif %}
 			</small>
 		</h2>
 
@@ -49,7 +69,9 @@
 		{% endif %}
 
 	</div>
+	
 	<br/>
+	
 	<ul class="list-inline">
 		<li><strong style="font-size: 12px">Status:</strong> 
 			{% if crawler.crawlerStatus == "running" %} <span id="status"
@@ -86,7 +108,6 @@
 			<span class="glyphicon glyphicon-link" aria-hidden="true"></span>
 			</strong>
 		</li>
-		<form></form>
 		{% endif %}
 		<li>
 			<strong style="font-size: 12px"><a id="data_tab">Refresh Data </a> 
@@ -96,10 +117,21 @@
 	</ul>
 </div>
 
+<form id="chain" action="/chain" method="post">
+	{% csrf_token %}
+	<input type="hidden" id="chainSelectedURL" name="chainSelectedURL" value="">
+	<input type="hidden" id="chainJS" name="chainJS" value="">
+	<input type="hidden" id="chainCSS" name="chainCSS" value="">
+</form>
+
 <div class="table-responsive">
 	<table id="crawlerData" class="table table-bordered"
 		style="width: 100%;">
 		<tr>
+			{% if chain_crawler %}			
+			<th class="fields">{{ chain_crawler }}</th>
+			{% endif %}
+			
 			{% for key in ordered_template_field.keys %}
 			<th class="fields">{{ key }}</th> 
 			{% endfor %}
@@ -113,8 +145,8 @@
 	</ul>
 </nav>
 
-<div id="settingsModal" class="modal fade ">
-  <div class="modal-dialog">
+<div id="settingsModal" class="modal fade">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>

@@ -30,27 +30,32 @@
 						type="button">Enter Your Seed URL.</button> 
 					<button id="step_one_bn" style="display: none;"
 						class="btn btn-success" type="button" data-container="body" data-toggle="popover" data-placement="top" 
-							data-content="2. Click here to proceed." data-trigger="manual">Next Step</button>
+							data-content="2. Click here to proceed." data-trigger="manual">Next Step &gt;</button>
 					
 				</div>
 
 				<!-- STEP 2 -->
 				<div id="step_two" class="input-group" style="display: none;">
+					
 					<div class="input-group-btn">
 						<button id="back2" type="button" class="btn btn-info" 
 						data-container="body" data-toggle="popover" data-placement="bottom" 
 							data-content="To go back Step 1, Click here." data-trigger="manual"> &lt; </button>
 						<button type="button" class="btn btn-info">Step 2 of 3</button>
 					</div>
+					
 					<div id="fields" class="form-group">
+						
 						<input id="firstField" class="field form-control" type="text" size="15" maxlength="20"
 							placeholder="fieldname" data-container="body" data-toggle="popover" data-placement="top" 
 							data-content="3. Enter Field Name." data-trigger="manual">
+						
 						<div id="firstBadge" class="field-badge form-control" data-container="body" data-toggle="popover" 
 						data-placement="bottom" data-content="This shows the number of data for this column that
 						 has been selected. Now try clicking on another similar data." data-trigger="manual">
 							<span class="badge">0</span>
 						</div>
+						
 						<div class="field-delete form-control" style="cursor: pointer">
 							<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 						</div>
@@ -78,7 +83,7 @@
 					<button id="step_two_bn" style="display: none;"
 						class="btn btn-success" type="button" data-container="body" data-toggle="popover" 
 						data-placement="top" data-content="Click here to proceed or 'Add Fields' to add a new column" 
-						data-trigger="manual">Next Step</button>
+						data-trigger="manual">Next Step &gt;</button>
 
 				</div>
 
@@ -100,13 +105,10 @@
 					<div class="form-group">&nbsp;</div>
 					<button id="step_three_instruction" style="display: none;" class="btn btn-info"
 						type="button">Select the 'Next' link</button>
-					
-					<button id="pager_done_bn" style="display: none;"
-						class="btn btn-primary" type="button">Done !</button>
-					
+
 					<div class="form-group">&nbsp;</div>
 					<button id="pager_cancel_bn" style="display: none;"
-						class="btn btn-default" type="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+						class="btn btn-danger" type="button">Cancel <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 					</button>
 						
 					<button id="pager_bn" style="display: none;"

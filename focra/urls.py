@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^check$', views.check_name, name='check_name'),
     url(r'^stats$', views.stats, name='stats'),
     url(r'^chain$', views.chain_crawler, name='chain_crawler'),
+    url(r'^createChain$', views.create_chain_crawler, name='createChain'),
     url(r'^(?P<username>\w+)$', views.overview, name='overview'),
     url(r'^(?P<username>\w+)/(?P<crawlerName>\w+)$', views.crawler, name='crawler'),
 )

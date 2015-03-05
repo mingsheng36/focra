@@ -13,3 +13,8 @@ body {
 #ifb {
 	background:rgba(255,255,255,0.5);
 }
+
+.modal .modal-body {
+    max-height: 420px;
+    overflow-y: auto;
+}
