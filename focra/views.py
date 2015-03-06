@@ -23,13 +23,8 @@ welcome page and sign up page
 ''' 
 def index(request):
     # Development purpose, login as Jayden
-    username = 'Jayden'
+    username = 'Ming'
     request.session['username'] = username
-    crawlers = Crawler.objects(crawlerOwner=username)
-    names = []
-    for crawler in crawlers:
-        names.append(crawler.crawlerName)
-    request.session['crawlers'] = names
     return redirect('/' + username)
     
 #     if request.method == 'GET':      
@@ -48,29 +43,28 @@ def index(request):
 Home page to authenticated usernames
 '''   
 def overview(request, username):
-    if request.method == 'GET':
-        username = request.session.get('username');
-        if username:
-            print 'authenticated'
-            crawlers = request.session.get('crawlers')
-            return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
-        else:
-            print 'not authorised'
-            return redirect('/')
+    username = request.session.get('username');
+    if username:
+        if request.method == 'GET':
+            
+                print 'authenticated'
+                crawlers = Crawler.objects(crawlerOwner=username)
+                return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
+    print 'not authorised'
+    return redirect('/')
     
 '''
 Crawler page to manage crawler
 '''   
 def crawler(request, username=None, crawlerName=None):
-    if request.method == 'GET':
-        username = request.session.get('username');
-        if username:
+    username = request.session.get('username');
+    if username:
+        if request.method == 'GET':
             try:
                 chain_crawler = None
                 chains = None
-                crawlers = request.session.get('crawlers')
+                crawlers = Crawler.objects(crawlerOwner=username)
                 crawler = Crawler.objects.get(crawlerName=crawlerName)
-                request.session['crawlerName'] = crawler.crawlerName
                 if len(crawler.crawlerSeeds) > 1:
                     # tell the UI this is a chain crawler
                     chain_crawler = "request_url"
@@ -85,12 +79,9 @@ def crawler(request, username=None, crawlerName=None):
                             chains.append(c)
                         else:
                             break
-                request.session['crawlerSeeds'] = crawler.crawlerSeeds
-                request.session['crawlerTemplate']= crawler.crawlerTemplate
-                request.session['crawlerPager'] = crawler.crawlerPager
-                request.session['crawlerStatus'] = crawler.crawlerStatus
-                request.session['crawlerAddr'] = crawler.crawlerAddr
                 crawler.rows_inserted = db[crawlerName].count()
+                if crawler.rows_inserted is None:
+                    crawler.rows_inserted = "0"
                 if crawler.time_executed is None:
                     crawler.time_executed = "0"
                 if crawler.crawled_pages is None:
@@ -136,9 +127,9 @@ Create a new crawler
 '''
 def createCrawler(request):
     username = request.session.get('username')
-    crawlers = request.session.get('crawlers')
     if request.method == 'GET':
         if username:
+            crawlers = Crawler.objects(crawlerOwner=username)
             return render(request, 'create.html', {'username': username, 'crawlers': crawlers})
     if request.method == 'POST':   
         if username:
@@ -159,75 +150,75 @@ def createCrawler(request):
                         crawlerOwner=username,
                         crawlerTemplate=crawlerTemplate,
                         crawlerDateTime=datetime.now()).save()
-                request.session['crawlers'] = crawlers + [crawlerName]
                 return redirect('/' + username + '/' + crawlerName)
             except Exception as err:
                 print err
     return redirect('/')
  
 '''
-Update current crawler in session
+Update current crawler
 '''
 def updateCrawler(request):
     return None
         
 '''
-Delete current crawler in session
+Delete current crawler
 '''
 def deleteCrawler(request):
-    if request.method == 'POST':  
-        try:
-            username = request.session.get('username')
-            crawlerName = request.session.get('crawlerName')
-            stopCrawler(request.session.get('crawlerAddr'))
-            Crawler.objects(crawlerName=crawlerName).delete()
-            crawlers = request.session.get('crawlers')
-            crawlers.remove(crawlerName)
-            request.session['crawlers'] = crawlers
-            db[crawlerName].drop()    
-            return redirect('/' + username)
-        except Exception as err:
-            print err
-    return redirect('/')
+    username = request.session.get('username')
+    if username:
+        if request.method == 'POST':  
+            try:
+                crawlerName = request.POST['crawlerName']
+                Crawler.objects(crawlerName=crawlerName).delete()
+                db[crawlerName].drop()    
+                return redirect('/' + username)
+            except Exception as err:
+                print err
+    else:
+        return redirect('/')
 
 '''
 Create Chain Crawler
 '''
 def chain_crawler(request):
-    if request.method == 'GET':
-        try:
-            crawlerParent = request.session.get('crawlerName')
-            field = request.GET['field']
-            request.session['chainField'] = field
-            cursor = db[crawlerParent].find({field:{'$ne':'null'}}, {field: 1}, limit=50)
-            return HttpResponse(dumps(cursor))
-        except Exception as err:
-            print err
-    elif request.method == 'POST':
-        try:
-            username = request.session.get('username')
-            crawlers = request.session.get('crawlers')
-            return render(request, 'chain.html', {'username': username, 
-                                                        'crawlers': crawlers, 
-                                                        'chainJS': request.POST['chainJS'], 
-                                                        'chainCSS': request.POST['chainCSS'],
-                                                        'chainURL': request.POST['chainSelectedURL']})
-        except Exception as err:
-            print err
+    username = request.session.get('username')
+    if username:
+        if request.method == 'GET':
+            try:
+                crawlerParent = request.GET['crawlerName']
+                field = request.GET['field']
+                cursor = db[crawlerParent].find({field:{'$ne':'null'}}, {field: 1}, limit=50)
+                return HttpResponse(dumps(cursor))
+            except Exception as err:
+                print err
+        elif request.method == 'POST':
+            try:
+                crawlers = Crawler.objects(crawlerOwner=username)
+                return render(request, 'chain.html', {'username': username, 
+                                                      'crawlers': crawlers, 
+                                                      'chainJS': request.POST['chainJS'], 
+                                                      'chainCSS': request.POST['chainCSS'],
+                                                      'chainURL': request.POST['chainSelectedURL'],
+                                                      'chainField': request.POST['chainField'],
+                                                      'chainParent': request.POST['chainParent']})
+            except Exception as err:
+                print err
+    else:
+        return redirect('/')
 
 def create_chain_crawler(request):
+    username = request.session.get('username')
     if request.method == 'POST':
-        crawlerParent = request.session.get('crawlerName')
-        chainField = request.session.get('chainField')
-        username = request.session.get('username')
-        crawlers = request.session.get('crawlers')
         try:
             crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()[:30]
             if not crawlerName:
                     crawlerName = 'blank'
             crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
             crawlerPager = request.POST['crawlerPager']
-            crawlerSeeds = [chainField, crawlerParent]
+            crawlerParent = request.POST['crawlerParent']
+            print crawlerParent + " asdasdasdasd"
+            crawlerSeeds = [request.POST['chainField'], crawlerParent]
             crawlerStatus = 'running'
             crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
             Crawler(crawlerName=crawlerName, 
@@ -240,7 +231,6 @@ def create_chain_crawler(request):
                     crawlerParent=crawlerParent,
                     crawlerDateTime=datetime.now()).save()
             Crawler.objects(crawlerName=crawlerParent).update_one(set__crawlerBaby=crawlerName)
-            request.session['crawlers'] = crawlers + [crawlerName]
             return redirect('/' + username + '/' + crawlerName)
         except Exception as err:
             print err
@@ -251,22 +241,17 @@ Handle start crawler requests
 def startCrawl(request):  
     if request.method == 'POST':  
         try:
-            crawlerName = request.session.get('crawlerName')
-            crawlerSeeds = request.session.get('crawlerSeeds')
-            crawlerTemplate = request.session.get('crawlerTemplate')
-            crawlerPager = request.session.get('crawlerPager')
+            crawlerName = request.POST['crawlerName']
             c = Crawler.objects.get(crawlerName=crawlerName)
             if db[crawlerName]:
                 db[crawlerName].drop()
             if c.crawlerAddr == '' and c.crawlerStatus != 'running':  
-                if len(crawlerSeeds) > 1:
-                    if Crawler.objects.with_id(crawlerSeeds[1]) is None:
+                if len(c.crawlerSeeds) > 1:
+                    if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
                         return HttpResponse("ParentDontExists")
-                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
+                crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'start')
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
                                                                     set__crawlerAddr=crawlerAddr)
-                request.session['crawlerAddr'] = crawlerAddr
-                request.session['crawlerStatus'] = 'running'
                 print crawlerName + ' - Running at ' + crawlerAddr
                 return HttpResponse(crawlerName + ' is running')
                        
@@ -283,16 +268,13 @@ Handle stop crawler requests
 def stopCrawl(request):
     if request.method == 'POST':
         try:
-            crawlerName = request.session.get('crawlerName')
-            crawlerAddr = request.session.get('crawlerAddr')
-            crawlerStatus = request.session.get('crawlerStatus')
-            if crawlerStatus == 'running':
-                print crawlerName + ' - Stopping at ' + request.session.get('crawlerAddr')
-                stopCrawler(crawlerAddr)
+            crawlerName = request.POST['crawlerName']
+            c = Crawler.objects.get(crawlerName=crawlerName)
+            if c.crawlerStatus == 'running':
+                print crawlerName + ' - Stopping at ' + c.crawlerAddr
+                stopCrawler(c.crawlerAddr)
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped',
                                                                     set__crawlerAddr='')
-                request.session['crawlerAddr'] = ''
-                request.session['crawlerStatus'] = 'stopped'
                 return HttpResponse(crawlerName + ' has been stopped')
             else:
                 return HttpResponse(crawlerName + ' is not running!')
@@ -307,15 +289,13 @@ Handle pause crawler requests
 def pauseCrawl(request):
     if request.method == 'POST':
         try:
-            crawlerName = request.session.get('crawlerName')
-            crawlerAddr = request.session.get('crawlerAddr')
-            crawlerStatus = request.session.get('crawlerStatus')
-            if crawlerAddr != '' and crawlerStatus == 'running':
-                print crawlerName + ' - Pausing at ' + request.session.get('crawlerAddr')
-                stopCrawler(request.session.get('crawlerAddr'))
+            crawlerName = request.POST['crawlerName']
+            c = Crawler.objects.get(crawlerName=crawlerName)
+            print c.crawlerAddr + c.crawlerStatus
+            if c.crawlerAddr != '' and c.crawlerStatus == 'running':
+                print crawlerName + ' - Pausing at ' + c.crawlerAddr
+                stopCrawler(c.crawlerAddr)
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='paused', set__crawlerAddr='')
-                request.session['crawlerAddr'] = ''
-                request.session['crawlerStatus'] = 'paused'
                 return HttpResponse(crawlerName + ' has been paused')
             else:
                 return HttpResponse(crawlerName + ' is not running!')
@@ -330,21 +310,14 @@ Handle resume crawler requests
 def resumeCrawl(request):
     if request.method == 'POST':  
         try:
-            crawlerName = request.session.get('crawlerName')
-            crawlerSeeds = request.session.get('crawlerSeeds')
-            crawlerTemplate = request.session.get('crawlerTemplate')
-            crawlerPager = request.session.get('crawlerPager')
-            crawlerAddr = request.session.get('crawlerAddr')
-            crawlerStatus = request.session.get('crawlerStatus')
-            if crawlerAddr == '' and crawlerStatus == 'paused':
-                if len(crawlerSeeds) > 1:
-                    if Crawler.objects.with_id(crawlerSeeds[1]) is None:
+            crawlerName = request.POST['crawlerName']            
+            c = Crawler.objects.get(crawlerName=crawlerName)
+            if c.crawlerAddr == '' and c.crawlerStatus == 'paused':
+                if len(c.crawlerSeeds) > 1:
+                    if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
                         return HttpResponse("ParentDontExists")
-                
-                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'resume')
+                crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'resume')
                 Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
-                request.session['crawlerAddr'] = crawlerAddr
-                request.session['crawlerStatus'] = 'running'
                 return HttpResponse(crawlerName + ' has been resumed')
             else:
                 return HttpResponse(crawlerName + ' was not paused!')
@@ -481,14 +454,15 @@ def fetch(request):
 Display Crawler data from CrawlerDB
 '''
 def data(request):
-    try: 
-        crawlerName = request.session.get('crawlerName')
-        start = request.GET['start']
-        row_limit = request.GET['rowLimit']
-        return HttpResponse(str(db[crawlerName].count()) + "," + dumps(db[crawlerName].find(skip=int(start),
-                                                                                            limit=int(row_limit))))
-    except Exception as err:
-        print err
+    if request.method == 'GET':
+        try: 
+            crawlerName = request.GET['crawlerName']
+            start = request.GET['start']
+            row_limit = request.GET['rowLimit']
+            return HttpResponse(str(db[crawlerName].count()) + "," + dumps(db[crawlerName].find(skip=int(start),
+                                                                                                limit=int(row_limit))))
+        except Exception as err:
+            print err
 
 '''
 Validate Crawler unique names
@@ -510,14 +484,15 @@ def check_name(request):
             
 def stats(request):
     if request.method == 'GET':
-        crawlerName = request.session.get('crawlerName')
-        if crawlerName:
-            try:
+        try:
+            if request.GET['crawlerName']:
+                crawlerName = request.GET['crawlerName']
+                
                 c = Crawler.objects.get(crawlerName=crawlerName)      
                 return HttpResponse(str(c.crawlerStatus) + "," +
                                     str(c.crawled_pages) + "," +
                                     str(db[crawlerName].count()) + "," +
                                     str(c.time_executed))
-            except Exception as err:
-                print err
-        return HttpResponse("");
+        except Exception as err:
+            print err
+    return HttpResponse("");

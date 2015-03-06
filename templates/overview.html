@@ -3,8 +3,46 @@
 {% block title %}{{username}}{% endblock %}
 {% block body_block %}
 
-<div id="overviewDiv" class="main">
-	<h1 id="display">Under Construction</h1>
+<div id="overviewDiv" class="main text-center" style="width:100vh; margin:0 auto;">
+	{% if crawlers %}
+		<table class="table">
+			<tr>
+				<th class="text-center">Name</th>
+				<th class="text-center">Status</th>
+				<th class="text-center">Time Executed (seconds)</th>
+				<th class="text-center">Crawled Pages</th>
+			</tr>
+		{% for crawler in crawlers %}
+			<tr>
+				<td><a href="/{{username}}/{{crawler.crawlerName}}" target="_blank">{{ crawler.crawlerName }}</a></td>
+				<td>
+					{% if crawler.crawlerStatus == "running" %} <span id="status"
+					class="label label-success">{{ crawler.crawlerStatus | title}}</span>
+					{% elif crawler.crawlerStatus == "stopped" %} <span id="status"
+					class="label label-danger">{{ crawler.crawlerStatus | title}}</span>
+					{% elif crawler.crawlerStatus == "paused" %} <span id="status"
+					class="label label-warning">{{ crawler.crawlerStatus | title}}</span>
+					{% elif crawler.crawlerStatus == "completed" %} <span id="status"
+					class="label label-primary">{{ crawler.crawlerStatus | title}}</span>
+					{% else %} <span id="status" class="label label-danger">unknown</span>
+					{% endif %}
+				</td>
+				<td>{{ crawler.time_executed | floatformat:"2"}}</td>
+				<td>{{ crawler.crawled_pages }}</td>
+			</tr>
+		{% endfor %}
+		</table>
+		
+	{% else %} 
+		<input type="hidden" id="first"
+		name="first" value="first">
+		<div class="jumbotron" style="margin-top: 50px">
+			<h1>Tutorial Video Here</h1>
+			<p>
+				<a class="btn btn-primary btn-lg" href="/create" role="button">Create Crawler Now</a>
+			</p>
+		</div>
+	{% endif %}
 </div>
 
 {% endblock %}

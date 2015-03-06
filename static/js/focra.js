@@ -674,7 +674,10 @@ $(document).ready(function() {
 			$.ajax({
 				url : '/start',
 				type: 'POST',
-				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+				data : {
+					csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+					'crawlerName': $('#crawlerName').val()
+				},
 				success: function( data ){
 					if (data == "ParentDontExists") {
 						$('#switchBn').html('Restart Crawl');
@@ -694,7 +697,10 @@ $(document).ready(function() {
 			$.ajax({
 				url : '/stop',
 				type: 'POST',
-				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value}
+				data : {
+					csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+					'crawlerName': $('#crawlerName').val()
+				}
 			});	
 		}
 		
@@ -708,7 +714,10 @@ $(document).ready(function() {
 			$.ajax({
 				url : '/pause',
 				type: 'POST',
-				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value}
+				data : {
+					csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+					'crawlerName': $('#crawlerName').val()
+				}
 			});
 		} else if ($('#stateBn').html().indexOf('play') >= 0) {
 			$('#stateBn').html('Resuming..');
@@ -716,7 +725,10 @@ $(document).ready(function() {
 			$.ajax({
 				url : '/resume',
 				type: 'POST',
-				data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+				data : {
+					csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+					'crawlerName': $('#crawlerName').val()
+				},
 				success: function( data ){
 					if (data == "ParentDontExists") {
 						$('#switchBn').html('Restart Crawl');
@@ -733,25 +745,14 @@ $(document).ready(function() {
 		}
 	});
 	
-	// resume crawler
-	$('#resumeBn').click(function(event) {
-		$('#display').html('Resuming..');
-		$.ajax({
-			url : '/resume',
-			type: 'POST',
-			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
-			success: function( data ){
-				$('#display').html(data);
-			}
-		});
-	});
-	
 	// delete crawler
 	$('#deleteBn').click(function(event) {
 		$.ajax({
 			url : '/delete',
 			type: 'POST',
-			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value},
+			data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+					'crawlerName': $('#crawlerName').val()
+			},
 			success: function( data ){
 				window.location.href = "/"
 			}
@@ -821,6 +822,9 @@ $(document).ready(function() {
 		$.ajax({
 			url: "/stats",
 			type: "GET",
+			data: {
+				'crawlerName': $('#crawlerName').val()
+			},
 			success: function(res) {
 				var stats = res.split(',');
 				if (stats[0] == "running") {
@@ -893,6 +897,7 @@ $(document).ready(function() {
 		});
 	}
 	
+	/***************** CHAIN SECTION *****************/
 	$(".fieldLinks").click(function(event) {
 		var field = $(this).html()
 		$('#chainText').html(field);
@@ -900,7 +905,8 @@ $(document).ready(function() {
 			url : '/chain',
 			type: 'GET',
 			data : {
-				'field': field
+				'field': field,
+				'crawlerName': $('#crawlerName').val()
 			},
 			success: function(res){
 				var data = $.parseJSON(res);
@@ -925,11 +931,12 @@ $(document).ready(function() {
 		});
 	});
 	
-	/***************** CHAIN SECTION *****************/
 	$('#chainLinks').on('click', '.chainURL', function(event) {
 		$('#chainSelectedURL').val($(this).attr('data-link'));
 		$('#chainJS').val(js);
 		$('#chainCSS').val(css);
+		$('#chainField').val($('#chainText').html());
+		$('#chainParent').val($('#crawlerName').val());
 		$('#chain').submit();
 	});
 	

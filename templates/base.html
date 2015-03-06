@@ -42,7 +42,7 @@
 					</a>
 						<ul class="dropdown-menu" role="menu">
 							{% for crawler in crawlers %}
-							<li><a href="/{{ username }}/{{ crawler }}">{{ crawler | title}}</a></li>
+							<li><a href="/{{ username }}/{{ crawler.crawlerName }}">{{ crawler.crawlerName | title}}</a></li>
 							{% endfor %}			
 						</ul>
 					</li>
@@ -54,7 +54,7 @@
 				</ul>
 
 				<ul class="nav navbar-nav navbar-right">
-					<li><a href="">{{ username }}</a></li>
+					<li><a href="/{{username}}">{{ username }}</a></li>
 					<li><a href="">Logout</a></li>
 					<!-- <li class="active"><a href="#">Logout <span class="sr-only">(current)</span> </a></li> -->
 				</ul>

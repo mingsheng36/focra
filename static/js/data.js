@@ -20,8 +20,10 @@ $(document).ready(function() {
 		$.ajax({
 			url: "/data",
 			type: "GET",
-			data: { 'rowLimit': rowLimit,
-					'start': start
+			data: { 
+				'crawlerName': $('#crawlerName').val(),
+				'rowLimit': rowLimit,
+				'start': start
 			},
 			success: function(res) {
 				var rowCount = res.split(",", 1);
@@ -57,8 +59,10 @@ $(document).ready(function() {
 		$.ajax({
 			url: "/data",
 			type: "GET",
-			data: { 'rowLimit': rowLimit,
-					'start': start
+			data: { 
+				'crawlerName': $('#crawlerName').val(),
+				'rowLimit': rowLimit,
+				'start': start
 			},
 			success: function(res) {
 				var rowCount = res.split(",", 1);
@@ -68,7 +72,11 @@ $(document).ready(function() {
 				$.each(data, function(i, obj) {
 					var rowData = "";
 					for (var j = 0; j < fields.length; j++) { 
-						rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
+						if (fields[j] == "request_url") {
+							rowData = rowData + "<td><a href='" + obj[fields[j]] + "' target='_blank'>" + obj[fields[j]] + "</a></td>";
+						} else {
+							rowData = rowData + "<td>" + obj[fields[j]] + "</td>";
+						}
 					}
 					$('#crawlerData').append(
 							"<tr>" + rowData + "</tr>"	

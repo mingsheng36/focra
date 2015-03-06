@@ -11,6 +11,8 @@
 		
 		<form id="create" method="post" action="/createChain" class="form-inline">
 			{% csrf_token %} 
+			<input type="hidden" id="chainField" name="chainField" value="{{ chainField }}">
+			<input type="hidden" id="crawlerParent" name="crawlerParent" value="{{ chainParent }}">
 			<input type="hidden" id="crawlerTemplate" name="crawlerTemplate" value="">
 			<input type="hidden" id="crawlerPager" name="crawlerPager" value="null">
 			
