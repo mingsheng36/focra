@@ -818,6 +818,7 @@ $(document).ready(function() {
 		hidePopovers();
 	});
 	
+	var oldRes = "";
 	function getStats() {
 		$.ajax({
 			url: "/stats",
@@ -830,9 +831,9 @@ $(document).ready(function() {
 				if (stats[0] == "running") {
 					// update stats
 					$("#status").removeClass().addClass('label label-success').html("Running");
-					$("#crawledPages").html(stats[1] + " pages");
-					$("#rowsInserted").html(stats[2] + " rows");
-					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$("#crawledPages").html(stats[1]);
+					$("#rowsInserted").html(stats[2]);
+					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').attr('disabled', true);
 					// show state button
 					$('#stateBn').html('Pause <span  class="glyphicon glyphicon-pause" aria-hidden="true"></span>');
@@ -849,9 +850,9 @@ $(document).ready(function() {
 				} else if (stats[0] == "stopped") {
 					// update stats
 					$("#status").removeClass().addClass('label label-danger').html("Stopped");
-					$("#crawledPages").html(stats[1] + " pages");
-					$("#rowsInserted").html(stats[2] + " rows");
-					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$("#crawledPages").html(stats[1]);
+					$("#rowsInserted").html(stats[2]);
+					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').removeAttr('disabled');
 					
 					// switch state to stop
@@ -859,14 +860,15 @@ $(document).ready(function() {
 					$('#switchBn').removeAttr('disabled');
 					$('#switchBn').removeClass('btn-danger').addClass('btn-success');
 					$('#stateBn').hide();
-					
-					clearInterval(poll_stats);
+					if (oldRes == res) {
+						clearInterval(poll_stats);
+					}
 				} else if (stats[0] == "paused") {
 					// update stats
 					$("#status").removeClass().addClass('label label-warning').html("Paused");
-					$("#crawledPages").html(stats[1] + " pages");
-					$("#rowsInserted").html(stats[2] + " rows");
-					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$("#crawledPages").html(stats[1]);
+					$("#rowsInserted").html(stats[2]);
+					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').removeAttr('disabled');
 					
 					// show resume button
@@ -874,14 +876,15 @@ $(document).ready(function() {
 					$('#stateBn').removeAttr('disabled');
 					$('#switchBn').html('Restart Crawl');
 					$('#switchBn').removeClass('btn-danger').addClass('btn-success');
-					
-					clearInterval(poll_stats);
+					if (oldRes == res) {
+						clearInterval(poll_stats);
+					}
 				} else if (stats[0] == "completed") {
 					// update stats
 					$("#status").removeClass().addClass('label label-primary').html("Completed");
-					$("#crawledPages").html(stats[1] + " pages");
-					$("#rowsInserted").html(stats[2] + " rows");
-					$("#timeExecuted").html(Math.round(stats[3]) + " seconds");
+					$("#crawledPages").html(stats[1]);
+					$("#rowsInserted").html(stats[2]);
+					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').removeAttr('disabled');
 					
 					if ($('#switchBn').prop('disabled') == false) {
@@ -889,10 +892,13 @@ $(document).ready(function() {
 						$('#switchBn').removeClass('btn-danger').addClass('btn-success');
 						$('#stateBn').hide();
 					}
-					clearInterval(poll_stats);
+					if (oldRes == res) {
+						clearInterval(poll_stats);
+					}
 				} else {
 					clearInterval(poll_stats);
 				}
+				oldRes = res;
 			}
 		});
 	}

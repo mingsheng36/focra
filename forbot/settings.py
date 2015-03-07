@@ -16,6 +16,10 @@ NEWSPIDER_MODULE = 'forbot.spiders'
 
 EXTENSIONS = {
      'scrapy.telnet.TelnetConsole': None,
+     'scrapy.webservice.WebService': None,
+     'scrapy.contrib.memusage.MemoryUsage': None,
+     'scrapy.contrib.memdebug.MemoryDebugger': None,
+     'scrapy.contrib.logstats.LogStats': None,
 }
 
 ITEM_PIPELINES = {'forbot.pipelines.MongoDBPipeline':10}

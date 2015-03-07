@@ -2,6 +2,7 @@ from scrapy.spider import Spider
 from scrapy import signals, Request
 from scrapy.contrib.loader import ItemLoader
 from scrapy.item import Item, Field
+from scrapy.exceptions import CloseSpider
 import json, collections
 from bs4 import BeautifulSoup
 from urlparse import urljoin
@@ -43,6 +44,7 @@ class FocraSpider(Spider):
 			self.pager = HTMLParser().unescape(self.pager)
 			self.base_url = kwargs.get('seeds').split(',')
 			self.crawled_pages = 0
+			self.status = None
 			
 			# non chain crawler dont have a queue, check for pager only
 			# chain crawler url does not start with http
@@ -63,7 +65,7 @@ class FocraSpider(Spider):
 					print self.cname + " - Start page is: " + self.base_url[0]
 					self.start_urls = self.base_url
 			else:
-				# baby crawler
+				# chain crawler
 				# get parent and field info from seeds
 				self.parentname = self.base_url.pop()
 				self.fieldname = self.base_url.pop()
@@ -95,6 +97,7 @@ class FocraSpider(Spider):
 				for link in cursor:
 					if link.get(self.fieldname):
 						soup = BeautifulSoup(link.get(self.fieldname))
+						# to see the links added to queue
 						print soup.a['href']
 						self.queue.put(soup.a['href'])
 				
@@ -122,7 +125,7 @@ class FocraSpider(Spider):
 				print self.cname + " - Stopped"
 				db = client['FocraDB']
 				collection = db['crawler']
-				# baby crawler queue from parent crawler
+				# chain crawler queue from parent crawler
 				if self.queue_counter != 0:
 					collection.update({"_id": self.cname}, {"$set":{'queue_counter': self.queue_counter, 
 																 	'crawled_pages': self.crawled_pages,
@@ -141,15 +144,17 @@ class FocraSpider(Spider):
 	# closed gracefully, crawler status complete
 	def idle(self):
 		try:
-			db = client['FocraDB']
-			collection = db['crawler']
-			collection.update({"_id": self.cname}, {"$set":{'crawlerAddr': '',
-															'crawlerStatus': 'completed',
-															'crawled_pages': self.crawled_pages,
-															'time_executed': time.time() - self.start_time}})
-			print self.cname + " - Crawl completed, closing gracefully"
-			self.runtype = 'complete'
-			client.close()
+			# crawl completed
+			if self.status == 'running':
+				db = client['FocraDB']
+				collection = db['crawler']
+				collection.update({"_id": self.cname}, {"$set":{'crawlerAddr': '',
+																'crawlerStatus': 'completed',
+																'crawled_pages': self.crawled_pages,
+																'time_executed': time.time() - self.start_time}})
+				print self.cname + " - Crawl completed, closing gracefully"
+				self.runtype = 'complete'
+				client.close()
 		except Exception as err:
 			print err
 			
@@ -158,7 +163,8 @@ class FocraSpider(Spider):
 			self.crawled_pages += 1
 			db = client['FocraDB']
 			db['crawler'].update({"_id": self.cname}, {"$set":{'crawled_pages': self.crawled_pages,
-															'time_executed': time.time()-self.start_time}})
+																'time_executed': time.time()-self.start_time}})
+			
 			print self.cname + " - Parsing items"
 			body = BeautifulSoup(response.body)
 			
@@ -184,6 +190,11 @@ class FocraSpider(Spider):
 			
 			yield dynamicItemLoader.load_item()
 			
+			# after scraping the page, check status to see whether we should stop
+			self.status = db['crawler'].find_one({"_id":self.cname}).get('crawlerStatus')
+			if self.status == 'stopped' or self.status == 'paused':
+				raise CloseSpider('stopped')
+			
 			# check for pagination
 			if self.pager != 'null':
 				next_link = None
@@ -208,7 +219,7 @@ class FocraSpider(Spider):
 					yield Request(self.next_page_link, callback=self.parse, dont_filter=True)
 					
 				else:
-					# chained crawler with pagination
+					# chained crawler WITH pagination
 					# check for more links from parent column
 					if not self.queue.empty():
 						yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
@@ -216,14 +227,14 @@ class FocraSpider(Spider):
 						if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 							self.check_queue()
 			else:
-				# chained crawler without pagination
+				# chained crawler WITHOUT pagination
 				# check for more links from parent column
 				if not self.queue.empty():
 					yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
 					self.queue_counter += 1
 					if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 						self.check_queue()
-					
+	
 		except Exception as err:
 			print err
 

@@ -2,8 +2,7 @@ import subprocess, re
 from subprocess import PIPE
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from scrapy.utils.jsonrpc import jsonrpc_client_call
-from models import Crawler
+from models import Crawler, User
 import json, collections
 from datetime import datetime
 from bson.json_util import dumps
@@ -19,47 +18,86 @@ client = MongoClient('localhost', 27017,  max_pool_size=1000)
 db = client['CrawlerDB']
 
 '''
-welcome page and sign up page
+welcome page
 ''' 
 def index(request):
-    # Development purpose, login as Jayden
-    username = 'mingsheng'
-    request.session['username'] = username
-    return redirect('/' + username)
-#     if request.method == 'GET':      
-#         return render(request, 'index.html')   
-#     elif request.method == 'POST':
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         request.session['username'] = username
-#         newUser = User(username=username, password=password).save()
-#         print newUser.username
-#         return redirect('/' + username)
-#     else: 
-#         return render(request, 'index.html')
+    if request.method == 'GET':
+        username = request.session.get('username')
+        if username is not None:
+            return redirect('/' + username)
+        return render(request, 'index.html')   
+    elif request.method == 'POST':
+        username = request.POST.get('username', "")
+        password = request.POST.get('password', "")
+        if username != "" and password != "":
+            try:
+                user = User.objects.get(username=username, password=password)
+                if user:
+                    print 'authenticated'
+                    request.session['username'] = username
+                    return HttpResponse('success')
+            except Exception as err:
+                print err
+                return HttpResponse('doesNotExist')
+        return HttpResponse('failed')
 
+'''
+Sign up page
+'''
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', "")
+        password = request.POST.get('password', "")
+        if len(username) > 20 or len(username) == 0:
+            return HttpResponse('usernameLength')
+        if len(password) < 8:
+            return HttpResponse('passwordLength')
+        elif not set('^[A-Za-z0-9]+$').intersection(username):
+            return HttpResponse('specialChar')
+        else:    
+            try:
+                # check if it exist, if exist it will have error
+                user = User.objects.get(username=username)
+                return HttpResponse('alreadyExist')
+            except Exception as err:
+                print err
+                user = User(username=username, password=password).save()
+                request.session['username'] = user.username
+                return HttpResponse('success')
+    return redirect('/')
+
+'''
+logout
+'''
+def logout(request):
+    if request.method == 'GET':
+        print request.session.get('username') + " logging out."
+        del request.session['username']
+        
+        return redirect('/')
+        
 '''
 Home page to authenticated usernames
 '''   
 def overview(request, username):
     #dev purpose
-    request.session['username'] = username
-    username = request.session.get('username');
+    #request.session['username'] = username
     if username:
+        if username != request.session.get('username'):
+            return error(request)
         if request.method == 'GET':
-            
-                print 'authenticated'
-                crawlers = Crawler.objects(crawlerOwner=username)
-                return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
-    print 'not authorised'
+            crawlers = Crawler.objects(crawlerOwner=username)
+            return render(request, 'overview.html', {'username': username, 'crawlers': crawlers})
     return redirect('/')
     
 '''
 Crawler page to manage crawler
 '''   
 def crawler(request, username=None, crawlerName=None):
-    username = request.session.get('username');
+    
     if username:
+        if username != request.session.get('username'):
+            return error(request)
         if request.method == 'GET':
             try:
                 chain_crawler = None
@@ -105,24 +143,6 @@ def crawler(request, username=None, crawlerName=None):
                 print err
     return redirect('/')
 
-def remove_duplicates_keys(ordered_pairs):
-    d = OrderedDict()
-    c = 1
-    for k, v in ordered_pairs:
-        # removes special chars and spaces
-        k = re.sub('[^A-Za-z0-9]+', '_', k)[:20]
-        if not k:
-            k = 'blank'
-        if k == 'request_url':
-            k = 'request_url1' 
-        if k in d:
-            k = k+str(c)
-            c += 1
-            d[k] = v
-        else:
-            d[k] = v
-    return d
-
 '''
 Create a new crawler
 '''
@@ -140,28 +160,21 @@ def createCrawler(request):
                 crawlerSeeds = request.POST['crawlerSeeds'].split('\r\n')
                 crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
                 crawlerPager = request.POST['crawlerPager']
-                crawlerStatus='running'
-                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
-                Crawler(crawlerName=crawlerName,
-                        crawlerSeeds=crawlerSeeds,
-                        crawlerAddr=crawlerAddr,
-                        crawlerStatus=crawlerStatus,
-                        crawlerPager=crawlerPager,
-                        crawlerOwner=username,
-                        crawlerTemplate=crawlerTemplate,
-                        crawlerDateTime=datetime.now()).save()
+                crawlerStatus = 'running'
+                if runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start'):
+                    Crawler(crawlerName=crawlerName,
+                            crawlerSeeds=crawlerSeeds,
+                            crawlerStatus=crawlerStatus,
+                            crawlerPager=crawlerPager,
+                            crawlerOwner=username,
+                            crawlerTemplate=crawlerTemplate,
+                            crawlerDateTime=datetime.now()).save()
                 return redirect('/' + username + '/' + crawlerName)
             except Exception as err:
                 print err
     else:
         return redirect('/')
- 
-'''
-Update current crawler
-'''
-def updateCrawler(request):
-    return None
-        
+
 '''
 Delete current crawler
 '''
@@ -180,7 +193,7 @@ def deleteCrawler(request):
         return redirect('/')
 
 '''
-Create Chain Crawler
+Get Links from parent crawler for chain crawler
 '''
 def chain_crawler(request):
     username = request.session.get('username')
@@ -208,6 +221,9 @@ def chain_crawler(request):
     else:
         return redirect('/')
 
+'''
+Create Chain Crawler
+'''
 def create_chain_crawler(request):
     username = request.session.get('username')
     if username:
@@ -219,20 +235,18 @@ def create_chain_crawler(request):
                 crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
                 crawlerPager = request.POST['crawlerPager']
                 crawlerParent = request.POST['crawlerParent']
-                print crawlerParent + " asdasdasdasd"
                 crawlerSeeds = [request.POST['chainField'], crawlerParent]
                 crawlerStatus = 'running'
-                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
-                Crawler(crawlerName=crawlerName, 
-                        crawlerSeeds=crawlerSeeds,
-                        crawlerAddr=crawlerAddr, 
-                        crawlerStatus=crawlerStatus,
-                        crawlerPager=crawlerPager,
-                        crawlerOwner=username,
-                        crawlerTemplate=crawlerTemplate,
-                        crawlerParent=crawlerParent,
-                        crawlerDateTime=datetime.now()).save()
-                Crawler.objects(crawlerName=crawlerParent).update_one(set__crawlerBaby=crawlerName)
+                if runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start'):
+                    Crawler(crawlerName=crawlerName, 
+                            crawlerSeeds=crawlerSeeds,
+                            crawlerStatus=crawlerStatus,
+                            crawlerPager=crawlerPager,
+                            crawlerOwner=username,
+                            crawlerTemplate=crawlerTemplate,
+                            crawlerParent=crawlerParent,
+                            crawlerDateTime=datetime.now()).save()
+                    Crawler.objects(crawlerName=crawlerParent).update_one(set__crawlerChain=crawlerName)
                 return redirect('/' + username + '/' + crawlerName)
             except Exception as err:
                 print err
@@ -251,21 +265,20 @@ def startCrawl(request):
                 c = Crawler.objects.get(crawlerName=crawlerName)
                 if db[crawlerName]:
                     db[crawlerName].drop()
-                if c.crawlerAddr == '' and c.crawlerStatus != 'running':  
+                if c.crawlerStatus != 'running':  
                     if len(c.crawlerSeeds) > 1:
                         if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
                             return HttpResponse("ParentDontExists")
-                    crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'start')
-                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
-                                                                        set__crawlerAddr=crawlerAddr)
-                    print crawlerName + ' - Running at ' + crawlerAddr
+                    if runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'start') == 'started':
+                        Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running')
+                        print crawlerName + ' is running'
                     return HttpResponse(crawlerName + ' is running')
                            
                 else:
                     return HttpResponse(crawlerName + ' is already running')
             except Exception as err:
                 print err
-    return HttpResponse("Crawl failed")
+    return redirect('/')
 
     
 '''
@@ -279,16 +292,14 @@ def stopCrawl(request):
                 crawlerName = request.POST['crawlerName']
                 c = Crawler.objects.get(crawlerName=crawlerName)
                 if c.crawlerStatus == 'running':
-                    print crawlerName + ' - Stopping at ' + c.crawlerAddr
-                    stopCrawler(c.crawlerAddr)
-                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped',
-                                                                        set__crawlerAddr='')
+                    print crawlerName + ' is stopping'
+                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped')
                     return HttpResponse(crawlerName + ' has been stopped')
                 else:
                     return HttpResponse(crawlerName + ' is not running!')
             except Exception as err:
                 print err
-    return HttpResponse("Stop failed")
+    return redirect('/')
  
 '''
 Handle pause crawler requests
@@ -300,17 +311,15 @@ def pauseCrawl(request):
             try:
                 crawlerName = request.POST['crawlerName']
                 c = Crawler.objects.get(crawlerName=crawlerName)
-                print c.crawlerAddr + c.crawlerStatus
-                if c.crawlerAddr != '' and c.crawlerStatus == 'running':
-                    print crawlerName + ' - Pausing at ' + c.crawlerAddr
-                    stopCrawler(c.crawlerAddr)
-                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='paused', set__crawlerAddr='')
+                if c.crawlerStatus == 'running':
+                    print crawlerName + ' is pausing'
+                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='paused')
                     return HttpResponse(crawlerName + ' has been paused')
                 else:
                     return HttpResponse(crawlerName + ' is not running!')
             except Exception as err:
                 print err
-    return HttpResponse("Pause failed")
+    return redirect('/')
 
 '''
 Handle resume crawler requests
@@ -322,56 +331,18 @@ def resumeCrawl(request):
             try:
                 crawlerName = request.POST['crawlerName']            
                 c = Crawler.objects.get(crawlerName=crawlerName)
-                if c.crawlerAddr == '' and c.crawlerStatus == 'paused':
+                if c.crawlerStatus == 'paused':
                     if len(c.crawlerSeeds) > 1:
                         if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
                             return HttpResponse("ParentDontExists")
-                    crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'resume')
-                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
-                    return HttpResponse(crawlerName + ' has been resumed')
+                    if runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'resume'):
+                        Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running')
+                        return HttpResponse(crawlerName + ' has been resumed')
                 else:
                     return HttpResponse(crawlerName + ' was not paused!')
             except Exception as err:
                 print err
-    return HttpResponse("Resume failed")
-
-'''
-Returns crawler running address
-Starting the crawler through cmdline in local machine
-Needs to be changed to start through HTTP call for scalability
-'''  
-def runCrawler(name, seeds, template, pager, runtype, pager_link=None):
-    try:
-        commands = ["scrapy", "crawl", "focras", 
-                    "-a", "cname=" + name.strip(), 
-                    "-a", "seeds=" + ','.join(seeds).strip(),
-                    "-a", "template=" + template.strip(), 
-                    "-a", "pager=" + pager.encode('ascii', 'xmlcharrefreplace'),
-                    "-a", "runtype=" + runtype.strip()]
-        crawlerProcess = subprocess.Popen(commands, stderr=PIPE)
-        while True:
-            line = crawlerProcess.stderr.readline()
-            # to view the process output, uncomment below 
-            # print line
-            crawlerAddr = re.findall('[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\:[0-9]{1,5}', line)
-            if crawlerAddr:
-                print name + ' running at '+ ''.join(crawlerAddr)
-                crawlerProcess.stderr.close()
-                break;
-            if line == '' and crawlerProcess.poll() != None:
-                break;
-        return ''.join(crawlerAddr)
-    except Exception as err:
-        print err
-
-'''
-Stopping crawler through JSONRPC
-'''  
-def stopCrawler(addr):
-    try:
-        jsonrpc_client_call("http://" + addr + "/crawler/engine", 'close_spider', 'focras')
-    except Exception:
-        pass
+    return redirect('/')
 
 '''
 Fetch seed URl and do HTML pre-processing
@@ -459,7 +430,7 @@ def fetch(request):
                 return HttpResponse("format")
             except Exception as err:
                 return HttpResponse("format")
-    return HttpResponse("")
+    return redirect('/')
             
 
 '''
@@ -477,7 +448,7 @@ def data(request):
                                                                                                     limit=int(row_limit))))
             except Exception as err:
                 print err
-    return HttpResponse("")
+    return redirect('/')
 
 '''
 Validate Crawler unique names
@@ -498,16 +469,15 @@ def check_name(request):
                     return HttpResponse("invalid")
             except Exception as err:
                 print err
-    return HttpResponse("")
+    return redirect('/')
             
 def stats(request):
     username = request.session.get('username')
     if username:
         if request.method == 'GET':
             try:
-                if request.GET['crawlerName']:
+                if request.GET.get('crawlerName'):
                     crawlerName = request.GET['crawlerName']
-                    
                     c = Crawler.objects.get(crawlerName=crawlerName)      
                     return HttpResponse(str(c.crawlerStatus) + "," +
                                         str(c.crawled_pages) + "," +
@@ -515,4 +485,57 @@ def stats(request):
                                         str(c.time_executed))
             except Exception as err:
                 print err
-    return HttpResponse("");
+    return redirect('/')
+
+def error(request):
+    return render(request, 'error.html')
+
+def remove_duplicates_keys(ordered_pairs):
+    d = OrderedDict()
+    c = 1
+    for k, v in ordered_pairs:
+        # removes special chars and spaces
+        k = re.sub('[^A-Za-z0-9]+', '_', k)[:20]
+        if not k:
+            k = 'blank'
+        if k == 'request_url':
+            k = 'request_url1' 
+        if k in d:
+            k = k+str(c)
+            c += 1
+            d[k] = v
+        else:
+            d[k] = v
+    return d
+
+'''
+Starting the crawler through cmdline in local machine
+Needs to be changed to start through HTTP call for scalability
+returns 'started' if success, None if fail
+'''  
+def runCrawler(name, seeds, template, pager, runtype, pager_link=None):
+    try:
+        commands = ["scrapy", "crawl", "focras", 
+                    "-a", "cname=" + name.strip(), 
+                    "-a", "seeds=" + ','.join(seeds).strip(),
+                    "-a", "template=" + template.strip(), 
+                    "-a", "pager=" + pager.encode('ascii', 'xmlcharrefreplace'),
+                    "-a", "runtype=" + runtype.strip()]
+        crawlerProcess = subprocess.Popen(commands, stderr=PIPE)
+        while True:
+            line = crawlerProcess.stderr.readline()
+            # to view the process output, uncomment below 
+            #print line
+            focras_started = re.findall('Spider opened', line)
+            if focras_started:
+                crawlerProcess.stderr.close()
+                return "started"
+                break
+            # incase of errors, the listener will close
+            if line == '' and crawlerProcess.poll() != None:
+                crawlerProcess.stderr.close()
+                break
+        return None
+    except Exception as err:
+        print err
+        

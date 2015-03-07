@@ -28,21 +28,29 @@
 	<div class="page-header form-inline" style="margin:0px">
 		<h2>
 			{{ crawler.crawlerName | title }}
-			<small>
-			{% if chains %}
-				{% for c in chains %}
-				<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-					(<a href="{{c}}" target="_blank">{{c}}</a>)
-				{% endfor %}
-			{% else %}
-				{% for seed in crawler.crawlerSeeds %}
-				
-					<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+				<span style="font-size:15px; vertical-align:middle;">
+					{% if crawler.crawlerStatus == "running" %} <span id="status"
+					class="label label-success">{{ crawler.crawlerStatus | title}}</span>
+					{% elif crawler.crawlerStatus == "stopped" %} <span id="status"
+					class="label label-danger">{{ crawler.crawlerStatus | title}}</span>
+					{% elif crawler.crawlerStatus == "paused" %} <span id="status"
+					class="label label-warning">{{ crawler.crawlerStatus | title}}</span>
+					{% elif crawler.crawlerStatus == "completed" %} <span id="status"
+					class="label label-primary">{{ crawler.crawlerStatus | title}}</span>
+					{% else %} <span id="status" class="label label-danger">unknown</span>
+					{% endif %}
+				</span>
+				<small>
+				{% if chains %}
+					{% for c in chains %}
+					=>(<a href="{{c}}" target="_blank">{{c}}</a>)
+					{% endfor %}
+				{% else %}
+					{% for seed in crawler.crawlerSeeds %}
 					(<a href="{{seed}}" target="_blank">{{seed}}</a>)
-				
-				{% endfor %}
-			{% endif %}
-			</small>
+					{% endfor %}
+				{% endif %}
+				</small>
 		</h2>
 
 		{% if crawler.crawlerStatus == "running" %}
@@ -81,34 +89,32 @@
 	<br/>
 	
 	<ul class="list-inline">
-		<li><strong style="font-size: 12px">Status:</strong> 
-			{% if crawler.crawlerStatus == "running" %} <span id="status"
-			class="label label-success">{{ crawler.crawlerStatus | title}}</span>
-			{% elif crawler.crawlerStatus == "stopped" %} <span id="status"
-			class="label label-danger">{{ crawler.crawlerStatus | title}}</span>
-			{% elif crawler.crawlerStatus == "paused" %} <span id="status"
-			class="label label-warning">{{ crawler.crawlerStatus | title}}</span>
-			{% elif crawler.crawlerStatus == "completed" %} <span id="status"
-			class="label label-primary">{{ crawler.crawlerStatus | title}}</span>
-			{% else %} <span id="status" class="label label-danger">unknown</span>
-			{% endif %}</li>
-		<li><strong style="font-size: 12px">Pages Crawled:</strong> <span
-			id="crawledPages" class="badge">{{ crawler.crawled_pages }}
-				pages</span></li>
-		<li><strong style="font-size: 12px">Rows Inserted:</strong> <span
-			id="rowsInserted" class="badge">{{ crawler.rows_inserted }}
-				rows</span></li>
-		<li><strong style="font-size: 12px">Time Executed:</strong> <span
-			id="timeExecuted" class="badge">{{ crawler.time_executed | floatformat:"0" }} seconds</span></li>
-		<li><strong style="font-size: 12px">Paginated:</strong> <span
-			class="badge"> 
-			{% if crawler.crawlerPager != "null" %} Yes 
-			{% else %} No 
-			{% endif %} </span></li>
-		<li>
-			<strong style="font-size: 12px"><a data-toggle="modal" data-target="#settingsModal">Settings</a>
-			<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-			</strong>
+		<li style="text-align: center; padding-right:15px;"> 
+			<span style="font-size:20px"> 
+			{% if crawler.crawlerPager != "null" %} 
+				Yes
+			{% else %} 
+				No 
+			{% endif %}
+			</span>
+			<br/>
+			<strong style="font-size: 12px">Paginated</strong>
+		</li>
+		<li style="text-align: center; padding-right:15px;">
+			<span id="crawledPages" style="font-size:20px">{{ crawler.crawled_pages }} </span>
+			<br/>
+			<strong style="font-size: 12px">Pages Crawled</strong>
+		</li>
+		<li style="text-align: center; padding-right:15px;"> 
+			<span id="rowsInserted" style="font-size:20px">{{ crawler.rows_inserted }}</span>
+			<br/>
+			<strong style="font-size: 12px">Rows Inserted</strong>
+		</li>
+		<li style="text-align: center; padding-right:15px;">
+			<span id="timeExecuted" style="font-size:20px">{{ crawler.time_executed | floatformat:"0" }}</span>
+			secs
+			<br/>
+			<strong style="font-size: 12px">Time Elapsed</strong> 
 		</li>
 		{% if fields_w_link %}
 		<li>
@@ -120,6 +126,11 @@
 		<li>
 			<strong style="font-size: 12px"><a id="data_tab">Refresh Data </a> 
 			<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+			</strong>
+		</li>
+		<li style="text-align: center;">
+			<strong style="font-size: 12px"><a data-toggle="modal" data-target="#settingsModal">Settings</a>
+			<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
 			</strong>
 		</li>
 	</ul>

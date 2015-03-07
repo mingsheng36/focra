@@ -1,9 +1,8 @@
 List of Tasks to do before Friday
 ===========================
-1. Index page/login/register and overview page
-2. not able to grab images on some sites (xpath problem)
-
-No time to implement before Friday
-===========================
-8. modify algorithm
-9. demo set with iso datetime for larry ( threadname, message, postDate )
+1. not able to grab images on some sites (xpath problem)
+2. Stats not updated the last time
+3. Restart Resume button sometimes does not disable after pressed
+4. Pause and resume 'next_link' should be before parsing not after parsing the item, so there wont be repeated pages crawled
+5. modify algorithm to include [y] in xpath
+6. step 1 js/css button alignment, step 2 fields alignment

@@ -1,15 +1,86 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
 {% load staticfiles %}
-{% block title %}Focra{% endblock %}
-{% block body_block %}
-<img src="{% static "images/spider.png" %}" alt="Focra icon" />
-<h1 id="display">Welcome to Focra</h1>
-<form method="post" action="">
-	{% csrf_token %}
-	Username: <input type="text" name="username" value="" size="30" placeholder="Username"/>
-    <br/>
-    Password: <input type="password" name="password" value="" size="30" placeholder="Password"/>
-    <br/>
-  	<input type="submit" value="Login">
-</form>
-{% endblock %}
+{% csrf_token %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="{% static 'images/favicon.png' %}">
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/index.css' %}" rel="stylesheet">
+<title>Focra</title>
+</head>
+<body>
+
+    <div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">Focra</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li id="signinLink" class="links active"><a>Sign in</a></li>
+                  <li id="registerLink" class="links"><a href="#register">Register</a></li>
+                  <li id="contactLink" class="links"><a href="#contact">Contact</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover">
+            <h1 class="cover-heading">Forum Crawler</h1>
+            
+				<div id="signinDiv" class="col-sm-6 col-sm-offset-3">
+						<p class="lead">Get Ready For Your Data.</p>
+						<input type="text" id="username" class="form-control text-center input-lg"
+								placeholder="Username" required autofocus style="margin-bottom:5px;">
+						
+						<input type="password" id="password" class="form-control text-center input-lg"
+								placeholder="Password" required>
+								<br/>
+						<p class="lead">
+							<a id="signin" href="" class="btn btn-lg btn-default">Sign in</a>
+						</p>
+				</div>
+				
+				<div id="registerDiv" class="col-sm-6 col-sm-offset-3" style="display: none;">
+						<p class="lead">Request an account with us.</p>
+						
+						<input type="text" id="register_username" class="form-control text-center input-lg"
+								placeholder="Username" required autofocus style="margin-bottom:5px;">
+						
+						<input type="password" id="register_password" class="form-control text-center input-lg"
+								placeholder="Password" required>
+								<br/>
+						<p class="lead">
+							<a id="register" href="" class="btn btn-lg btn-default">Register</a>
+						</p>
+				</div>
+				<div id="contactDiv" class="col-sm-6 col-sm-offset-3" style="display: none;>
+						<p class="lead">Feedbacks? Email me.<br/> mingsheng36@gmail.com</p>
+				</div>
+			</div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <p>Copyright 2015 by <a href="https://github.com/mingsheng36/Focra">@mingsheng36</a>.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+</body>
+<script type="text/javascript"
+	src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/index.js' %}"></script>
+</html>
