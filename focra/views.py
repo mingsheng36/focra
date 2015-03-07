@@ -23,10 +23,9 @@ welcome page and sign up page
 ''' 
 def index(request):
     # Development purpose, login as Jayden
-    username = 'Ming'
+    username = 'mingsheng'
     request.session['username'] = username
     return redirect('/' + username)
-    
 #     if request.method == 'GET':      
 #         return render(request, 'index.html')   
 #     elif request.method == 'POST':
@@ -35,7 +34,7 @@ def index(request):
 #         request.session['username'] = username
 #         newUser = User(username=username, password=password).save()
 #         print newUser.username
-#         return home(request)
+#         return redirect('/' + username)
 #     else: 
 #         return render(request, 'index.html')
 
@@ -43,6 +42,8 @@ def index(request):
 Home page to authenticated usernames
 '''   
 def overview(request, username):
+    #dev purpose
+    request.session['username'] = username
     username = request.session.get('username');
     if username:
         if request.method == 'GET':
@@ -127,12 +128,11 @@ Create a new crawler
 '''
 def createCrawler(request):
     username = request.session.get('username')
-    if request.method == 'GET':
-        if username:
+    if username:
+        if request.method == 'GET':
             crawlers = Crawler.objects(crawlerOwner=username)
             return render(request, 'create.html', {'username': username, 'crawlers': crawlers})
-    if request.method == 'POST':   
-        if username:
+        if request.method == 'POST':   
             try:
                 crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()[:30]
                 if not crawlerName:
@@ -153,7 +153,8 @@ def createCrawler(request):
                 return redirect('/' + username + '/' + crawlerName)
             except Exception as err:
                 print err
-    return redirect('/')
+    else:
+        return redirect('/')
  
 '''
 Update current crawler
@@ -209,122 +210,130 @@ def chain_crawler(request):
 
 def create_chain_crawler(request):
     username = request.session.get('username')
-    if request.method == 'POST':
-        try:
-            crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()[:30]
-            if not crawlerName:
-                    crawlerName = 'blank'
-            crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
-            crawlerPager = request.POST['crawlerPager']
-            crawlerParent = request.POST['crawlerParent']
-            print crawlerParent + " asdasdasdasd"
-            crawlerSeeds = [request.POST['chainField'], crawlerParent]
-            crawlerStatus = 'running'
-            crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
-            Crawler(crawlerName=crawlerName, 
-                    crawlerSeeds=crawlerSeeds,
-                    crawlerAddr=crawlerAddr, 
-                    crawlerStatus=crawlerStatus,
-                    crawlerPager=crawlerPager,
-                    crawlerOwner=username,
-                    crawlerTemplate=crawlerTemplate,
-                    crawlerParent=crawlerParent,
-                    crawlerDateTime=datetime.now()).save()
-            Crawler.objects(crawlerName=crawlerParent).update_one(set__crawlerBaby=crawlerName)
-            return redirect('/' + username + '/' + crawlerName)
-        except Exception as err:
-            print err
+    if username:
+        if request.method == 'POST':
+            try:
+                crawlerName = re.sub('[^A-Za-z0-9]+', '', request.POST['crawlerName']).lower()[:30]
+                if not crawlerName:
+                        crawlerName = 'blank'
+                crawlerTemplate = json.dumps(json.loads(request.POST['crawlerTemplate'], object_pairs_hook=remove_duplicates_keys))
+                crawlerPager = request.POST['crawlerPager']
+                crawlerParent = request.POST['crawlerParent']
+                print crawlerParent + " asdasdasdasd"
+                crawlerSeeds = [request.POST['chainField'], crawlerParent]
+                crawlerStatus = 'running'
+                crawlerAddr = runCrawler(crawlerName, crawlerSeeds, crawlerTemplate, crawlerPager, 'start')
+                Crawler(crawlerName=crawlerName, 
+                        crawlerSeeds=crawlerSeeds,
+                        crawlerAddr=crawlerAddr, 
+                        crawlerStatus=crawlerStatus,
+                        crawlerPager=crawlerPager,
+                        crawlerOwner=username,
+                        crawlerTemplate=crawlerTemplate,
+                        crawlerParent=crawlerParent,
+                        crawlerDateTime=datetime.now()).save()
+                Crawler.objects(crawlerName=crawlerParent).update_one(set__crawlerBaby=crawlerName)
+                return redirect('/' + username + '/' + crawlerName)
+            except Exception as err:
+                print err
+    else:
+        return redirect('/')
 
 '''
 Handle start crawler requests
 '''
-def startCrawl(request):  
-    if request.method == 'POST':  
-        try:
-            crawlerName = request.POST['crawlerName']
-            c = Crawler.objects.get(crawlerName=crawlerName)
-            if db[crawlerName]:
-                db[crawlerName].drop()
-            if c.crawlerAddr == '' and c.crawlerStatus != 'running':  
-                if len(c.crawlerSeeds) > 1:
-                    if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
-                        return HttpResponse("ParentDontExists")
-                crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'start')
-                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
-                                                                    set__crawlerAddr=crawlerAddr)
-                print crawlerName + ' - Running at ' + crawlerAddr
-                return HttpResponse(crawlerName + ' is running')
-                       
-            else:
-                return HttpResponse(crawlerName + ' is already running')
-        except Exception as err:
-            print err
-    else:
-        return HttpResponse("Crawl failed")
+def startCrawl(request):
+    username = request.session.get('username')
+    if username:
+        if request.method == 'POST':  
+            try:
+                crawlerName = request.POST['crawlerName']
+                c = Crawler.objects.get(crawlerName=crawlerName)
+                if db[crawlerName]:
+                    db[crawlerName].drop()
+                if c.crawlerAddr == '' and c.crawlerStatus != 'running':  
+                    if len(c.crawlerSeeds) > 1:
+                        if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
+                            return HttpResponse("ParentDontExists")
+                    crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'start')
+                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running',
+                                                                        set__crawlerAddr=crawlerAddr)
+                    print crawlerName + ' - Running at ' + crawlerAddr
+                    return HttpResponse(crawlerName + ' is running')
+                           
+                else:
+                    return HttpResponse(crawlerName + ' is already running')
+            except Exception as err:
+                print err
+    return HttpResponse("Crawl failed")
+
     
 '''
 Handle stop crawler requests
 '''      
 def stopCrawl(request):
-    if request.method == 'POST':
-        try:
-            crawlerName = request.POST['crawlerName']
-            c = Crawler.objects.get(crawlerName=crawlerName)
-            if c.crawlerStatus == 'running':
-                print crawlerName + ' - Stopping at ' + c.crawlerAddr
-                stopCrawler(c.crawlerAddr)
-                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped',
-                                                                    set__crawlerAddr='')
-                return HttpResponse(crawlerName + ' has been stopped')
-            else:
-                return HttpResponse(crawlerName + ' is not running!')
-        except Exception as err:
-            print err
-    else:
-        return HttpResponse("Stop failed")
+    username = request.session.get('username')
+    if username:
+        if request.method == 'POST':
+            try:
+                crawlerName = request.POST['crawlerName']
+                c = Crawler.objects.get(crawlerName=crawlerName)
+                if c.crawlerStatus == 'running':
+                    print crawlerName + ' - Stopping at ' + c.crawlerAddr
+                    stopCrawler(c.crawlerAddr)
+                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='stopped',
+                                                                        set__crawlerAddr='')
+                    return HttpResponse(crawlerName + ' has been stopped')
+                else:
+                    return HttpResponse(crawlerName + ' is not running!')
+            except Exception as err:
+                print err
+    return HttpResponse("Stop failed")
  
 '''
 Handle pause crawler requests
 '''      
 def pauseCrawl(request):
-    if request.method == 'POST':
-        try:
-            crawlerName = request.POST['crawlerName']
-            c = Crawler.objects.get(crawlerName=crawlerName)
-            print c.crawlerAddr + c.crawlerStatus
-            if c.crawlerAddr != '' and c.crawlerStatus == 'running':
-                print crawlerName + ' - Pausing at ' + c.crawlerAddr
-                stopCrawler(c.crawlerAddr)
-                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='paused', set__crawlerAddr='')
-                return HttpResponse(crawlerName + ' has been paused')
-            else:
-                return HttpResponse(crawlerName + ' is not running!')
-        except Exception as err:
-            print err
-    else:
-        return HttpResponse("Pause failed")
+    username = request.session.get('username')
+    if username:
+        if request.method == 'POST':
+            try:
+                crawlerName = request.POST['crawlerName']
+                c = Crawler.objects.get(crawlerName=crawlerName)
+                print c.crawlerAddr + c.crawlerStatus
+                if c.crawlerAddr != '' and c.crawlerStatus == 'running':
+                    print crawlerName + ' - Pausing at ' + c.crawlerAddr
+                    stopCrawler(c.crawlerAddr)
+                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='paused', set__crawlerAddr='')
+                    return HttpResponse(crawlerName + ' has been paused')
+                else:
+                    return HttpResponse(crawlerName + ' is not running!')
+            except Exception as err:
+                print err
+    return HttpResponse("Pause failed")
 
 '''
 Handle resume crawler requests
 '''      
 def resumeCrawl(request):
-    if request.method == 'POST':  
-        try:
-            crawlerName = request.POST['crawlerName']            
-            c = Crawler.objects.get(crawlerName=crawlerName)
-            if c.crawlerAddr == '' and c.crawlerStatus == 'paused':
-                if len(c.crawlerSeeds) > 1:
-                    if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
-                        return HttpResponse("ParentDontExists")
-                crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'resume')
-                Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
-                return HttpResponse(crawlerName + ' has been resumed')
-            else:
-                return HttpResponse(crawlerName + ' was not paused!')
-        except Exception as err:
-            print err
-    else:
-        return HttpResponse("Resume failed")
+    username = request.session.get('username')
+    if username:
+        if request.method == 'POST':  
+            try:
+                crawlerName = request.POST['crawlerName']            
+                c = Crawler.objects.get(crawlerName=crawlerName)
+                if c.crawlerAddr == '' and c.crawlerStatus == 'paused':
+                    if len(c.crawlerSeeds) > 1:
+                        if Crawler.objects.with_id(c.crawlerSeeds[1]) is None:
+                            return HttpResponse("ParentDontExists")
+                    crawlerAddr = runCrawler(crawlerName, c.crawlerSeeds, c.crawlerTemplate, c.crawlerPager, 'resume')
+                    Crawler.objects(crawlerName=crawlerName).update_one(set__crawlerStatus='running', set__crawlerAddr=crawlerAddr)
+                    return HttpResponse(crawlerName + ' has been resumed')
+                else:
+                    return HttpResponse(crawlerName + ' was not paused!')
+            except Exception as err:
+                print err
+    return HttpResponse("Resume failed")
 
 '''
 Returns crawler running address
@@ -368,131 +377,142 @@ def stopCrawler(addr):
 Fetch seed URl and do HTML pre-processing
 '''
 def fetch(request):
-    if request.method == 'GET':
-        try:  
-            url = request.GET['url']
-            if not url.startswith("http"):
-                return HttpResponse("format")
-            js = request.GET['js']
-            css = request.GET['css']
-            req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            resp = urllib2.urlopen(req)
-            cleaned_resp = ''
-            for line in resp:
-                # fix for some forums templates, prevent popups
-                line = line.replace('popupctrl', '')
-                line = line.replace('popupmenu', '')
-                a = re.findall('url\((.*?)\)', line)
-                if a:
-                    for link in a:  
-                        if 'http' not in link:
-                            link = link.replace("'","")
-                            link = link.replace('"',"")
-                            line = re.sub("url\((.*?)\)"
-                                          , 'url(' + str(url) + ''.join(link) + ')' 
-                                          , line) 
+    username = request.session.get('username')
+    if username:
+        if request.method == 'GET':
+            try:  
+                url = request.GET['url']
+                if not url.startswith("http"):
+                    return HttpResponse("format")
+                js = request.GET['js']
+                css = request.GET['css']
+                req = urllib2.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                resp = urllib2.urlopen(req)
+                cleaned_resp = ''
+                for line in resp:
+                    # fix for some forums templates, prevent popups
+                    line = line.replace('popupctrl', '')
+                    line = line.replace('popupmenu', '')
+                    a = re.findall('url\((.*?)\)', line)
+                    if a:
+                        for link in a:  
+                            if 'http' not in link:
+                                link = link.replace("'","")
+                                link = link.replace('"',"")
+                                line = re.sub("url\((.*?)\)"
+                                              , 'url(' + str(url) + ''.join(link) + ')' 
+                                              , line) 
+                        
+                    cleaned_resp = cleaned_resp + line
                     
-                cleaned_resp = cleaned_resp + line
+                soup = BeautifulSoup(cleaned_resp)
                 
-            soup = BeautifulSoup(cleaned_resp)
-            
-            # fix page being redirected
-            for tag in soup.find_all('span', onclick=True):
-                tag['onclick'] = ""
+                # fix page being redirected
+                for tag in soup.find_all('span', onclick=True):
+                    tag['onclick'] = ""
+                    
+                # patch the css url so it will load from the server
+                for tag in soup.find_all('link', href=True):
+                    if css == 'true':
+                        if 'http' not in tag['href']:
+                            tag['href'] = urljoin(url, tag['href'])
+                    else:
+                        tag.decompose()
                 
-            # patch the css url so it will load from the server
-            for tag in soup.find_all('link', href=True):
-                if css == 'true':
-                    if 'http' not in tag['href']:
-                        tag['href'] = urljoin(url, tag['href'])
-                else:
-                    tag.decompose()
-            
-            # patch image url so it will load from the server
-            for tag in soup.find_all('img', src=True):
-                if 'http' not in tag['src']:
-                    tag['src'] = urljoin(url, tag['src'])
-            
-            # load external script for web page to load properly
-            # so users are more familiar with the interface
-            for tag in soup.find_all('script', src=True):
-                if js == 'true':
-                    tag.decompose()
-                else:
+                # patch image url so it will load from the server
+                for tag in soup.find_all('img', src=True):
                     if 'http' not in tag['src']:
                         tag['src'] = urljoin(url, tag['src'])
-
-            # fix for some forums, disable in-line scripts that prevents page from loading
-            # e.g http://www.kiasuparents.com/kiasu/forum/index.php
-            for tag in soup.find_all('script', src=False):
-                tag.decompose()
-            
-            # disable and remove all iframe to prevent errors
-            for tag in soup.find_all('iframe', src=True):
-                tag['src'] = ''
-                tag['srcdoc'] = ''
-            
-            # remove all the tbody before generating the html source
-            # iframe at create.html will still generate a general tbody tag
-            for tag in soup.find_all('tbody'):
-                tag.unwrap()
-            
-            # inject focra.css into response
-            css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
-            soup.head.append(css_tag)
-
-            return HttpResponse(mark_safe(soup.prettify(encoding='ascii')))
-        except urllib2.HTTPError as err:
-            return HttpResponse(str(err.code))
-        except ValueError:
-            return HttpResponse("format")
-        except Exception as err:
-            return HttpResponse("format")
+                
+                # load external script for web page to load properly
+                # so users are more familiar with the interface
+                for tag in soup.find_all('script', src=True):
+                    if js == 'true':
+                        tag.decompose()
+                    else:
+                        if 'http' not in tag['src']:
+                            tag['src'] = urljoin(url, tag['src'])
+    
+                # fix for some forums, disable in-line scripts that prevents page from loading
+                # e.g http://www.kiasuparents.com/kiasu/forum/index.php
+                for tag in soup.find_all('script', src=False):
+                    tag.decompose()
+                
+                # disable and remove all iframe to prevent errors
+                for tag in soup.find_all('iframe', src=True):
+                    tag['src'] = ''
+                    tag['srcdoc'] = ''
+                
+                # remove all the tbody before generating the html source
+                # iframe at create.html will still generate a general tbody tag
+                for tag in soup.find_all('tbody'):
+                    tag.unwrap()
+                
+                # inject focra.css into response
+                css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
+                soup.head.append(css_tag)
+    
+                return HttpResponse(mark_safe(soup.prettify(encoding='ascii')))
+            except urllib2.HTTPError as err:
+                return HttpResponse(str(err.code))
+            except ValueError:
+                return HttpResponse("format")
+            except Exception as err:
+                return HttpResponse("format")
+    return HttpResponse("")
             
 
 '''
 Display Crawler data from CrawlerDB
 '''
 def data(request):
-    if request.method == 'GET':
-        try: 
-            crawlerName = request.GET['crawlerName']
-            start = request.GET['start']
-            row_limit = request.GET['rowLimit']
-            return HttpResponse(str(db[crawlerName].count()) + "," + dumps(db[crawlerName].find(skip=int(start),
-                                                                                                limit=int(row_limit))))
-        except Exception as err:
-            print err
+    username = request.session.get('username')
+    if username:
+        if request.method == 'GET':
+            try: 
+                crawlerName = request.GET['crawlerName']
+                start = request.GET['start']
+                row_limit = request.GET['rowLimit']
+                return HttpResponse(str(db[crawlerName].count()) + "," + dumps(db[crawlerName].find(skip=int(start),
+                                                                                                    limit=int(row_limit))))
+            except Exception as err:
+                print err
+    return HttpResponse("")
 
 '''
 Validate Crawler unique names
 '''
 def check_name(request):
-    if request.method == 'GET':
-        try:
-            if request.GET['crawlerName']:
-                crawlerName = re.sub('[^A-Za-z0-9]+', '', request.GET['crawlerName']).lower()[:30]
-                c = Crawler.objects(crawlerName=crawlerName)
-                if c:
-                    return HttpResponse("invalid")
+    username = request.session.get('username')
+    if username:
+        if request.method == 'GET':
+            try:
+                if request.GET['crawlerName']:
+                    crawlerName = re.sub('[^A-Za-z0-9]+', '', request.GET['crawlerName']).lower()[:30]
+                    c = Crawler.objects(crawlerName=crawlerName)
+                    if c:
+                        return HttpResponse("invalid")
+                    else:
+                        return HttpResponse("valid")
                 else:
-                    return HttpResponse("valid")
-            else:
-                return HttpResponse("invalid")
-        except Exception as err:
-            print err
+                    return HttpResponse("invalid")
+            except Exception as err:
+                print err
+    return HttpResponse("")
             
 def stats(request):
-    if request.method == 'GET':
-        try:
-            if request.GET['crawlerName']:
-                crawlerName = request.GET['crawlerName']
-                
-                c = Crawler.objects.get(crawlerName=crawlerName)      
-                return HttpResponse(str(c.crawlerStatus) + "," +
-                                    str(c.crawled_pages) + "," +
-                                    str(db[crawlerName].count()) + "," +
-                                    str(c.time_executed))
-        except Exception as err:
-            print err
+    username = request.session.get('username')
+    if username:
+        if request.method == 'GET':
+            try:
+                if request.GET['crawlerName']:
+                    crawlerName = request.GET['crawlerName']
+                    
+                    c = Crawler.objects.get(crawlerName=crawlerName)      
+                    return HttpResponse(str(c.crawlerStatus) + "," +
+                                        str(c.crawled_pages) + "," +
+                                        str(db[crawlerName].count()) + "," +
+                                        str(c.time_executed))
+            except Exception as err:
+                print err
     return HttpResponse("");
