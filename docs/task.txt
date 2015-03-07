@@ -1,4 +1,4 @@
-List of Tasks to do before Friday
+List of Tasks to do
 ===========================
 1. not able to grab images on some sites (xpath problem)
 2. Stats not updated the last time
@@ -8,4 +8,15 @@ List of Tasks to do before Friday
 6. step 1 js/css button alignment, step 2 fields alignment
 7. Number of rows per page settings
 8. Crawl Delay
-9. 
+
+
+Instructions to deploy
+===========================
+1. Clone this repository or downlaod as zip
+2. Command prompt >> cd to the cloned/downloaded directory 
+3. Command prompt >> pip install -r requirements.txt
+4. Create two database, 'FocraDB' and 'CrawlerDB' in your MongoDB using default host:port (127.0.0.1:27017)
+5. Start MongoDB, command prompt >> mongod
+6. Make sure you add this directory to your [PYTHONPATH](http://stackoverflow.com/a/4855685)
+7. Command prompt >> python manage.py runserver
+8. Go to [localhost:8000](http://localhost:8000) and start crawling!
