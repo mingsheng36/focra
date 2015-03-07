@@ -173,7 +173,8 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Settings</h4>
       </div>
-      <div class="modal-body table-responsive">
+      <div class="modal-body table-responsive" style="padding-bottom:0px;">
+      
         <table class="table table-striped table-bordered">
         	<tr>
         		<th colspan=2>{{ crawler.crawlerName | title}} Template</th>
@@ -185,6 +186,35 @@
 			</tr>
 			{% endfor %}
 		</table>
+      	
+      	<table class="table table-condensed" style="margin-bottom: 0px;">
+
+      		<tr>
+      			<td>Rows per page:</td>
+      			<td>
+	      			<div class="dropdown">
+					  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+					    <span id="rowData">10</span>
+					    <span class="caret"></span>
+					  </button>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+					  	<li role="presentation"><a class="rowNumber" role="menuitem" tabindex="-1" href="#">10</a></li>
+					    <li role="presentation"><a class="rowNumber" role="menuitem" tabindex="-1" href="#">20</a></li>
+					    <li role="presentation"><a class="rowNumber" role="menuitem" tabindex="-1" href="#">30</a></li>
+					    <li role="presentation"><a class="rowNumber" role="menuitem" tabindex="-1" href="#">40</a></li>
+					    <li role="presentation"><a class="rowNumber" role="menuitem" tabindex="-1" href="#">50</a></li>
+					  </ul>
+					</div>		
+      			</td>	
+      		</tr>
+      		<tr>
+      			<td>Obey Robots.txt:</td>
+      			<td>
+					Check if yes <input type="checkbox" value=""> 
+				</td>
+      		</tr>
+      	</table>
+      
       </div>
       <div class="modal-footer">
 			<button id="deleteBn" class="btn btn-danger" type="submit"

@@ -9,6 +9,13 @@ $(document).ready(function() {
 	var start = 0;
 	var rowLimit = 10;
 	
+	$('.rowNumber').click(function(event){
+		$('#rowData').html($(this).html());
+		rowLimit = $('#rowData').html();
+		$('#crawlerData').find("tr:gt(0)").remove();
+		loadData(start, rowLimit);
+	});
+	
 	loadData(start, rowLimit);
 	
 	$('#data_tab').click(function(){

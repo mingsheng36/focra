@@ -6,3 +6,6 @@ List of Tasks to do before Friday
 4. Pause and resume 'next_link' should be before parsing not after parsing the item, so there wont be repeated pages crawled
 5. modify algorithm to include [y] in xpath
 6. step 1 js/css button alignment, step 2 fields alignment
+7. Number of rows per page settings
+8. Crawl Delay
+9. 
