@@ -5,7 +5,7 @@ built using Django 1.7, MongoDB 2.6.5 and Scrapy 0.24.4
 
 - Focra Demo ([http://focra-mingsheng36.rhcloud.com/](http://focra-mingsheng36.rhcloud.com/))
 
-![alt text](https://github.com/mingsheng36/Focra/blob/master/docs/3.png "Demo")
+![alt text](https://github.com/mingsheng36/Focra/blob/master/docs/demo.png "Demo")
 
 ##Features
 - [x] Visually create your own XPath template

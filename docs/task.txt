@@ -7,7 +7,11 @@ List of Tasks to do
 5. modify algorithm to include [y] in xpath
 6. step 1 js/css button alignment, step 2 fields alignment
 7. Number of rows per page settings
-8. Crawl Delay
+8. Crawl Delay settings
+9. Show Last page crawled (to know the reason why it stopped)
+10. Show Next page to crawl?
+11. Adblock parsing
+12. Datetime formatting
 
 Pre-requisites
 ==========================
