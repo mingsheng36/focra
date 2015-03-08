@@ -21,7 +21,7 @@
 
           <div class="masthead clearfix">
             <div class="inner">
-              <h3 class="masthead-brand">Focra</h3>
+              <h3 class="masthead-brand"><a href="/">Focra</a></h3>
               <nav>
                 <ul class="nav masthead-nav">
                   <li id="signinLink" class="links active"><a>Sign in</a></li>
@@ -33,9 +33,10 @@
           </div>
 
           <div class="inner cover">
-            <h1 class="cover-heading">Forum Crawler</h1>
+            
             
 				<div id="signinDiv" class="col-sm-6 col-sm-offset-3">
+					<h1 class="cover-heading">Forum Crawler</h1>
 						<p class="lead">Get Ready For Your Data.</p>
 						<input type="text" id="username" class="form-control text-center input-lg"
 								placeholder="Username" required autofocus style="margin-bottom:5px;">
@@ -44,11 +45,12 @@
 								placeholder="Password" required>
 								<br/>
 						<p class="lead">
-							<a id="signin" href="" class="btn btn-lg btn-default">Sign in</a>
+							<a id="signin" href="#" class="btn btn-lg btn-default">Sign in</a>
 						</p>
 				</div>
 				
 				<div id="registerDiv" class="col-sm-6 col-sm-offset-3" style="display: none;">
+					<h1 class="cover-heading">Forum Crawler</h1>
 						<p class="lead">Request an account with us.</p>
 						
 						<input type="text" id="register_username" class="form-control text-center input-lg"
@@ -58,11 +60,13 @@
 								placeholder="Password" required>
 								<br/>
 						<p class="lead">
-							<a id="register" href="" class="btn btn-lg btn-default">Register</a>
+							<a id="register" href="#" class="btn btn-lg btn-default">Register</a>
 						</p>
 				</div>
-				<div id="contactDiv" class="col-sm-6 col-sm-offset-3" style="display: none;>
-						<p class="lead">Feedbacks? Email me.<br/> mingsheng36@gmail.com</p>
+				<div id="contactDiv" class="col-sm-6 col-sm-offset-3" style="display: none;">
+						<p class="lead">Feedback? Email me.<br/>
+						<a style="text-decoration: underline;"
+						href="mailto:mingsheng36@gmail.com">mingsheng36@gmail.com</a></p>
 				</div>
 			</div>
 
@@ -77,6 +81,24 @@
       </div>
 
     </div>
+
+<div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="alertModalHeader"></h4>
+      </div>
+      <div class="modal-body">
+          <div class="form-group">
+            
+          </div>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+
 
 </body>
 <script type="text/javascript"

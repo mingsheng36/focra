@@ -28,7 +28,7 @@
 					<img height="40px" height="40px" src="{% static 'images/favicon.png' %}">
 				</a>
 				-->
-				<a class="navbar-brand" >
+				<a class="navbar-brand" href="/">
 					Focra
 				</a>
 			</div>
@@ -38,6 +38,7 @@
 					<li class="dropdown">
 					<a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
 						Crawlers
+						<span class="glyphicon glyphicon-list" aria-hidden="true"></span> 
 						<span class="caret"></span>
 					</a>
 						<ul class="dropdown-menu" role="menu">
@@ -55,7 +56,7 @@
 
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="/{{username}}">{{ username }}</a></li>
-					<li><a href="/logout">Logout</a></li>
+					<li><a href="/logout"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span> Logout</a></li>
 					<!-- <li class="active"><a href="#">Logout <span class="sr-only">(current)</span> </a></li> -->
 				</ul>
 			</div>

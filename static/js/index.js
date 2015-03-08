@@ -12,9 +12,15 @@ $(document).ready(function() {
 			},
 			success: function( data ){
 				if (data == "doesNotExist") {
+//					$('#alertModalHeader').html('Your dont have account with us');
+//					$('#alertModal').modal('show');
 					alert('Your dont have account with us');
 				} else if (data == "success") {
 					window.location.href = "/" + $('#username').val();
+				} else if (data == 'failed') {
+//					$('#alertModalHeader').html('Your dont have account with us');
+//					$('#alertModal').modal('show');
+					alert('Please enter your username and password');
 				}
 			}
 		});

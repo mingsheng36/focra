@@ -9,6 +9,12 @@ List of Tasks to do
 7. Number of rows per page settings
 8. Crawl Delay
 
+Pre-requisites
+==========================
+- [Python 2.7](https://www.python.org/downloads/)
+- [Pip](https://pip.pypa.io/en/latest/installing.html)
+- [MongoDB](http://docs.mongodb.org/manual/installation/) 
+
 
 Instructions to deploy
 ===========================

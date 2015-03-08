@@ -50,10 +50,10 @@ def register(request):
         password = request.POST.get('password', "")
         if len(username) > 20 or len(username) == 0:
             return HttpResponse('usernameLength')
-        if len(password) < 8:
-            return HttpResponse('passwordLength')
-        elif not set('^[A-Za-z0-9]+$').intersection(username):
+        elif not re.match('^\d*[a-zA-Z][a-zA-Z\d]*$', username):
             return HttpResponse('specialChar')
+        elif len(password) < 8:
+            return HttpResponse('passwordLength')
         else:    
             try:
                 # check if it exist, if exist it will have error
@@ -71,10 +71,12 @@ logout
 '''
 def logout(request):
     if request.method == 'GET':
-        print request.session.get('username') + " logging out."
-        del request.session['username']
-        
-        return redirect('/')
+        try:
+            print request.session.get('username') + " logging out."
+            del request.session['username']
+        except Exception as err:
+            print err
+    return redirect('/')
         
 '''
 Home page to authenticated usernames
