@@ -1,16 +1,19 @@
-import subprocess, re
+'''
+Created on 9 Mar 2015
+
+@author: Tan Ming Sheng
+'''
+import subprocess, re, json, collections, urllib2, csv, codecs, cStringIO
 from subprocess import PIPE
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from models import Crawler, User
-import json, collections
 from datetime import datetime
 from bson.json_util import dumps
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
 from django.utils.safestring import mark_safe
 from urlparse import urljoin
-import urllib2
 from collections import OrderedDict
 
 # limit the total number of concurrent users
@@ -489,9 +492,48 @@ def stats(request):
                 print err
     return redirect('/')
 
+'''
+Export data to excel
+'''
+def export(request):
+    username = request.session.get('username')
+    if username:
+        if request.method == 'POST':  
+            try:
+                crawlerName = request.POST['exportCrawlerName']
+                c = Crawler.objects.get(crawlerName=crawlerName)
+                ordered_template_field = json.loads(c.crawlerTemplate, object_pairs_hook=collections.OrderedDict)
+                headers = ordered_template_field.keys()
+                if c.crawlerParent is not None:
+                    headers.insert(0, 'request_url')
+                    
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="' + crawlerName + '.csv"'
+                
+                writer = UnicodeWriter(response,quoting=csv.QUOTE_ALL)
+                writer.writerow(headers)
+                for row in db[crawlerName].find():
+                    r = []
+                    for field in headers:
+                        if row[field]:
+                            r.append(row[field])
+                        else:
+                            r.append("")
+                    writer.writerow(r)
+                return response
+            except Exception as err:
+                print err
+    return redirect('/')
+
+'''
+return error page
+'''
 def error(request):
     return render(request, 'error.html')
 
+'''
+helper function to remove duplicate keys
+'''
 def remove_duplicates_keys(ordered_pairs):
     d = OrderedDict()
     c = 1
@@ -540,4 +582,23 @@ def runCrawler(name, seeds, template, pager, runtype, pager_link=None):
         return None
     except Exception as err:
         print err
-        
+
+'''
+Support unicode in export data
+'''
+class UnicodeWriter:
+    def __init__(self, f, dialect=csv.excel, encoding="utf-8-sig", **kwds):
+        self.queue = cStringIO.StringIO()
+        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
+        self.stream = f
+        self.encoder = codecs.getincrementalencoder(encoding)()
+    def writerow(self, row):
+        self.writer.writerow([s.encode("utf-8") for s in row])
+        data = self.queue.getvalue()
+        data = data.decode("utf-8")
+        data = self.encoder.encode(data)
+        self.stream.write(data)
+        self.queue.truncate(0)
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)

@@ -1,15 +1,18 @@
+'''
+Created on 9 Mar 2015
+
+@author: Tan Ming Sheng
+'''
+import json, collections, Queue, time
 from scrapy.spider import Spider
 from scrapy import signals, Request
 from scrapy.contrib.loader import ItemLoader
 from scrapy.item import Item, Field
 from scrapy.exceptions import CloseSpider
-import json, collections
 from bs4 import BeautifulSoup
 from urlparse import urljoin
 from HTMLParser import HTMLParser
 from pymongo import MongoClient
-import Queue
-import time
 
 client = MongoClient('localhost', 27017)
 LINK_NUMBER = 50

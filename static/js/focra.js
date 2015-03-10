@@ -967,4 +967,10 @@ $(document).ready(function() {
 			$(showDOM).popover('show');
 		}
 	}
+	
+	/******** EXPORT EXCEL *********/	
+	$('#exportBn').click(function(event) {
+		$('#export').submit();
+	});
+	
 });

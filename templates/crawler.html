@@ -136,15 +136,6 @@
 	</ul>
 </div>
 
-<form id="chain" action="/chain" method="post">
-	{% csrf_token %}
-	<input type="hidden" id="chainSelectedURL" name="chainSelectedURL" value="">
-	<input type="hidden" id="chainJS" name="chainJS" value="">
-	<input type="hidden" id="chainCSS" name="chainCSS" value="">
-	<input type="hidden" id="chainField" name="chainField" value="">
-	<input type="hidden" id="chainParent" name="chainParent" value="">
-</form>
-
 <div class="table-responsive">
 	<table id="crawlerData" class="table table-bordered"
 		style="width: 100%;">
@@ -217,8 +208,11 @@
       
       </div>
       <div class="modal-footer">
-			<button id="deleteBn" class="btn btn-danger" type="submit"
-				data-toggle="tooltip" data-placement="top" title="Delete Crawler">
+      		<button id="exportBn" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="Export Data">
+				Export Data 
+				<span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+			</button>
+			<button id="deleteBn" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Delete Crawler">
 				Delete Crawler
 				<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
 			</button>
@@ -237,7 +231,7 @@
        		Chain Crawler: 
         </strong>
 		<div class="dropdown form-group">
-	        <button id="chainField" type="button" class="btn btn-default"
+	        <button id="selectField" type="button" class="btn btn-default"
 				data-toggle="dropdown" aria-expanded="false">
 				<mark id="chainText">Select Fields Here !</mark>
 				<span class="caret"></span>
@@ -265,6 +259,20 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<form id="chain" action="/chain" method="post">
+	{% csrf_token %}
+	<input type="hidden" id="chainSelectedURL" name="chainSelectedURL" value="">
+	<input type="hidden" id="chainJS" name="chainJS" value="">
+	<input type="hidden" id="chainCSS" name="chainCSS" value="">
+	<input type="hidden" id="chainField" name="chainField" value="">
+	<input type="hidden" id="chainParent" name="chainParent" value="">
+</form>
+
+<form id="export" action="/export" method="post">
+	{% csrf_token %}
+	<input type="hidden" id="exportCrawlerName" name="exportCrawlerName" value="{{ crawler.crawlerName }}">
+</form>
 
 {% endblock %}
 {% block script_block %}

@@ -1,3 +1,8 @@
+'''
+Created on 9 Mar 2015
+
+@author: Tan Ming Sheng
+'''
 from django.conf.urls import patterns, url
 import views
 
@@ -10,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^stop$', views.stopCrawl, name='stopCrawl'),
     url(r'^pause$', views.pauseCrawl, name='pauseCrawl'),
     url(r'^resume$', views.resumeCrawl, name='resumeCrawl'),
+    url(r'^export$', views.export, name='export'), 
     url(r'^delete$', views.deleteCrawler, name='deleteCrawler'),
     url(r'^fetch$', views.fetch, name='fetch'),
     url(r'^data$', views.data, name='data'),

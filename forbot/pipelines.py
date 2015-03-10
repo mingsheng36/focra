@@ -1,3 +1,8 @@
+'''
+Created on 9 Mar 2015
+
+@author: Tan Ming Sheng
+'''
 from pymongo import MongoClient
 
 class MongoDBPipeline(object):

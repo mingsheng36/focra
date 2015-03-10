@@ -1,12 +1,8 @@
-"""
-Django settings for focra project.
+'''
+Created on 9 Mar 2015
 
-For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
-"""
+@author: Tan Ming Sheng
+'''
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os

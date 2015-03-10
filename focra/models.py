@@ -1,3 +1,8 @@
+'''
+Created on 9 Mar 2015
+
+@author: Tan Ming Sheng
+'''
 from mongoengine import Document, StringField, ListField, DateTimeField
  
 class User(Document):

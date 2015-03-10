@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
+'''
+Created on 9 Mar 2015
 
-# Scrapy settings for fobot project
-#
-# For simplicity, this file contains only the most important settings by
-# default. All the other settings are documented here:
-#
-#     http://doc.scrapy.org/en/latest/topics/settings.html
-#
-
+@author: Tan Ming Sheng
+'''
 BOT_NAME = 'forbot'
 USER_AGENT = 'Mozilla/5.0'
 
