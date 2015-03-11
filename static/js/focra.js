@@ -862,6 +862,7 @@ $(document).ready(function() {
 					$("#rowsInserted").html(stats[2]);
 					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').attr('disabled', true);
+					$('#exportBn').attr('disabled', true);
 					// show state button
 					$('#stateBn').html('Pause <span  class="glyphicon glyphicon-pause" aria-hidden="true"></span>');
 					$('#stateBn').removeAttr('disabled');
@@ -881,6 +882,7 @@ $(document).ready(function() {
 					$("#rowsInserted").html(stats[2]);
 					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').removeAttr('disabled');
+					$('#exportBn').removeAttr('disabled');
 					
 					// switch state to stop
 					$('#switchBn').html('Restart Crawl');
@@ -897,6 +899,7 @@ $(document).ready(function() {
 					$("#rowsInserted").html(stats[2]);
 					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').removeAttr('disabled');
+					$('#exportBn').removeAttr('disabled');
 					
 					// show resume button
 					$('#stateBn').html('Resume <span class="glyphicon glyphicon-play" aria-hidden="true"></span>');
@@ -913,6 +916,7 @@ $(document).ready(function() {
 					$("#rowsInserted").html(stats[2]);
 					$("#timeExecuted").html(Math.round(stats[3]));
 					$('#deleteBn').removeAttr('disabled');
+					$('#exportBn').removeAttr('disabled');
 					
 					if ($('#switchBn').prop('disabled') == false) {
 						$('#switchBn').html('Restart Crawl');
