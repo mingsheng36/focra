@@ -16,8 +16,8 @@ built using Django 1.7, MongoDB 2.6.5 and Scrapy 0.24.4
 - [x] Show Hierarchy of Crawlers (how they are chained) 
 - [x] View Data in Pages
 - [x] User Accounts
-- [ ] Improve on algorithms (Aggregation + Alignment)
-- [ ] Export Data to Excel / CSV / JSON URL
+- [x] Export Data to Excel / CSV / JSON URL
+- [ ] Improve on Algorithms (Aggregation + Alignment)
 - [ ] Schedule Crawl Frequency
 - [ ] Crawl JavaScript Pages (Get from XHR request)
 - [ ] Appending of Data (Latest data appending)
