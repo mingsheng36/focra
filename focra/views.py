@@ -506,7 +506,7 @@ def export(request):
                 headers = ordered_template_field.keys()
                 if c.crawlerParent is not None:
                     headers.insert(0, 'request_url')
-                    
+                
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = 'attachment; filename="' + crawlerName + '.csv"'
                 
@@ -515,15 +515,9 @@ def export(request):
                 for row in db[crawlerName].find():
                     r = []
                     for field in headers:
-                        if row[field]:
-                            # if the pager is in html format / hurts performance
-#                             if "</a>" in row[field]:
-#                                 if BeautifulSoup(row[field]).a:
-#                                     row[field] = ''.join(BeautifulSoup(row[field]).a.strings)
-#                             elif "<img" in row[field]:
-#                                 if BeautifulSoup(row[field]).img:
-#                                     row[field] = ''.join(BeautifulSoup(row[field]).img.get('src'))
-                            r.append(row[field])
+                        if field in row:
+                            if row[field]:
+                                r.append(row[field])
                         else:
                             r.append("")
                     writer.writerow(r)
