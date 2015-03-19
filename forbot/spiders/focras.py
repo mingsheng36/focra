@@ -190,7 +190,7 @@ class FocraSpider(Spider):
 			for key, value in self.template.iteritems():
 				self.item.fields[key] = Field()
 				dynamicItemLoader.add_xpath(key, value)
-			
+				
 			yield dynamicItemLoader.load_item()
 			
 			# after scraping the page, check status to see whether we should stop
@@ -215,6 +215,7 @@ class FocraSpider(Spider):
 				else:
 					if response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract():
 						next_link = response.xpath('//a[text()[normalize-space()="'+ self.pager +'"]]/@href').extract()[0]
+					
 				
 				if next_link:
 					self.next_page_link = next_link
@@ -225,7 +226,9 @@ class FocraSpider(Spider):
 					# chained crawler WITH pagination
 					# check for more links from parent column
 					if not self.queue.empty():
-						yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
+						k = self.queue.get()
+						print " top ---"+k
+						yield Request(k, callback=self.parse, dont_filter=True)
 						self.queue_counter += 1
 						if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 							self.check_queue()
@@ -233,7 +236,9 @@ class FocraSpider(Spider):
 				# chained crawler WITHOUT pagination
 				# check for more links from parent column
 				if not self.queue.empty():
-					yield Request(self.queue.get(), callback=self.parse, dont_filter=True)
+					l = self.queue.get()
+					print " btm ---"+l
+					yield Request(l, callback=self.parse, dont_filter=True)
 					self.queue_counter += 1
 					if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 						self.check_queue()
@@ -258,7 +263,8 @@ class FocraSpider(Spider):
 			for link in cursor:
 				if link.get(self.fieldname):
 					soup = BeautifulSoup(link.get(self.fieldname))
-					print soup.a['href']
+					# uncomment below to see queue links
+					#print soup.a['href']
 					self.queue.put(soup.a['href'])
 		except Exception as err:
 			print err			

@@ -19,6 +19,7 @@ from collections import OrderedDict
 # limit the total number of concurrent users
 client = MongoClient('localhost', 27017,  max_pool_size=1000)
 db = client['CrawlerDB']
+server_url = 'http://localhost:8000'
 
 '''
 welcome page
@@ -425,10 +426,11 @@ def fetch(request):
                     tag.unwrap()
                 
                 # inject focra.css into response
-                css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href='http://localhost:8000/static/css/focra.css')
+                css_tag = soup.new_tag("link", rel="stylesheet", type="text/css", href= server_url + '/static/css/focra.css')
                 soup.head.append(css_tag)
     
                 return HttpResponse(mark_safe(soup.prettify(encoding='ascii')))
+            
             except urllib2.HTTPError as err:
                 return HttpResponse(str(err.code))
             except ValueError:
@@ -543,6 +545,8 @@ def remove_duplicates_keys(ordered_pairs):
         k = re.sub('[^A-Za-z0-9]+', '_', k)[:20]
         if not k:
             k = 'blank'
+        if k == '_id':
+            k = 'id'
         if k == 'request_url':
             k = 'request_url1' 
         if k in d:

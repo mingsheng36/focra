@@ -173,6 +173,7 @@ $(document).ready(function() {
 	// iframe on load
 	$('#iframe').load(function(){
 		if ($('#iframe').attr('srcdoc') != '') {
+			
 			$('#loader').fadeOut('fast', function(event) {	
 				showStepTwo();
 				// for chain crawler
@@ -189,20 +190,26 @@ $(document).ready(function() {
 			
 			var contain_texts = "";
 			
+			// mouse over event
 			$(this.contentWindow.document).mouseover(function (event) {
-				contain_texts = $(event.target).clone().children().remove().end().text().trim();
+								
+				contain_texts = $(event.target).text().trim().length;
+
 				if (pager_mode) {
-					if (typeof $(event.target).attr('href') != 'undefined' && contain_texts != '') {
+					if (typeof $(event.target).attr('href') != 'undefined' && contain_texts != 0) {
 						$(event.target).addClass( "outline-element" );
 					}
 				} else {
-					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != '') {
+					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != 0) {
 						$(event.target).addClass( "outline-element" );
 					}
 				}
-				
+			
+			// mouse out event
 			}).mouseout(function (event) {
 				$(event.target).removeClass('outline-element');
+			
+			// on click event
 			}).on('click dblclick', function (event) {
 				
 				if (first == true && pager_mode == false && shownBadge == false) {
@@ -230,7 +237,10 @@ $(document).ready(function() {
 				/************** END *****************/
 				
 				else {
-					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != '') {
+					
+					//alert($(event.target).text());
+					
+					if ($(event.target).prop('tagName').toLowerCase() == 'img' || contain_texts != 0) {
 						if ($(event.target).parent().prop('tagName').toLowerCase() == 'a') {
 							$(event.target).parent().toggleClass('outline-element-clicked');
 							selected_xpaths.push(getElementTreeXPath($(event.target).parent()));
@@ -575,8 +585,17 @@ $(document).ready(function() {
 			/**** ADDED ****/
 			var node1 = selected_xpaths[0].split('/');
 			// get the text or src only
-			if (node1[node1.length-1].replace(/[^a-z]/g,'') != 'img' || node1[node1.length-1].replace(/[^a-z]/g,'') != 'a') {
-				general_xpath += '/text()';
+			if (node1[node1.length-1].replace(/[^a-z]/g,'').trim() != 'img' && node1[node1.length-1].replace(/[^a-z]/g,'').trim() != 'a') {
+				//general_xpath += '//text()[normalize-space()]';
+				general_xpath = '';
+				for (n=1; n < node1.length; n++) {
+					if (n == node1.length-1) {
+						general_xpath += "//" + node1[n];
+					} else {
+						general_xpath += "/" + node1[n];
+					}
+				}
+				general_xpath = general_xpath;
 			}
 			
 			candidate_xpaths = selected_xpaths;
@@ -644,9 +663,19 @@ $(document).ready(function() {
 					//sub_x = sub_x + '/@src';
 					sub_x = sub_x;
 				} else if (node1[node1.length-1].replace(/[^a-z]/g,'') == 'a') {
+					//sub_x = sub_x + '/@href';
 					sub_x = sub_x;
 				} else {
-					sub_x = sub_x + '/text()';
+					sub_x_split = sub_x.split('/');
+					sub_x = '';
+					for (s=1; s < sub_x_split.length; s++) {
+						if (s == sub_x_split.length-1) {
+							sub_x += "//" + sub_x_split[s];
+						} else {
+							sub_x += "/" + sub_x_split[s];
+						}
+					}
+					sub_x = sub_x;
 				}
 				// remove tbody because its generated from browser
 				general_xpath = (x + sub_x).replace(/\/tbody/g, '');
@@ -657,8 +686,17 @@ $(document).ready(function() {
 				// node2 will take over node1
 				general_xpath = selected_xpaths[0].replace(/\/tbody/g, '');
 				
-				if (node1[node1.length-1].replace(/[^a-z]/g,'') != 'img' || node1[node1.length-1].replace(/[^a-z]/g,'') != 'a') {
-					general_xpath += '/text()';
+				if (node1[node1.length-1].replace(/[^a-z]/g,'') != 'img' && node1[node1.length-1].replace(/[^a-z]/g,'') != 'a') {
+					//general_xpath += '/descendant-or-self::text()[normalize-space()]';
+					general_xpath = '';
+					for (n=1; n < node1.length; n++) {
+						if (n == node1.length-1) {
+							general_xpath += "//" + node1[n];
+						} else {
+							general_xpath += "/" + node1[n];
+						}
+					}
+					general_xpath = general_xpath;
 				}
 				
 				// no candidates, return a single node
@@ -675,8 +713,17 @@ $(document).ready(function() {
 			
 			var node1 = selected_xpaths[0].split('/');
 			
-			if (node1[node1.length-1].replace(/[^a-z]/g,'') != 'img' || node1[node1.length-1].replace(/[^a-z]/g,'') != 'a') {
-				general_xpath += '/text()';
+			if (node1[node1.length-1].replace(/[^a-z]/g,'') != 'img' && node1[node1.length-1].replace(/[^a-z]/g,'') != 'a') {
+				//general_xpath += '//text()[normalize-space()]';
+				general_xpath = '';
+				for (n=1; n < node1.length; n++) {
+					if (n == node1.length-1) {
+						general_xpath += "//" + node1[n];
+					} else {
+						general_xpath += "/" + node1[n];
+					}
+				}
+				general_xpath = general_xpath;
 			}
 			
 			candidate_xpaths = selected_xpaths;
@@ -951,11 +998,11 @@ $(document).ready(function() {
 				$.each(data, function(i, obj) {
 					if ($(obj[field]).text().replace(/\s/g, "") != "") {
 						$('#chainLinks').append(
-							"<tr class='chainURL' data-link='" + $(obj[field]).attr('href') + "'><td>" + $(obj[field]).text() + "</td></tr>"	
+							"<tr class='chainURL' data-link='" + $(obj[field]).attr('href') + "'><td><a>" + $(obj[field]).text() + "</a></td></tr>"	
 						);
 					} else {
 						$('#chainLinks').append(
-							"<tr class='chainURL' data-link='" + $(obj[field]).attr('href') + "'><td>" + $(obj[field]).attr('href') + "</td></tr>"	
+							"<tr class='chainURL' data-link='" + $(obj[field]).attr('href') + "'><td><a>" + $(obj[field]).attr('href') + "</a></td></tr>"	
 						);
 					}
 				});

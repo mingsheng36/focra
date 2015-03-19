@@ -1,7 +1,15 @@
 .outline-element {
-	border: 2px solid orange;
+	background-color: #FFBB33 !important;
 }
 
 .outline-element-clicked {
-	border: 2px solid orange;
+	background-color: #FFBB33 !important;
+}
+
+.outline-image {
+	border: 2px solid #FFBB33;
+}
+
+.outline-image-clicked {
+	border: 2px solid #FFBB33;
 }

@@ -1,0 +1,29 @@
+List of Tasks to do
+===========================
+1. Add tooltips for buttons
+2. Stats not updated the last time
+3. Restart Resume button sometimes does not disable after pressed
+4. Pause and resume 'next_link' should be before parsing not after parsing the item, so there wont be repeated pages crawled
+5. modify algorithm to include [y] in xpath
+6. step 1 js/css button alignment, step 2 fields alignment
+8. Crawl Delay settings
+9. Show Last page crawled (to know the reason why it stopped)
+10. Show Next page to crawl?
+11. Adblock parsing
+12. Datetime formatting
+
+1. User account
+	1.1 Registration
+	1.2 Login
+
+2. Creating Crawler
+	2.1 Choosing seed URL
+	2.2 Customising Template
+	2.3 Pagination
+
+3. Crawler Controls
+	3.1 Pause/Resume Crawl
+	3.2 Stop/Restart Crawl
+	3.3 Delete Crawler
+
+4. Export Data to CSV
