@@ -590,7 +590,7 @@ $(document).ready(function() {
 				general_xpath = '';
 				for (n=1; n < node1.length; n++) {
 					if (n == node1.length-1) {
-						general_xpath += "//" + node1[n];
+						general_xpath += "/" + node1[n];
 					} else {
 						general_xpath += "/" + node1[n];
 					}
@@ -670,7 +670,7 @@ $(document).ready(function() {
 					sub_x = '';
 					for (s=1; s < sub_x_split.length; s++) {
 						if (s == sub_x_split.length-1) {
-							sub_x += "//" + sub_x_split[s];
+							sub_x += "/" + sub_x_split[s];
 						} else {
 							sub_x += "/" + sub_x_split[s];
 						}
@@ -691,7 +691,7 @@ $(document).ready(function() {
 					general_xpath = '';
 					for (n=1; n < node1.length; n++) {
 						if (n == node1.length-1) {
-							general_xpath += "//" + node1[n];
+							general_xpath += "/" + node1[n];
 						} else {
 							general_xpath += "/" + node1[n];
 						}
@@ -718,7 +718,7 @@ $(document).ready(function() {
 				general_xpath = '';
 				for (n=1; n < node1.length; n++) {
 					if (n == node1.length-1) {
-						general_xpath += "//" + node1[n];
+						general_xpath += "/" + node1[n];
 					} else {
 						general_xpath += "/" + node1[n];
 					}
@@ -965,11 +965,11 @@ $(document).ready(function() {
 					$('#deleteBn').removeAttr('disabled');
 					$('#exportBn').removeAttr('disabled');
 					
-					if ($('#switchBn').prop('disabled') == false) {
-						$('#switchBn').html('Restart Crawl');
-						$('#switchBn').removeClass('btn-danger').addClass('btn-success');
-						$('#stateBn').hide();
-					}
+					$('#switchBn').removeAttr('disabled');
+					$('#switchBn').html('Restart Crawl');
+					$('#switchBn').removeClass('btn-danger').addClass('btn-success');
+					$('#stateBn').hide();
+					
 					if (oldRes == res) {
 						clearInterval(poll_stats);
 					}

@@ -70,6 +70,7 @@ class MongoDBPipeline(object):
                 temp = row.copy()
                 temp.pop("request_url", None)
                 if temp:
+                    crawler_collection.insert(row)
                     bulk.append(row)
 
             if len(bulk) > 0:

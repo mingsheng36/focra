@@ -5,7 +5,7 @@ Created on 9 Mar 2015
 '''
 import json, collections, Queue, time
 from scrapy.spider import Spider
-from scrapy import signals, Request
+from scrapy import signals, Request, Selector
 from scrapy.contrib.loader import ItemLoader
 from scrapy.item import Item, Field
 from scrapy.exceptions import CloseSpider
@@ -181,16 +181,54 @@ class FocraSpider(Spider):
 				t.unwrap()
 			
 			response = response.replace(body=body.prettify(encoding='ascii'))
+			
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 			
 			if self.parentname is not None:
 				self.item.fields['request_url'] = Field()
 				dynamicItemLoader.add_value("request_url", response.url)
+
+			'''
+			new codes
+			'''
+			r = None
+			d = {}
+			for k, v in self.template.iteritems():
+				d[k] = v.split('/')
 				
-			for key, value in self.template.iteritems():
-				self.item.fields[key] = Field()
-				dynamicItemLoader.add_xpath(key, value)
-				
+			lca = self.longest_common_ancestor(d)
+			if lca:
+				#r = response.xpath('/html/body/div[2]/div[1]/div[3]/div[3]/div[2]/div[2]/table').extract()
+				r = response.xpath(lca).extract()
+			
+			if not r:
+				for key, value in self.template.iteritems():
+					#print value
+					self.item.fields[key] = Field()
+					dynamicItemLoader.add_xpath(key, value)
+					
+			else:
+				for i in range(len(r)):
+					
+					# data region
+					sel = Selector(text=r[i])
+					
+					for key, value in self.template.iteritems():
+						
+						self.item.fields[key] = Field()
+						
+						x = sel.xpath(self.get_xpath_tail(lca, value)).extract()
+						x = ''.join(x)
+						
+						if x.startswith('<a') or x.startswith('<img'):
+							dynamicItemLoader.add_value(key, x)
+						else:
+							sb = ""
+							for string in BeautifulSoup(''.join(x)).stripped_strings:
+								sb += " " + string
+							dynamicItemLoader.add_value(key, sb)
+
+			print "yielded dynamic loader"
 			yield dynamicItemLoader.load_item()
 			
 			# after scraping the page, check status to see whether we should stop
@@ -220,6 +258,7 @@ class FocraSpider(Spider):
 				if next_link:
 					self.next_page_link = next_link
 					print self.cname + ' - Next page is: ' + self.next_page_link
+					print "yielded request top"
 					yield Request(self.next_page_link, callback=self.parse, dont_filter=True)
 					
 				else:
@@ -227,7 +266,7 @@ class FocraSpider(Spider):
 					# check for more links from parent column
 					if not self.queue.empty():
 						k = self.queue.get()
-						print " top ---"+k
+						print "yielded request middle ---"+k
 						yield Request(k, callback=self.parse, dont_filter=True)
 						self.queue_counter += 1
 						if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
@@ -237,7 +276,7 @@ class FocraSpider(Spider):
 				# check for more links from parent column
 				if not self.queue.empty():
 					l = self.queue.get()
-					print " btm ---"+l
+					print "yielded request btm ---"+l
 					yield Request(l, callback=self.parse, dont_filter=True)
 					self.queue_counter += 1
 					if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
@@ -267,4 +306,40 @@ class FocraSpider(Spider):
 					#print soup.a['href']
 					self.queue.put(soup.a['href'])
 		except Exception as err:
-			print err			
+			print err	
+	
+	'''
+	find the longest common ancestor
+	'''
+	def longest_common_ancestor(self, d):
+		p = None
+		for l in d.values():
+			if len(l) < p or p is None:
+				p = len(l)
+	
+		diff_index = None
+		
+		for i in range(p):
+			check = None
+			for v in d.itervalues():
+				if check is None or check == v[i]:
+					check = v[i]
+				elif check != v[i]:
+					diff_index = i
+					break
+			if diff_index:
+				break
+					
+		if diff_index:
+			sb = ""
+			for i in range(diff_index):
+				if i != 0:	
+					sb += "/" + d.values()[0][i]
+			return sb
+		return None
+	
+	def get_xpath_tail(self, lca, value):
+		last = lca.split("/")
+		return '//' + last[len(last)-1] + value.replace(lca, "", 1)
+	
+	
