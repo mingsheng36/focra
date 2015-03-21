@@ -9,6 +9,7 @@ List of Tasks to do
 10. Show Next page to crawl?
 11. Adblock parsing
 12. Datetime formatting
+13. structured <a <img must only take the first!
 
 Pre-requisites
 ==========================

@@ -200,14 +200,10 @@ class FocraSpider(Spider):
 			lca = self.longest_common_ancestor(d)
 			
 			if lca:
-				#print lca
-				print len(response.body)
-				r = response.xpath(lca).extract()
-				print len(r)
+				r = response.xpath(lca).extract()				
 				if r:
 					if len(r) <= 1:
 						for key, value in self.template.iteritems():
-							#print value
 							self.item.fields[key] = Field()
 							dynamicItemLoader.add_xpath(key, value)
 					else:

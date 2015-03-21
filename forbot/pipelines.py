@@ -27,8 +27,6 @@ class MongoDBPipeline(object):
     need to join them together
     '''
     def process_item(self, item, spider):
-            
-        print "ran------------"
         try:
             crawler_collection = self.crawler_db[spider.cname]
             '''
