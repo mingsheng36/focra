@@ -1,3 +1,14 @@
+#1 Hardwarezone --- Of course! hardwarezone is the most active forum in SG...
+#2 vr-zone --- same field as hardwarezone... but not as popular.
+#3 sgforums --- A general Singapore based forum which includes all kind of topics... such as sggirls, chit chat, etc.
+#4 sgclub --- A general Singapore based forum which includes every topic but their shopping spree is the most active and popular, they also have clubs such as bowling, basketball. (i am in their bowling club)
+#5 flowerpod --- A female forum with almost all female discussing about beauty and fashion.
+#6 singaporebikes --- A forum about Bikes!
+#7 keeptouch --- A general Forum... not much about this cause it is very general and nothing special.
+#8 singaporemotherhood --- A forum with all mothers in there! If you are a mother you should check this forum out... it is a really nice forum with lots of mother information.
+#9 cozycot --- Same type of forum as flowerpod but not as good as it.
+#10 shoppinglifestyle --- One of the oldest shopping spree website that do sprees.
+
 List of Singapore forums - robots.txt
 ======================================
 0. http://www.onetonline.org/

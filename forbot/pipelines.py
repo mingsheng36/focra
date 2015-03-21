@@ -27,21 +27,13 @@ class MongoDBPipeline(object):
     need to join them together
     '''
     def process_item(self, item, spider):
+            
+        print "ran------------"
         try:
             crawler_collection = self.crawler_db[spider.cname]
             '''
             remove null values
             '''
-#             most_length = 0
-#             for i in item:
-#                 z = item.get(i)
-#                 for j in range(len(z)):
-#                     z[j] = z[j].strip()
-#                     z[j] = z[j].rstrip('\n')
-#                 item[i] = filter(None, z)
-#                 if len(item.get(i)) > most_length:
-#                     most_length = len(item.get(i))
-
             #print item
             most_length = 0
             for i in item:
@@ -57,7 +49,12 @@ class MongoDBPipeline(object):
                     else:
                         try:
                             data = item.get(i)[j]
-                            if data.startswith('<a') or data.startswith('<img'):
+                            if data.startswith('<a'):
+                                soup = BeautifulSoup(data).a
+                                del soup['class']
+                                del soup['style']
+                                row[i] = unicode(soup)
+                            elif data.startswith('<img'):
                                 row[i] = data
                             else:
                                 sb = ""
@@ -70,25 +67,11 @@ class MongoDBPipeline(object):
                 temp = row.copy()
                 temp.pop("request_url", None)
                 if temp:
-                    crawler_collection.insert(row)
+                    #crawler_collection.insert(row)
                     bulk.append(row)
 
             if len(bulk) > 0:
                 crawler_collection.insert(bulk, {'ordered': 'true'})
-            
-#             # put them in a row
-#             for j in range(most_length):
-#                 row = {}
-#                 for k in item.keys():
-#                     row[k] = None
-#                     if k == 'request_url':
-#                         row[k] = item.get(k)[0]
-#                     try:
-#                         if item.get(k)[j].strip():
-#                             row[k] = item.get(k)[j]
-#                     except Exception:
-#                         pass
-#                 crawler_collection.insert(row)
 
             print 'pipline - Inserted ' + str(len(bulk)) + ' rows'
         except Exception as err:

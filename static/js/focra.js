@@ -521,10 +521,13 @@ $(document).ready(function() {
 					$('#step_three_bn').trigger('click');
 				}
 			}
-			break;
+			break;	
 		default:
 			break
 		}
+		
+		//left key - 37
+		//right key - 39
 	});
 	
 	/*********** Helper functions **************/	

@@ -3,7 +3,7 @@ Created on 9 Mar 2015
 
 @author: Tan Ming Sheng
 '''
-import json, collections, Queue, time
+import json, collections, Queue, time, re
 from scrapy.spider import Spider
 from scrapy import signals, Request, Selector
 from scrapy.contrib.loader import ItemLoader
@@ -101,7 +101,7 @@ class FocraSpider(Spider):
 					if link.get(self.fieldname):
 						soup = BeautifulSoup(link.get(self.fieldname))
 						# to see the links added to queue
-						print soup.a['href']
+						#print soup.a['href']
 						self.queue.put(soup.a['href'])
 				
 				# if resume
@@ -167,7 +167,6 @@ class FocraSpider(Spider):
 			db = client['FocraDB']
 			db['crawler'].update({"_id": self.cname}, {"$set":{'crawled_pages': self.crawled_pages,
 																'time_executed': time.time()-self.start_time}})
-			
 			print self.cname + " - Parsing items"
 			body = BeautifulSoup(response.body)
 			
@@ -182,8 +181,10 @@ class FocraSpider(Spider):
 			
 			response = response.replace(body=body.prettify(encoding='ascii'))
 			
-			dynamicItemLoader = ItemLoader(item=self.item, response=response)
+			self.item.clear()
 			
+			dynamicItemLoader = ItemLoader(item=self.item, response=response)
+
 			if self.parentname is not None:
 				self.item.fields['request_url'] = Field()
 				dynamicItemLoader.add_value("request_url", response.url)
@@ -195,39 +196,49 @@ class FocraSpider(Spider):
 			d = {}
 			for k, v in self.template.iteritems():
 				d[k] = v.split('/')
-				
+
 			lca = self.longest_common_ancestor(d)
-			if lca:
-				#r = response.xpath('/html/body/div[2]/div[1]/div[3]/div[3]/div[2]/div[2]/table').extract()
-				r = response.xpath(lca).extract()
 			
-			if not r:
+			if lca:
+				#print lca
+				print len(response.body)
+				r = response.xpath(lca).extract()
+				print len(r)
+				if r:
+					if len(r) <= 1:
+						for key, value in self.template.iteritems():
+							#print value
+							self.item.fields[key] = Field()
+							dynamicItemLoader.add_xpath(key, value)
+					else:
+						for i in range(len(r)):	
+							# data region
+							#print r[i].encode('ascii', 'ignore')
+							sel = Selector(text=r[i])
+							
+							for key, value in self.template.iteritems():
+								
+								self.item.fields[key] = Field()
+								
+								#print self.get_xpath_tail(lca, value)
+								
+								x = sel.xpath(self.get_xpath_tail(lca, value)).extract()
+								
+								x = ''.join(x)
+								if x.startswith('<a') or x.startswith('<img'):
+									dynamicItemLoader.add_value(key, x)
+								else:
+									sb = ""
+									for string in BeautifulSoup(x).stripped_strings:
+										sb += "\n" + string
+									dynamicItemLoader.add_value(key, sb)
+								
+			else:
 				for key, value in self.template.iteritems():
 					#print value
 					self.item.fields[key] = Field()
 					dynamicItemLoader.add_xpath(key, value)
-					
-			else:
-				for i in range(len(r)):
-					
-					# data region
-					sel = Selector(text=r[i])
-					
-					for key, value in self.template.iteritems():
-						
-						self.item.fields[key] = Field()
-						
-						x = sel.xpath(self.get_xpath_tail(lca, value)).extract()
-						x = ''.join(x)
-						
-						if x.startswith('<a') or x.startswith('<img'):
-							dynamicItemLoader.add_value(key, x)
-						else:
-							sb = ""
-							for string in BeautifulSoup(''.join(x)).stripped_strings:
-								sb += " " + string
-							dynamicItemLoader.add_value(key, sb)
-
+			
 			print "yielded dynamic loader"
 			yield dynamicItemLoader.load_item()
 			
@@ -281,7 +292,7 @@ class FocraSpider(Spider):
 					self.queue_counter += 1
 					if self.queue.qsize() <= LINK_NUMBER and self.end_of_data == False:
 						self.check_queue()
-	
+						
 		except Exception as err:
 			print err
 
@@ -312,6 +323,8 @@ class FocraSpider(Spider):
 	find the longest common ancestor
 	'''
 	def longest_common_ancestor(self, d):
+		if len(d) < 1:
+			return None
 		p = None
 		for l in d.values():
 			if len(l) < p or p is None:
@@ -331,6 +344,10 @@ class FocraSpider(Spider):
 				break
 					
 		if diff_index:
+			# return None if root note is '/html' which is 1
+			# return None if root note is '/'  which is 0
+			if diff_index == 0 or diff_index == 1:
+				return None
 			sb = ""
 			for i in range(diff_index):
 				if i != 0:	
@@ -340,6 +357,6 @@ class FocraSpider(Spider):
 	
 	def get_xpath_tail(self, lca, value):
 		last = lca.split("/")
-		return '//' + last[len(last)-1] + value.replace(lca, "", 1)
+		return '//' + re.sub('[^A-Za-z]+', '', last[len(last)-1]) + value.replace(lca, "", 1)
 	
 	
