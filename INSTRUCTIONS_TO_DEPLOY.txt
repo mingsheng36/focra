@@ -1,0 +1,15 @@
+Pre-requisites
+==========================
+- [Python 2.7](https://www.python.org/downloads/)
+- [Pip](https://pip.pypa.io/en/latest/installing.html)
+- [MongoDB](http://docs.mongodb.org/manual/installation/) 
+
+Instructions to deploy
+===========================
+1. Command prompt  cd to this directory 
+2. Command prompt  pip install -r requirements.txt
+3. Create two database, 'FocraDB' and 'CrawlerDB' in your MongoDB using default hostport (127.0.0.127017)
+4. Start MongoDB, command prompt  mongod
+5. Make sure you add this current directory to your [PYTHONPATH](http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7)
+6. Command prompt  python manage.py runserver
+7. Go to [localhost8000](httplocalhost8000) and start crawling!

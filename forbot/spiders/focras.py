@@ -48,6 +48,7 @@ class FocraSpider(Spider):
 			self.base_url = kwargs.get('seeds').split(',')
 			self.crawled_pages = 0
 			self.status = None
+			self.lcam = None
 			
 			# non chain crawler dont have a queue, check for pager only
 			# chain crawler url does not start with http
@@ -181,11 +182,10 @@ class FocraSpider(Spider):
 			
 			response = response.replace(body=body.prettify(encoding='ascii'))
 			
-			self.item.clear()
-			
 			dynamicItemLoader = ItemLoader(item=self.item, response=response)
 
 			if self.parentname is not None:
+				self.item.clear()
 				self.item.fields['request_url'] = Field()
 				dynamicItemLoader.add_value("request_url", response.url)
 
@@ -197,7 +197,13 @@ class FocraSpider(Spider):
 			for k, v in self.template.iteritems():
 				d[k] = v.split('/')
 
-			lca = self.longest_common_ancestor(d)
+			lca = None
+			if self.lcam:
+				lca = self.lcam
+			else:
+				lca = self.longest_common_ancestor(d)
+				self.lcam = lca
+				print lca
 			
 			if lca:
 				r = response.xpath(lca).extract()				
@@ -316,11 +322,13 @@ class FocraSpider(Spider):
 			print err	
 	
 	'''
-	find the longest common ancestor
+	find the lowest common ancestor
 	'''
 	def longest_common_ancestor(self, d):
+		
 		if len(d) < 1:
 			return None
+		
 		p = None
 		for l in d.values():
 			if len(l) < p or p is None:
@@ -340,15 +348,17 @@ class FocraSpider(Spider):
 				break
 					
 		if diff_index:
+			# return None if root note is '/body' which is 2
 			# return None if root note is '/html' which is 1
 			# return None if root note is '/'  which is 0
-			if diff_index == 0 or diff_index == 1:
+			if diff_index < 3:
 				return None
 			sb = ""
 			for i in range(diff_index):
 				if i != 0:	
 					sb += "/" + d.values()[0][i]
 			return sb
+		
 		return None
 	
 	def get_xpath_tail(self, lca, value):
