@@ -27,6 +27,5 @@ built using Django 1.7, MongoDB 2.6.5 and Scrapy 0.24.4
 - [ ] Django Push Events (currently using poll)
 
 ###Things to Note
-- The demo is a prototype for this project.
 - Internet Explorer not supported.
 - There is a download delay of 2 seconds to avoid affecting other servers.
